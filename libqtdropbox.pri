@@ -5,4 +5,5 @@ HEADERS += qtdropbox_global.h\
            qdropbox.h \
            qtdropbox.h \
            qdropboxjson.h \
-           qdropboxaccount.h
+           qdropboxaccount.h \
+		   qdropboxfile.h
