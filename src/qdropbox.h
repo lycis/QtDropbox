@@ -94,6 +94,12 @@ public:
     void setSharedSecret(QString sharedSecret);
     QString sharedSecret();
 
+    QString token();
+    QString tokenSecret();
+
+    QString appKey();
+    QString appSharedSecret();
+
 
     // authentication
     int requestToken();
@@ -103,6 +109,8 @@ public:
 
     // account info
     int requestAccountInfo();
+
+    QString oAuthSign(QUrl base, QString method = "GET");
 
 signals:
     void errorOccured(Error errorcode);
@@ -129,8 +137,8 @@ private:
     Error   errorState;
     QString errorText;
 
-    QString appKey;
-    QString appSharedSecret;
+    QString _appKey;
+    QString _appSharedSecret;
 
     QUrl        apiurl;
     QString     nonce;
@@ -152,7 +160,6 @@ private:
 
     QString hmacsha1(QByteArray key, QByteArray baseString);
     QString generateNonce(qint32 length);
-    QString oAuthSign(QUrl base, QString method = "GET");
     void prepareApiUrl();
     int sendRequest(QUrl request, QString type = "GET", QByteArray postdata = 0, QString host = "");
     void responseTokenRequest(QString response);

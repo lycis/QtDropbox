@@ -16,14 +16,16 @@ DEFINES += QTDROPBOX_LIBRARY \
 SOURCES += \
     src/qdropbox.cpp \
     src/qdropboxjson.cpp \
-    src/qdropboxaccount.cpp
+    src/qdropboxaccount.cpp \
+    src/qdropboxfile.cpp
 
 HEADERS += \
-    src/qtdropbox.h\
     src/qtdropbox_global.h \
     src/qdropbox.h \
     src/qdropboxjson.h \
-    src/qdropboxaccount.h
+    src/qdropboxaccount.h \
+    src/qdropboxfile.h \
+    src/qtdropbox.h
 
 TARGET = QtDropbox
 

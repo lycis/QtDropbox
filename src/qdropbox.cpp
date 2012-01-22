@@ -36,7 +36,7 @@ QDropbox::QDropbox(QString key, QString sharedSecret, OAuthMethod method, QStrin
     errorState      = QDropbox::NoError;
     errorText       = "";
     setKey(key);
-    appSharedSecret = sharedSecret;
+    _appSharedSecret = sharedSecret;
     setAuthMethod(method);
     setApiVersion("1.0");
     setApiUrl(url);
@@ -319,7 +319,7 @@ QString QDropbox::generateNonce(qint32 length)
 QString QDropbox::oAuthSign(QUrl base, QString method)
 {
     if(oauthMethod == QDropbox::Plaintext)
-        return QString("%1&%2").arg(appSharedSecret).arg(oauthTokenSecret);
+        return QString("%1&%2").arg(_appSharedSecret).arg(oauthTokenSecret);
 
     QString param   = base.toString(QUrl::RemoveAuthority|QUrl::RemovePath|QUrl::RemoveScheme).mid(1);
     param = QUrl::toPercentEncoding(param);
@@ -329,7 +329,7 @@ QString QDropbox::oAuthSign(QUrl base, QString method)
     qDebug() << "param = " << param << endl << "requrl = " << requrl << endl;
 #endif
     QString baseurl = method+"&"+requrl+"&"+param;
-    QString key     = QString("%1&%2").arg(appSharedSecret).arg(oauthTokenSecret);
+    QString key     = QString("%1&%2").arg(_appSharedSecret).arg(oauthTokenSecret);
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "baseurl = " << baseurl << " endbase";
 #endif
@@ -533,24 +533,44 @@ void QDropbox::parseAccountInfo(QString response)
 
 void QDropbox::setKey(QString key)
 {
-    appKey = key;
+    _appKey = key;
     return;
 }
 
 QString QDropbox::key()
 {
-    return appKey;
+    return _appKey;
 }
 
 void QDropbox::setSharedSecret(QString sharedSecret)
 {
-    appSharedSecret = sharedSecret;
+    _appSharedSecret = sharedSecret;
     return;
 }
 
 QString QDropbox::sharedSecret()
 {
-    return appSharedSecret;
+    return _appSharedSecret;
+}
+
+QString QDropbox::token()
+{
+    return oauthToken;
+}
+
+QString QDropbox::tokenSecret()
+{
+    return oauthTokenSecret;
+}
+
+QString QDropbox::appKey()
+{
+    return _appKey;
+}
+
+QString QDropbox::appSharedSecret()
+{
+    return _appSharedSecret;
 }
 
 int QDropbox::requestToken()
@@ -562,7 +582,7 @@ int QDropbox::requestToken()
 
     QUrl url;
     url.setUrl(apiurl.toString());
-    url.addQueryItem("oauth_consumer_key",appKey);
+    url.addQueryItem("oauth_consumer_key",_appKey);
     url.addQueryItem("oauth_nonce", nonce);
     url.addQueryItem("oauth_signature_method", sigmeth);
     url.addQueryItem("oauth_timestamp", QString::number(timestamp));
@@ -612,7 +632,7 @@ int QDropbox::requestAccessToken()
 {
     QUrl url;
     url.setUrl(apiurl.toString());
-    url.addQueryItem("oauth_consumer_key",appKey);
+    url.addQueryItem("oauth_consumer_key",_appKey);
     url.addQueryItem("oauth_nonce", nonce);
     url.addQueryItem("oauth_signature_method", signatureMethodString());
     url.addQueryItem("oauth_timestamp", QString::number((int) QDateTime::currentMSecsSinceEpoch()/1000));
@@ -643,7 +663,7 @@ int QDropbox::requestAccountInfo()
 {
     QUrl url;
     url.setUrl(apiurl.toString());
-    url.addQueryItem("oauth_consumer_key",appKey);
+    url.addQueryItem("oauth_consumer_key",_appKey);
     url.addQueryItem("oauth_nonce", nonce);
     url.addQueryItem("oauth_signature_method", signatureMethodString());
     url.addQueryItem("oauth_timestamp", QString::number((int) QDateTime::currentMSecsSinceEpoch()/1000));
