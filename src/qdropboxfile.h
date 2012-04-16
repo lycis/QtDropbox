@@ -8,6 +8,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QUrl>
+#include <QEvent>
 
 #include "qtdropbox_global.h"
 #include "qtdropbox.h"
@@ -34,6 +35,7 @@ public:
     QString filename();
 
     bool flush();
+    bool event(QEvent* event);
 
 protected:
     qint64 readData(char *data, qint64 maxlen);
@@ -53,11 +55,28 @@ private:
 
     QDropbox *_api;
 
+
+    enum WaitState{
+        notWaiting,
+        waitForRead,
+        waitForWrite
+    };
+
+    WaitState _waitMode;
+
+    QEventLoop* _evLoop;
+
+    int     lastErrorCode;
+    QString lastErrorMessage;
+
     void obtainToken();
     void connectSignals();
 
     bool isMode(QIODevice::OpenMode mode);
     bool getFileContent(QString filename);
+    void rplyFileContent(QNetworkReply* rply);
+    void startEventLoop();
+    void stopEventLoop();
 };
 
 #endif // QDROPBOXFILE_H

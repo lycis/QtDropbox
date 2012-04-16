@@ -48,6 +48,7 @@ void QDropboxJson::parseString(QString strJson)
     bool insertValue = false;
     bool isJson      = false;
     bool isArray     = false;
+    bool openQuotes  = false;
 
     QDropboxJson *jsonValue;
 
@@ -57,7 +58,10 @@ void QDropboxJson::parseString(QString strJson)
         {
         case '"':
             if(!isKey)
+            {
                 buffer += "\"";
+                openQuotes = !openQuotes;
+            }
             continue;
             break;
         case ' ':
@@ -83,6 +87,8 @@ void QDropboxJson::parseString(QString strJson)
             isKey  = false;
             break;
         case ',':
+            if(openQuotes)
+                continue;
 #ifdef QTDROPBOX_DEBUG
             qDebug() << "value = " << buffer << endl;
 #endif
@@ -170,7 +176,7 @@ void QDropboxJson::parseString(QString strJson)
         if(insertValue)
         {
 #ifdef QTDROPBOX_DEBUG
-            qDebug() << "insert value " << key << endl;
+            qDebug() << "insert value " << key << " with content = " << value.trimmed() << " and type = " << interpretType(value.trimmed()) << endl;
 #endif
             QString *valuePointer = new QString(value.trimmed());
             qdropboxjson_entry e;
@@ -346,7 +352,7 @@ bool QDropboxJson::getBool(QString key, bool force)
 void QDropboxJson::emptyList()
 {
     QList<QString> keys = valueMap.keys();
-    for(qint32 i; i<keys.size(); ++i)
+    for(qint32 i=0; i<keys.size(); ++i)
     {
         qdropboxjson_entry e = valueMap.value(keys.at(i));
         if(e.type == QDROPBOXJSON_TYPE_JSON)

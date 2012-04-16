@@ -29,14 +29,6 @@ const qdropbox_request_type QDROPBOX_REQ_REDIREC = 0x04;
 const qdropbox_request_type QDROPBOX_REQ_ACCTOKN = 0x05;
 const qdropbox_request_type QDROPBOX_REQ_ACCINFO = 0x06;
 
-const qint32 QDROPBOX_ERROR_BAD_INPUT           = 400;
-const qint32 QDROPBOX_ERROR_EXPIRED_TOKEN       = 401;
-const qint32 QDROPBOX_ERROR_BAD_OAUTH_REQUEST   = 403;
-const qint32 QDROPBOX_ERROR_FILE_NOT_FOUND      = 404;
-const qint32 QDROPBOX_ERROR_WRONG_METHOD        = 405;
-const qint32 QDROPBOX_ERROR_REQUEST_CAP         = 503;
-const qint32 QDROPBOX_ERROR_USER_OVER_QUOTA     = 507;
-
 struct qdropbox_request{
     qdropbox_request_type type;
     QString method;
@@ -112,6 +104,11 @@ public:
 
     QString oAuthSign(QUrl base, QString method = "GET");
 
+    QString signatureMethodString();
+
+    // static
+    static QString generateNonce(qint32 length);
+
 signals:
     void errorOccured(Error errorcode);
     void tokenExpired();
@@ -144,7 +141,7 @@ private:
     QString     nonce;
     long        timestamp;
     OAuthMethod oauthMethod;
-    QString     version;
+    QString     _version;
 
     QString oauthToken;
     QString oauthTokenSecret;
@@ -159,13 +156,11 @@ private:
 
 
     QString hmacsha1(QByteArray key, QByteArray baseString);
-    QString generateNonce(qint32 length);
     void prepareApiUrl();
     int sendRequest(QUrl request, QString type = "GET", QByteArray postdata = 0, QString host = "");
     void responseTokenRequest(QString response);
     int responseDropboxLogin(QString response, int reqnr);
     void responseAccessToken(QString response);
-    QString signatureMethodString();
     void parseToken(QString response);
     void parseAccountInfo(QString response);
 };
