@@ -9,10 +9,10 @@ class QTDROPBOXSHARED_EXPORT QDropboxAccount : public QObject
 {
     Q_OBJECT
 public:
-    explicit QDropboxAccount(QObject *parent = 0);
-    explicit QDropboxAccount(QDropboxJson *json, QObject *parent = 0);
-    explicit QDropboxAccount(QString jsonString, QObject *parent = 0);
-    explicit QDropboxAccount(QDropboxAccount &other);
+    QDropboxAccount(QObject *parent = 0);
+    QDropboxAccount(QDropboxJson *json, QObject *parent = 0);
+    QDropboxAccount(QString jsonString, QObject *parent = 0);
+    QDropboxAccount(QDropboxAccount &other);
 
     void setJson(QDropboxJson *json);
     bool isValid();

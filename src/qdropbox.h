@@ -12,11 +12,13 @@
 #include <QDateTime>
 #include <QUrl>
 #include <QDomDocument>
+#include <QEventLoop>
 
 #ifdef QTDROPBOX_DEBUG
 #include <QDebug>
 #endif
 
+#include "qtdropbox_global.h"
 #include "qdropboxjson.h"
 #include "qdropboxaccount.h"
 
@@ -100,7 +102,7 @@ public:
     int requestAccessToken();
 
     // account info
-    int requestAccountInfo();
+    QDropboxAccount accountInfo();
 
     QString oAuthSign(QUrl base, QString method = "GET");
 
@@ -154,6 +156,13 @@ private:
     QString mail;
     QString password;
 
+    // for blocked functions
+    QEventLoop *_evLoop;
+    void startEventLoop();
+    void stopEventLoop();
+
+    // temporary memory
+    QDropboxJson _tempJson;
 
     QString hmacsha1(QByteArray key, QByteArray baseString);
     void prepareApiUrl();

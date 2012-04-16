@@ -38,8 +38,9 @@ class QTDROPBOXSHARED_EXPORT QDropboxJson : public QObject
 {
     Q_OBJECT
 public:
-    explicit QDropboxJson(QObject *parent = 0);
-    explicit QDropboxJson(QString strJson, QObject *parent = 0);
+    QDropboxJson(QObject *parent = 0);
+    QDropboxJson(QString strJson, QObject *parent = 0);
+    QDropboxJson(QDropboxJson &other);
     ~QDropboxJson();
 
     enum DataType{
@@ -66,6 +67,8 @@ public:
     QDropboxJson *getJson(QString key);
     double        getDouble(QString key, bool force = false);
     bool          getBool(QString key, bool force = false);
+
+    QString strContent();
     
 private:
     QMap<QString, qdropboxjson_entry> valueMap;
@@ -73,6 +76,7 @@ private:
 
     void emptyList();
     qdropboxjson_entry_type interpretType(QString value);
+    QString _strContent;
 };
 
 #endif // QDROPBOXJSON_H

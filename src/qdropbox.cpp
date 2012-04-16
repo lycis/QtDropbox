@@ -23,6 +23,8 @@ QDropbox::QDropbox(QObject *parent) :
 
     // needed for nonce generation
     qsrand(QDateTime::currentMSecsSinceEpoch());
+
+    _evLoop = NULL;
 }
 
 QDropbox::QDropbox(QString key, QString sharedSecret, OAuthMethod method, QString url, QObject *parent) :
@@ -50,6 +52,8 @@ QDropbox::QDropbox(QString key, QString sharedSecret, OAuthMethod method, QStrin
 
     // needed for nonce generation
     qsrand(QDateTime::currentMSecsSinceEpoch());
+
+    _evLoop = NULL;
 }
 
 void QDropbox::test()
@@ -516,6 +520,7 @@ void QDropbox::parseAccountInfo(QString response)
 
     QDropboxJson json;
     json.parseString(response);
+    _tempJson.parseString(response);
     if(!json.isValid())
     {
         errorState = QDropbox::APIError;
@@ -524,10 +529,12 @@ void QDropbox::parseAccountInfo(QString response)
         qDebug() << "error: " << errorText << endl;
 #endif
         emit errorOccured(errorState);
+        stopEventLoop();
         return;
     }
 
     emit accountInfo(response);
+    stopEventLoop();
     return;
 }
 
@@ -664,7 +671,7 @@ int QDropbox::requestAccessToken()
     return reqnr;
 }
 
-int QDropbox::requestAccountInfo()
+QDropboxAccount QDropbox::accountInfo()
 {
     QUrl url;
     url.setUrl(apiurl.toString());
@@ -681,5 +688,29 @@ int QDropbox::requestAccountInfo()
 
     int reqnr = sendRequest(url);
     requestMap[reqnr].type = QDROPBOX_REQ_ACCINFO;
-    return reqnr;
+    startEventLoop();
+    QDropboxAccount a(&_tempJson, this);
+    return a;
+}
+
+void QDropbox::startEventLoop()
+{
+#ifdef QTDROPBOX_DEBUG
+    qDebug() << "QDropbox::startEventLoop()" << endl;
+#endif
+    if(_evLoop == NULL)
+        _evLoop = new QEventLoop(this);
+    _evLoop->exec();
+    return;
+}
+
+void QDropbox::stopEventLoop()
+{
+#ifdef QTDROPBOX_DEBUG
+    qDebug() << "QDropbox::stopEventLoop()" << endl;
+#endif
+    if(_evLoop == NULL)
+        return;
+    _evLoop->exit();
+    return;
 }

@@ -13,6 +13,12 @@ QDropboxJson::QDropboxJson(QString strJson, QObject *parent) :
     parseString(strJson);
 }
 
+QDropboxJson::QDropboxJson(QDropboxJson &other)
+{
+    valid = false;
+    parseString(other.strContent());
+}
+
 QDropboxJson::~QDropboxJson()
 {
     emptyList();
@@ -23,6 +29,8 @@ void QDropboxJson::parseString(QString strJson)
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "parse string = " << strJson << endl;
 #endif
+
+    _strContent = strJson;
 
     // clear all existing data
     emptyList();
@@ -347,6 +355,11 @@ bool QDropboxJson::getBool(QString key, bool force)
         return false;
 
     return true;
+}
+
+QString QDropboxJson::strContent()
+{
+    return _strContent;
 }
 
 void QDropboxJson::emptyList()

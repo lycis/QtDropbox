@@ -11,7 +11,8 @@
 #include <QEvent>
 
 #include "qtdropbox_global.h"
-#include "qtdropbox.h"
+#include "qdropboxjson.h"
+#include "qdropbox.h"
 
 const QString QDROPBOXFILE_CONTENT_URL = "https://api-content.dropbox.com";
 
