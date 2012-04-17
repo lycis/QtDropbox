@@ -104,6 +104,7 @@ public:
     // account info
     QDropboxAccount accountInfo();
 
+    // functions for signing
     QString oAuthSign(QUrl base, QString method = "GET");
 
     QString signatureMethodString();

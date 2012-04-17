@@ -236,6 +236,7 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
         case QDROPBOX_REQ_RQTOKEN:
             // requested a tiken
             responseTokenRequest(response);
+            emit requestTokenFinished(oauthToken, oauthTokenSecret);
             break;
         case QDROPBOX_REQ_AULOGIN:
             delayed_nr = responseDropboxLogin(response, nr);
@@ -420,7 +421,6 @@ int QDropbox::sendRequest(QUrl request, QString type, QByteArray postdata, QStri
 void QDropbox::responseTokenRequest(QString response)
 {
     parseToken(response);
-    emit requestTokenFinished(oauthToken, oauthTokenSecret);
     return;
 }
 
