@@ -560,9 +560,21 @@ QString QDropbox::sharedSecret()
     return _appSharedSecret;
 }
 
+void QDropbox::setToken(QString t)
+{
+    oauthToken = t;
+    return;
+}
+
 QString QDropbox::token()
 {
     return oauthToken;
+}
+
+void QDropbox::setSecret(QString s)
+{
+    oauthTokenSecret = s;
+    return;
 }
 
 QString QDropbox::tokenSecret()
