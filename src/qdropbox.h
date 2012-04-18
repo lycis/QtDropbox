@@ -88,7 +88,9 @@ public:
     void setSharedSecret(QString sharedSecret);
     QString sharedSecret();
 
+    void setToken(QString t);
     QString token();
+    void setSecret(QString s);
     QString tokenSecret();
 
     QString appKey();
