@@ -702,7 +702,14 @@ QDropboxAccount &QDropbox::accountInfo()
     requestMap[reqnr].type = QDROPBOX_REQ_ACCINFO;
     startEventLoop();
     QDropboxAccount a(&_tempJson, this);
-    QDropboxAccount& r = a;
+    _account = a;
+    QDropboxAccount& r = _account;
+
+#ifdef QTDROPBOX_DEBUG
+    qDebug() << "account info loop finished" << endl;
+    qDebug() << r.quota() << endl;
+#endif
+
     return r;
 }
 
@@ -724,6 +731,9 @@ void QDropbox::stopEventLoop()
 #endif
     if(_evLoop == NULL)
         return;
+#ifdef QTDROPBOX_DEBUG
+    qDebug() << "loop ended" << endl;
+#endif
     _evLoop->exit();
     return;
 }

@@ -167,6 +167,8 @@ private:
     // temporary memory
     QDropboxJson _tempJson;
 
+    QDropboxAccount _account;
+
     QString hmacsha1(QByteArray key, QByteArray baseString);
     void prepareApiUrl();
     int sendRequest(QUrl request, QString type = "GET", QByteArray postdata = 0, QString host = "");

@@ -22,18 +22,9 @@ QDropboxAccount::QDropboxAccount(QString jsonString, QObject *parent) :
 }
 
 QDropboxAccount::QDropboxAccount(QDropboxAccount& other) :
-    QObject(other.parent())
+    QObject()
 {
-    qDebug() << "creating account from account" << endl;
-    qDebug() << "taken reflink: " << other.referralLink().toString() << endl;
-    _referralLink = other.referralLink();
-    _displayName  = other.displayName();
-    _uid          = other.uid();
-    _country      = other.country();
-    _email        = other.email();
-    _quotaShared  = other.quotaShared();
-    _quota    = other.quota();
-    _quotaNormal  = other.quotaNormal();
+    copyFrom(other);
 }
 
 void QDropboxAccount::setJson(QDropboxJson *json)
@@ -140,4 +131,25 @@ quint64 QDropboxAccount::quota()
 quint64 QDropboxAccount::quotaNormal()
 {
     return _quotaNormal;
+}
+
+QDropboxAccount &QDropboxAccount::operator =(QDropboxAccount &a)
+{
+    copyFrom(a);
+    return *this;
+}
+
+void QDropboxAccount::copyFrom(QDropboxAccount &other)
+{
+    this->setParent(other.parent());
+    qDebug() << "creating account from account" << endl;
+    qDebug() << "taken reflink: " << other.referralLink().toString() << endl;
+    _referralLink = other.referralLink();
+    _displayName  = other.displayName();
+    _uid          = other.uid();
+    _country      = other.country();
+    _email        = other.email();
+    _quotaShared  = other.quotaShared();
+    _quota    = other.quota();
+    _quotaNormal  = other.quotaNormal();
 }

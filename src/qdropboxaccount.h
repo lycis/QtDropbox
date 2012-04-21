@@ -26,6 +26,9 @@ public:
     quint64  quota();
     quint64  quotaNormal();
 
+    QDropboxAccount& operator =(QDropboxAccount&);
+    void copyFrom(QDropboxAccount& a);
+
 private:
     bool valid;
     

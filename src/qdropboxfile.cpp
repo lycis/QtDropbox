@@ -165,6 +165,9 @@ qint64 QDropboxFile::writeData(const char *data, qint64 len)
     _buffer->setRawData(pNext, new_len);
     delete current_data;
     delete new_data;
+#ifdef QTDROPBOX_DEBUG
+    qDebug() << "new content: " << _buffer->toHex() << endl;
+#endif
     return 0;
 }
 
