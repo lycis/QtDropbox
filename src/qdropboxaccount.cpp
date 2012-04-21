@@ -21,7 +21,8 @@ QDropboxAccount::QDropboxAccount(QString jsonString, QObject *parent) :
     setJson(&json);
 }
 
-QDropboxAccount::QDropboxAccount(QDropboxAccount& other)
+QDropboxAccount::QDropboxAccount(QDropboxAccount& other) :
+    QObject(other.parent())
 {
     qDebug() << "creating account from account" << endl;
     qDebug() << "taken reflink: " << other.referralLink().toString() << endl;

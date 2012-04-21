@@ -683,7 +683,7 @@ int QDropbox::requestAccessToken()
     return reqnr;
 }
 
-QDropboxAccount QDropbox::accountInfo()
+QDropboxAccount &QDropbox::accountInfo()
 {
     QUrl url;
     url.setUrl(apiurl.toString());
@@ -702,7 +702,8 @@ QDropboxAccount QDropbox::accountInfo()
     requestMap[reqnr].type = QDROPBOX_REQ_ACCINFO;
     startEventLoop();
     QDropboxAccount a(&_tempJson, this);
-    return a;
+    QDropboxAccount& r = a;
+    return r;
 }
 
 void QDropbox::startEventLoop()

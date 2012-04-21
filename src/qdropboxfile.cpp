@@ -156,6 +156,15 @@ qint64 QDropboxFile::readData(char *data, qint64 maxlen)
 
 qint64 QDropboxFile::writeData(const char *data, qint64 len)
 {
+    qint64 new_len = _buffer->size()+len;
+    char *current_data = _buffer->data();
+    char *new_data     = new char[new_len];
+    memcpy(new_data, current_data, _buffer->size());
+    char *pNext = current_data+_buffer->size();
+    memcpy(new_data, data, len);
+    _buffer->setRawData(pNext, new_len);
+    delete current_data;
+    delete new_data;
     return 0;
 }
 

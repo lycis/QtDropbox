@@ -13,7 +13,8 @@ QDropboxJson::QDropboxJson(QString strJson, QObject *parent) :
     parseString(strJson);
 }
 
-QDropboxJson::QDropboxJson(QDropboxJson &other)
+QDropboxJson::QDropboxJson(QDropboxJson &other) :
+    QObject(other.parent())
 {
     valid = false;
     parseString(other.strContent());

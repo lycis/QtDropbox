@@ -104,7 +104,7 @@ public:
     int requestAccessToken();
 
     // account info
-    QDropboxAccount accountInfo();
+    QDropboxAccount& accountInfo();
 
     // functions for signing
     QString oAuthSign(QUrl base, QString method = "GET");

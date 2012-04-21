@@ -12,7 +12,7 @@ public:
     QDropboxAccount(QObject *parent = 0);
     QDropboxAccount(QDropboxJson *json, QObject *parent = 0);
     QDropboxAccount(QString jsonString, QObject *parent = 0);
-    QDropboxAccount(QDropboxAccount &other);
+    QDropboxAccount(QDropboxAccount& other);
 
     void setJson(QDropboxJson *json);
     bool isValid();
