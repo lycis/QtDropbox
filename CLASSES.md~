@@ -20,7 +20,7 @@ or an already authorized token). After this method is called the Dropbox connect
 is usually ready for use. Use this function if you already have an authorized token and
 secret from.
 
-#### QDropboxAccount accountInfo()
+#### QDropboyAccount accountInfo()
 Requests and returns account information from Dropbox.
 
 
@@ -59,7 +59,7 @@ for your own purposes of course.
 #### void parseString(QString strJson)
 Interprets a string and fills the JSON with data from that string.
 
-#### Accessing functions
+#### Acessing functions
 There are a lot of functions to access a value from the JSON. One for every possible
 datatype: int, unsigned int, string, double, bool and finally there may be a JSON
 embedded in another JSON.
