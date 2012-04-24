@@ -41,6 +41,9 @@ public:
     void setFlushThreshold(qint64 num);
     qint64 flushThreshold();
 
+    void setOverwrite(bool overwrite);
+    bool overwrite();
+
 protected:
     qint64 readData(char *data, qint64 maxlen);
     qint64 writeData(const char *data, qint64 len);
@@ -74,6 +77,8 @@ private:
     QString lastErrorMessage;
 
     qint64 _bufferThreshold;
+
+    bool _overwrite;
 
     void obtainToken();
     void connectSignals();

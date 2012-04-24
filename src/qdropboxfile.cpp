@@ -130,6 +130,17 @@ qint64 QDropboxFile::flushThreshold()
     return _bufferThreshold;
 }
 
+void QDropboxFile::setOverwrite(bool overwrite)
+{
+    _overwrite = overwrite;
+    return;
+}
+
+bool QDropboxFile::overwrite()
+{
+    return _overwrite;
+}
+
 qint64 QDropboxFile::readData(char *data, qint64 maxlen)
 {
 #ifdef QTDROPBOX_DEBUG
@@ -353,7 +364,7 @@ void QDropboxFile::rplyFileWrite(QNetworkReply *rply)
         break;
     }
 
-
+    // TODO interpret returned data as QDropboxFileMetadata
     emit bytesWritten(_buffer->size());
     return;
 }
@@ -397,7 +408,7 @@ bool QDropboxFile::putFile()
     request.addQueryItem("oauth_timestamp", QString::number((int) QDateTime::currentMSecsSinceEpoch()/1000));
     request.addQueryItem("oauth_token", _api->token());
     request.addQueryItem("oauth_version", _api->apiVersion());
-    request.addQueryItem("overwrite", "true");
+    request.addQueryItem("overwrite", (_overwrite?"true":"false"));
 
     QString signature = _api->oAuthSign(request);
     request.addQueryItem("oauth_signature", signature);
@@ -431,5 +442,6 @@ void QDropboxFile::_init(QDropbox *api, QString filename, qint64 bufferTh)
     _evLoop          = NULL;
     _waitMode        = notWaiting;
     _bufferThreshold = bufferTh;
+    _overwrite       = false;
     return;
 }
