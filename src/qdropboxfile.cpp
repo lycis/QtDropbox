@@ -4,9 +4,7 @@ QDropboxFile::QDropboxFile(QObject *parent) :
     QIODevice(parent),
     _conManager(this)
 {
-    _buffer = NULL;
-    _evLoop = NULL;
-    _waitMode = notWaiting;
+    _init(NULL, "", 1024);
     connectSignals();
 }
 
@@ -14,11 +12,7 @@ QDropboxFile::QDropboxFile(QDropbox *api, QObject *parent) :
     QIODevice(parent),
     _conManager(this)
 {
-    _api    = api;
-    _evLoop = NULL;
-    _buffer = NULL;
-    _waitMode = notWaiting;
-
+    _init(api, "", 1024);
     obtainToken();
     connectSignals();
 }
@@ -27,12 +21,7 @@ QDropboxFile::QDropboxFile(QString filename, QDropbox *api, QObject *parent) :
     QIODevice(parent),
     _conManager(this)
 {
-   _api      = api;
-   _buffer   = NULL;
-   _filename = filename;
-   _evLoop = NULL;
-   _waitMode = notWaiting;
-
+    _init(api, filename, 1024);
    obtainToken();
    connectSignals();
 }
@@ -159,7 +148,7 @@ qint64 QDropboxFile::writeData(const char *data, qint64 len)
     qint64 new_len = _buffer->size()+len;
     char *current_data = _buffer->data();
 #ifdef QTDROPBOX_DEBUG
-    qDebug() << "new content: " << _buffer->toHex() << endl;
+    qDebug() << "old content: " << _buffer->toHex() << endl;
 #endif
     char *new_data     = new char[new_len];
     memcpy(new_data, current_data, _buffer->size());
@@ -314,5 +303,16 @@ void QDropboxFile::stopEventLoop()
     if(_evLoop == NULL)
         return;
     _evLoop->exit();
+    return;
+}
+
+void QDropboxFile::_init(QDropbox *api, QString filename, qint64 bufferTh)
+{
+    _api             = api;
+    _buffer          = NULL;
+    _filename        = filename;
+    _evLoop          = NULL;
+    _waitMode        = notWaiting;
+    _bufferThreshold = bufferTh;
     return;
 }

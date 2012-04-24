@@ -70,6 +70,8 @@ private:
     int     lastErrorCode;
     QString lastErrorMessage;
 
+    qint64 _bufferThreshold;
+
     void obtainToken();
     void connectSignals();
 
@@ -78,6 +80,8 @@ private:
     void rplyFileContent(QNetworkReply* rply);
     void startEventLoop();
     void stopEventLoop();
+
+    void _init(QDropbox *api, QString filename, qint64 bufferTh);
 };
 
 #endif // QDROPBOXFILE_H
