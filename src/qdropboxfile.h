@@ -81,8 +81,10 @@ private:
     bool isMode(QIODevice::OpenMode mode);
     bool getFileContent(QString filename);
     void rplyFileContent(QNetworkReply* rply);
+    void rplyFileWrite(QNetworkReply* rply);
     void startEventLoop();
     void stopEventLoop();
+    bool putFile();
 
     void _init(QDropbox *api, QString filename, qint64 bufferTh);
 };
