@@ -113,6 +113,14 @@ bool QDropboxFile::event(QEvent *event)
     return QIODevice::event(event);
 }
 
+void QDropboxFile::setFlushThreshold(qint64 num)
+{
+    if(num<0)
+        num = 0;
+    _bufferThreshold = num;
+    return;
+}
+
 qint64 QDropboxFile::readData(char *data, qint64 maxlen)
 {
 #ifdef QTDROPBOX_DEBUG
@@ -158,6 +166,11 @@ qint64 QDropboxFile::writeData(const char *data, qint64 len)
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "new content: " << _buffer->toHex() << endl;
 #endif
+
+    // flush if the threshold is reached
+    if(new_len%_bufferThreshold)
+        flush();
+
     return 0;
 }
 

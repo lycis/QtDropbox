@@ -38,6 +38,9 @@ public:
     bool flush();
     bool event(QEvent* event);
 
+    void setFlushThreshold(qint64 num);
+    qint64 flushThreshold();
+
 protected:
     qint64 readData(char *data, qint64 maxlen);
     qint64 writeData(const char *data, qint64 len);
