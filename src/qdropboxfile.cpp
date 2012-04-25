@@ -173,25 +173,18 @@ qint64 QDropboxFile::readData(char *data, qint64 maxlen)
 
 qint64 QDropboxFile::writeData(const char *data, qint64 len)
 {
-    qint64 new_len = _buffer->size()+len;
-    char *current_data = _buffer->data();
-
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "old content: " << _buffer->toHex() << endl;
 #endif
 
-    char *new_data     = new char[new_len];
-    memcpy(new_data, current_data, _buffer->size());
-    char *pNext = new_data+_buffer->size();
-    memcpy(pNext, data, len);
-    _buffer->setRawData(new_data, new_len);
+    _buffer->append(data, len);
 
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "new content: " << _buffer->toHex() << endl;
 #endif
 
     // flush if the threshold is reached
-    if(new_len%_bufferThreshold)
+    if(_buffer->size()%_bufferThreshold)
         flush();
 
     return 0;
