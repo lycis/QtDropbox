@@ -17,7 +17,8 @@ SOURCES += \
     src/qdropbox.cpp \
     src/qdropboxjson.cpp \
     src/qdropboxaccount.cpp \
-    src/qdropboxfile.cpp
+    src/qdropboxfile.cpp \
+    src/qdropboxfileinfo.cpp
 
 HEADERS += \
     src/qtdropbox_global.h \
@@ -25,7 +26,8 @@ HEADERS += \
     src/qdropboxjson.h \
     src/qdropboxaccount.h \
     src/qdropboxfile.h \
-    src/qtdropbox.h
+    src/qtdropbox.h \
+    src/qdropboxfileinfo.h
 
 TARGET = QtDropbox
 
