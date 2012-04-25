@@ -47,7 +47,13 @@ a local buffer. This function is usually not called directly but from any of the
 Q<Something>Stream classes.
 
 #### qint64 writeData(const char *data, qint64 len)
-Writes to a file in the Dropbox (not implemented yet).
+Writes to a file in the Dropbox. Automatically flushes if the internal buffer reaches
+a configured threshold (1024 bytes of new data by default).
+
+
+## QDropboxFileInfo
+### Description
+This class contains metadata of files or directories in the Dropbox. (not implemented)
 
 ## QDropboxJson
 ### Description
