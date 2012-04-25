@@ -5,5 +5,6 @@
 #include "qdropbox.h"
 #include "qdropboxjson.h"
 #include "qdropboxfile.h"
+#include "qdropboxfileinfo.h"
 
 #endif // QTDROPBOX_H
