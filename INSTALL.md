@@ -14,9 +14,11 @@ QtDropbox is built by using these commands:
     make
 
 If you want to generate a documentation use
+
     make documentation
 
 After all binaries are compiled use
+
     make install
 
 This will create the directories lib/ and qtdropbox/.
@@ -43,3 +45,4 @@ as it is required to run QtDropbox.
 ### Using with other C++ projects
 QtDropbox is not intended to be used with non-Qt projects. If you
 make it run - tell me :)
+

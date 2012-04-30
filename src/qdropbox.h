@@ -31,11 +31,17 @@ const qdropbox_request_type QDROPBOX_REQ_REDIREC = 0x04;
 const qdropbox_request_type QDROPBOX_REQ_ACCTOKN = 0x05;
 const qdropbox_request_type QDROPBOX_REQ_ACCINFO = 0x06;
 
+//! Internally used struct to handle network requests sent from QDropbox
+/*!
+  This structure is used internally by QDropbox. It is used to connect network
+  requests that are sent to the Dropbox API server with the asynchronous queries
+  made to the QtDropbox API.
+ */
 struct qdropbox_request{
-    qdropbox_request_type type;
-    QString method;
-    QString host;
-    int linked;
+    qdropbox_request_type type; //!< Type of the request
+    QString method;             //!< Used method to send the request (POST/GET)
+    QString host;               //!< Host that received the request
+    int linked;                 //!< ID of any linked request (for forwarded requests)
 };
 
 //! The main entry point of QtDropbox API. Provides various connection facilities and general information.
