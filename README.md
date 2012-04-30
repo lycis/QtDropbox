@@ -9,31 +9,40 @@ Dropbox. All HTTP calls are hidden behind the curtains of neat C++/Qt classes wi
 method names and specific uses.
 
 
-# Development
+## Development
 QtDropbox is currently under development and only provides limited features at the moment. If
 you have some knowledge about C++ (with Qt framework and/or the Dropbox REST API you are welcome
 to contribute to this project. For details take a look at the
 [project webpage](http://lycis.github.com/QtDropbox/)
 
-## Current status
+### Current status
 Because QtDropbox is far from being ready for a release candidate I will list all already available
 and somewhat tested features here:
 
 * Connect to dropbox
 * Request account information
-* Access files (read only)
+* Access files (read/write)
 
 The next features to be implemented are:
-
-* Full access for files
+* Documentation
+* Accessing file/directory metadata
 * Acessing the directory structure
 
-# Further information
+## Documentation
+You can generate a documentation of of all classes by:
+    
+    qmake
+    make doc
+
+This will generate a directory called doxy/ that contains a HTML documentation. Input files
+to generate a LaTeX based configuration are supplied as well.
+
+## Further information
 There are some files apart this README that may provide some useful information:
 
 * LICENSE
   It's LGPL v3 although that is currently not mentioned in the files
-* CLASSES
-  provides a short overview about the responsibilities of each class
+* INSTALL.md
+  Installation and usage instructions
 * doc/
   Generally everthing inside this directory is information.

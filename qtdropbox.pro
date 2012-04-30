@@ -1,10 +1,8 @@
 #-------------------------------------------------
-#
-# Project created by QtCreator 2012-01-16T19:14:33
-#
+# General definitions and dependencies
 #-------------------------------------------------
 
-QT       += network xml debug
+QT       += network xml
 
 QT       -= gui
 
@@ -33,3 +31,23 @@ TARGET = QtDropbox
 
 OTHER_FILES += \
     libqtdropbox.pri
+
+target.path = lib/
+
+#-------------------------------------------------
+# Documentation target
+#-------------------------------------------------
+documentation.commands = doxygen doc/doxygen.conf
+QMAKE_EXTRA_TARGETS += documentation
+
+#-------------------------------------------------
+# Package target
+#-------------------------------------------------
+package.files = libqtdropbox.pri \
+                src/*.h
+package.path = qtdropbox
+
+#-------------------------------------------------
+# install definitions
+#-------------------------------------------------
+INSTALLS += target package

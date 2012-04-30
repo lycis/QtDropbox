@@ -38,92 +38,345 @@ struct qdropbox_request{
     int linked;
 };
 
+//! The main entry point of QtDropbox API. Provides various connection facilities and general information.
+/*!
+  QDropbox provides you with all utilities required to connect to any Dropbox account. For purposes of
+  connection this class provides an asynchronous, signal and slot based, interface.
+
+  <h3>Connection to new account</h3>
+  If you want to initiate a new connection to an account that did not authorize your application to
+  access it you use requestToken() and then you have to call requestAccessToken as soon as the signal
+  requestTokenFinished() is emitted.
+
+  If the token you are using is not authorized or is expired the signal tokenExpired() will be emitted.
+  In this case you have to prompt the user for reauthorization of your application. A link to the
+  authoriziation interface of Dropbox is provided by the function authorizeLink(). This API does not
+  automatise the authorization process as this feature is not provided by Dropbox. So you have to
+  display the link in a web browser.
+
+  To reconnect to an account on a later use of your application you have to save the token and token
+  secret obtained after requestAccessToken(). These values are provided by the functions token() and
+  tokenSecret().
+
+  <h3>Connection to authorized account</h3>
+  If the account you want to connect to has already authorized your application and you already
+  have obtained an authorized token and token secret you will use a shortcut to connect. You have
+  to set the token and token secret you obtained by a prior use of the API with the according
+  functions setToken() and setTokenSecret(). You do not need to invoke requestToken() or
+  requestAccessToken(). These functions are only called at first use or if no token and token secret
+  are available.
+
+  Should the token or token secret you are using be already expired the signal tokenExpired()
+  will be emitted. In that case you have to prompt the user for reauthorization.
+
+  \todo Provide blocking and non-blocking functionality for all requests.
+
+ */
 class QTDROPBOXSHARED_EXPORT QDropbox : public QObject
 {
     Q_OBJECT
 public:
+    //! Method for oAuth authentication
+    /*! These methods are used for authentication with the oAuth protocol
+        \bug Currently HMAC-SHA1 encoding does not work.
+     */
     enum OAuthMethod{
-        Plaintext,
-        HMACSHA1
+        Plaintext, /*!< Plaintext authentication, HTTPS is automatically used. */
+        HMACSHA1 /*!< HMAC-SHA1 encoded authentication */
     };
 
+    //! Error state of QDropbox
+    /*!
+      This enum is used to determine the current error state of the Dropbox connection.
+      If an error occurs it can be access by using the error() function.
+     */
     enum Error{
-        NoError,
-        CommunicationError,
-        VersionNotSupported,
-        UnknownAuthMethod,
-        ResponseToUnknownRequest,
-        APIError,
-        UnknownQueryMethod,
-        BadInput,
-        BadOAuthRequest,
-        WrongHttpMethod,
-        MaxRequestsExeeded,
-        UserOverQuota
+        NoError,                        /*!< No error occured */
+        CommunicationError,             /*!< Error while communicating with the server */
+        VersionNotSupported,            /*!< The used Dropbox API version is not supported by the server */
+        UnknownAuthMethod,              /*!< The used authentication method is not supported */
+        ResponseToUnknownRequest,       /*!< QtDropbox API received an unexpected response from the server */
+        APIError,                       /*!< The remote server violated the Dropbox REST API protocol by sending wrong data. */
+        UnknownQueryMethod,             /*!< Internal error. The API tried to send with a not supported HTTP Query method. */
+        BadInput,                       /*!< A wrong input parameter was sent to the Dropbox REST API. Dropbox API error 400*/
+        BadOAuthRequest,                /*!< A wrong oAuth request was received by the server (expired time stamp,
+                                             bad nonce etc.). Dropbox API error 403 */
+        WrongHttpMethod,                /*!< The REST API request used a wrong HTTP method. Dropbox API error 405 */
+        MaxRequestsExceeded,            /*!< The maximum amount of requests was exceeded. Dropbox API error 503 */
+        UserOverQuota                   /*!< The user exceeded his or her storage quota. Dropbox API error 507 */
     };
 
+    /*!
+      This constructor creates an unconfigured instance of QDropbox. The server URL is set to <em>api.dropbpx.com</em>,
+      the REST API version 1.0 is used (currently the only one supported) and the authentication method is
+      QDropbox::Plaintext.
+
+      You need to set your API key and shared secret by using setKey(QString key) and setSharedSecret(QString sharedSecret).
+
+      \param parent The parent object QDropbox depends on.
+     */
     explicit QDropbox(QObject *parent = 0);
+
+    /*!
+      This constructor initializes QDropbox with your key and shared secret. The selected authentication method and
+      API URL will be set as well.
+
+      \param key API key of your application (provided by Dropbox)
+      \param sharedSecret Your app's secret (provided by Dropbox
+      \param method Used authentication method
+      \param url URL of the API server
+      \param parent Parent object of QDropbox
+
+     */
     explicit QDropbox(QString key, QString sharedSecret,
                       OAuthMethod method = QDropbox::Plaintext,
                       QString url = "api.dropbox.com", QObject *parent = 0);
 
-    void test();
+    /*!
+      If an error occured you can access the last error code by using this function.
+     */
+    Error  error();
 
-    // get and set
-    qint64  error();
+    /*!
+      After an error occured you'll get a description of the last error by using this
+      function.
+     */
     QString errorString();
 
+    /*!
+      Use this function if you want to change the URL of the API server you are
+      accessing. This won't usually be necessary as QtDropbox automatically chooses the
+      official Dropbox API server according to the request. This is usually
+      http://api.dropbox.com
+
+      \param url URL of the API server. Usually this is <em>api.dropbox.com</em>
+     */
     void setApiUrl(QString url);
+
+    /*!
+      Provides you with the address of the API server.
+     */
     QString apiUrl();
 
+    /*!
+      This function is used to changed the used authentication method. You can use it
+      even if you want to change the authentication method during an already existing
+      connection.
+
+      \param m Authentication method.
+     */
     void setAuthMethod(OAuthMethod m);
+
+    /*!
+      Returns the currently used authentication method.
+     */
     OAuthMethod authMethod();
 
+    /*!
+      Set the version of the Dropbox API to be used. 1.0 is default. Usually you don't
+      need to use this function as currently only version 1.0 is supported by Dropbox.
+
+      \param apiversion Version string of the API
+     */
     void setApiVersion(QString apiversion);
+
+    /*!
+      Returns the currently used API version.
+     */
     QString apiVersion();
 
+    /*!
+      Use this function to set your applications API key if you did not already when
+      using the constructor. The API key is provided when you register your application
+      with Dropbox.
+
+      \param key API key of your application.
+     */
     void setKey(QString key);
+
+    /*!
+      Returns the used API key of the application.
+    */
     QString key();
 
+    /*!
+      Use this function to set your applications API secret if you did not when using
+      the constructor. The API secret is provided when you register your application
+      with Dopbox.
+
+      \param sharedSecret API secret of your application
+     */
     void setSharedSecret(QString sharedSecret);
+
+    /*!
+      Returns the used API secret.
+     */
     QString sharedSecret();
 
+    /*!
+      If you have an already verified and authorized token to communicate with the
+      Dropbox API you can set it by using this function. By setting a token you
+      do not need to use requestToken() and requestAccessToken() to iniate a
+      connection.
+
+      \param t token string
+     */
     void setToken(QString t);
+    /*!
+      Returns the used token. This function may be used to get an authorized token
+      after iniating a new connection (e.g. to save it for later use).
+     */
     QString token();
+
+    /*!
+      If you have an already verified and authorized token and token secret to
+      communicate with the Dropbox API you can set the secret by using this
+      function. By setting token and secret you do not need to use requestToken()
+      and requestAccessToken() to iniaite a connection.
+
+      \param s token secret string
+     */
     void setSecret(QString s);
+    /*!
+      Returns the currently used token secret. This function may be used to get an
+      authorized token secret after iniating a new connection (e.g. to save it).
+     */
     QString tokenSecret();
 
+    /*!
+      Returns the Dropbox API key that is used.
+     */
     QString appKey();
+
+    /*!
+      Returns the currently used Dropbox API shared secret of your application.
+     */
     QString appSharedSecret();
 
+    /*!
+      This functions requests a request token that will be valid for the rest of the
+      authentication process. When the token is received the signal
+      requestTokenFinished(...) will be emitted.
 
-    // authentication
+      After the request token was obtained you can continue with the authentication by
+      prompting the user to authorize your application.
+
+      It is not necessary to call this function when the user already authenticated
+      your application. In this case just provide the token and token secret received
+      by using requestAccessToken() to QDropbox.
+
+      \todo Provide a blocking interface.
+     */
     int requestToken();
+    /*!
+      This function should do automatic authorization.
+      \warning This functions is currently not supported by the Dropbox API. You need
+               the user to authenticate by using the URL provided by authorizeLink().
+     */
     int authorize(QString mail, QString password);
+    /*!
+      Returns an URL the user will have to use to authorize the connection to your
+      application. You may use that link in connection with QDesktopServices::openUrl(...)
+      to open a web browser with the returned URL.
+     */
     QUrl authorizeLink();
+    /*!
+      This function should be invoked after the user authorized your application. It
+      retrieves an access token from the Dropbox API that you'll have to use to access
+      Dropbox services.
+
+      \todo Provide a blocking interface.
+     */
     int requestAccessToken();
 
-    // account info
+    /*!
+      By using this function the account information of the connected user will be
+      retrieved. The returned instance of QDropboxAccount contains current information
+      about the user account.
+     */
     QDropboxAccount& accountInfo();
 
-    // functions for signing
+    /*!
+      This function is public for internal QtDropbox API use. It is used to sign
+      requests to the Dropbox API and thus is required by most other QtDropbox
+      classes for their requests.
+
+      \param base Complete unsigned request URL
+      \param method Request method (currently only POST or GET)
+     */
     QString oAuthSign(QUrl base, QString method = "GET");
 
+    /*!
+      Returns the authentication method as string.
+     */
     QString signatureMethodString();
 
-    // static
+    /*!
+      This functions generates and returns a nonce with the given length. The
+      generated nonce is a random hex based string.
+
+      \param length Length of the nonce.
+     */
     static QString generateNonce(qint32 length);
 
 signals:
+    /*!
+      This signal is emitted whenever an error occurs. The error is passed
+      as parameter to the slot. To retrieve descriptive information about
+      the error use errorString().
+
+      \param errorcode The occured error.
+     */
     void errorOccured(Error errorcode);
+    /*!
+      Emitted when the used token is expired. Reauthorize the user connection
+      by prompting the URL provided by authorizeUrl() to your user to reauthorize.
+     */
     void tokenExpired();
+    /*!
+      Should never be emitted by QDropbox as there is no functionality that accesses
+      files in QDropbox but all implemented in QDropboxFile.
+     */
     void fileNotFound();
 
+    /*!
+      QDropbox uses an operation based asynchronous interface for reacting to messages.
+      This signal is emitted whenever a request to the Dropbox API is finished.
+
+      \param requestnr Number of the finished request.
+     */
     void operationFinished(int requestnr);
+
+    /*!
+      This signal is emitted when the function requestToken() is finished and a
+      token and token scret (valid for authorization only) is received.
+
+      \param token Temporary token
+      \param secret Temporary token secret
+     */
     void requestTokenFinished(QString token, QString secret);
+    /*!
+      This signal is emitted when the function requestAccessToken() is finished and
+      a valid and authorized token used for the connection was received.
+
+      \param token Token used for the connection to Dropbox
+      \param secret Secret used for the connection to Dropbox
+     */
     void accessTokenFinished(QString token, QString secret);
+    /*!
+      Emitted whenever the token changes.
+
+      \param token New token.
+      \param secret New secret.
+     */
     void tokenChanged(QString token, QString secret);
 
+    /*!
+      Emitted when account information was received. Only relevant for non-blocking
+      use of accountInfo().
+
+      \param accountJson JSON that contains the account information data.
+     */
     void accountInfo(QString accountJson);
 
 

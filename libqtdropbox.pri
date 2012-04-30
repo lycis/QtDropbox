@@ -8,3 +8,5 @@ HEADERS += qtdropbox_global.h\
            qdropboxaccount.h \
            qdropboxfile.h \
            qdropboxfileinfo.h
+
+CONFIG += network

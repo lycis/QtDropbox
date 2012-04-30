@@ -56,15 +56,7 @@ QDropbox::QDropbox(QString key, QString sharedSecret, OAuthMethod method, QStrin
     _evLoop = NULL;
 }
 
-void QDropbox::test()
-{
-    qDebug() << apiurl.toString(QUrl::RemoveScheme) << endl;
-   // conManager.setHost(apiurl.toString(QUrl::RemoveScheme).mid(2), QHttp::ConnectionModeHttp);
-   // conManager.get("/");
-    return;
-}
-
-qint64 QDropbox::error()
+QDropbox::Error QDropbox::error()
 {
     return errorState;
 }
@@ -159,7 +151,7 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
         return;
         break;
     case QDROPBOX_ERROR_REQUEST_CAP:
-        errorState = QDropbox::MaxRequestsExeeded;
+        errorState = QDropbox::MaxRequestsExceeded;
         errorText = "";
         emit errorOccured(errorState);
         return;
