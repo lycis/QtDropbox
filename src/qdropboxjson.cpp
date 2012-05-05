@@ -270,7 +270,7 @@ QDropboxJson::DataType QDropboxJson::type(QString key)
     return UnknownType;
 }
 
-int QDropboxJson::getInt(QString key, bool force)
+qint64 QDropboxJson::getInt(QString key, bool force)
 {
     if(!valueMap.contains(key))
         return 0;
@@ -284,7 +284,7 @@ int QDropboxJson::getInt(QString key, bool force)
     return e.value.value->toInt();
 }
 
-quint32 QDropboxJson::getUInt(QString key, bool force)
+quint64 QDropboxJson::getUInt(QString key, bool force)
 {
     if(!valueMap.contains(key))
         return 0;
@@ -315,13 +315,13 @@ QString QDropboxJson::getString(QString key, bool force)
 QDropboxJson* QDropboxJson::getJson(QString key)
 {
     if(!valueMap.contains(key))
-        return 0;
+        return NULL;
 
     qdropboxjson_entry e;
     e = valueMap.value(key);
 
     if(e.type != QDROPBOXJSON_TYPE_JSON)
-        return 0;
+        return NULL;
 
 
     return e.value.json;

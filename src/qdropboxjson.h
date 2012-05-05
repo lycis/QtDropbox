@@ -24,51 +24,161 @@ const qdropboxjson_entry_type QDROPBOXJSON_TYPE_UNKNOWN = '?';
 
 class QDropboxJson;
 
+//! Keeps values of a JSON
 union qdropboxjson_value{
-    QDropboxJson  *json;
-    QString       *value;
+    QDropboxJson  *json; //!< Used to store subjsons (JSON in JSON)
+    QString       *value; //!< used to store a real value, all values are converted from QString
 };
 
+//! Keeps keys of a JSON
 struct qdropboxjson_entry{
-    qdropboxjson_entry_type type;
-    qdropboxjson_value      value;
+    qdropboxjson_entry_type type; //!< Datatype of value
+    qdropboxjson_value      value; //!< Reference to the value struct
 };
 
+//! Used to store JSON data that is returned from Dropbox.
+/*!
+  Most of the communication with Dropbox is handled by using JSON data structures. JSON is
+  originally method of complex data description used for JavaScript and PHP and thus it is
+  designed to work with typeless languages. QDropboxJson provides an interface that maps
+  the mixed type values of a JSON to native C++ data types as good as possible.
+
+  A JSON is usually passed as string and can be parsed by either passing that string to the
+  constructor or using parseString(). If any error occurs the QDropboxJson will be marked as
+  invalid (see isValid()).
+
+  The data of a valid QDropboxJson can be accessed by using one of the get-functions. If the
+  value you want to access is not mapped to the datatype you requested an empty value will be
+  returned. You can always set a force flag. If you do the returned value will be converted but
+  may return nonsense data. Use this flag with care and only if you know what you're doing.
+
+  \warning Currently arrays in JSONs are not supported.
+  \todo Implement support for arrays.
+ */
 class QTDROPBOXSHARED_EXPORT QDropboxJson : public QObject
 {
     Q_OBJECT
 public:
+    /*!
+      Creates an empty JSON object.
+
+      \param parent Pointer to the parent QObject.
+     */
     QDropboxJson(QObject *parent = 0);
+
+    /*!
+      This constructor interprets the given string as JSON.
+
+      \param strJson JSON as string.
+      \param parent Parent QObject.
+     */
     QDropboxJson(QString strJson, QObject *parent = 0);
+
+    /*!
+      Copies the data of another QDropboxJSon.
+
+      \param other The QDropboxJson to be copied.
+     */
     QDropboxJson(QDropboxJson &other);
+
+    /*!
+      Cleans up the JSON on destruction.
+     */
     ~QDropboxJson();
 
+    /*!
+      This enum is used to categorize the data type of JSON values.
+     */
     enum DataType{
-        NumberType,
-        StringType,
-        JsonType,
-        ArrayType,
-        FloatType,
-        BoolType,
-        UnsignedIntType,
-        UnknownType
+        NumberType, //!< Number based type (interpreted as qint64)
+        StringType, //!< String based type of variable length
+        JsonType,   //!< A subjson
+        ArrayType,  //!< Array data type (currently not supported!)
+        FloatType,  //!< Floating point based datatype
+        BoolType,   //!< Boolean based types.
+        UnsignedIntType, //!< Number based type unsigned (only applied if NumberType does not match)
+        UnknownType //!< Data type could not be identified.
     };
 
+    /*!
+      Interprets a string as JSON - or at least tries to. If this is not possible
+      the QDropboxJson will be invalidated.
+
+      \parem strJson JSON in string representation.
+     */
     void parseString(QString strJson);
+
+    /*!
+      Drops all stored JSON data.
+     */
     void clear();
+
+    /*!
+      Returns true if the QDropboxJson contains valid data from a JSON. If an error occurs
+      during the parsing of a JSON string this function will return false.
+     */
     bool isValid();
 
+    /*!
+      Returns true if the QDropboxJson contains the given key.
+
+      \param key The requested key.
+     */
     bool     hasKey(QString key);
+
+    /*!
+      Returns the data type of the value mapped to the key.
+      \param key The key to be checked.
+     */
     DataType type(QString key);
 
-    int           getInt(QString key, bool force = false);
-    quint32       getUInt(QString key, bool force = false);
+    /*!
+      Returns a stored integer value identified by the given key. If the key does
+      not map 0 is returned. If the force flag is set the check of the data type
+      is omitted and it is tried to convert the value regardless of the real data type.
+     */
+    qint64        getInt(QString key, bool force = false);
+
+    /*!
+      Returns a stored unsigned integer value identified by the given key. If the key does
+      not map 0 is returned. If the force flag is set the check of the data type
+      is omitted and it is tried to convert the value regardless of the real data type.
+     */
+    quint64       getUInt(QString key, bool force = false);
+
+    /*!
+      Returns a stored string value identified by the given key. If the key does
+      not map an empty QString is returned. If the force flag is set the check of the data type
+      is omitted and it is tried to convert the value regardless of the real data type.
+     */
     QString       getString(QString key, bool force = false);
+
+    /*!
+      Returns a sub JSON identified by the given key. If the key does not map to a
+      JSON a NULL pointer will be returned. It is not possible to force a conversion.
+     */
     QDropboxJson *getJson(QString key);
+
+    /*!
+      Returns a stored floating point value identified by the given key. If the key does
+      not map 0.0 is returned. If the force flag is set the check of the data type
+      is omitted and it is tried to convert the value regardless of the real data type.
+     */
     double        getDouble(QString key, bool force = false);
+
+    /*!
+      Returns a stored boolean value identified by the given key. If the key does
+      not map false is returned. If the force flag is set the check of the data type
+      is omitted and it is tried to convert the value regardless of the real data type.
+     */
     bool          getBool(QString key, bool force = false);
 
+    /*!
+      Returns the stored JSON's string representation.
+     */
     QString strContent();
+
+    //! \todo operator=
     
 private:
     QMap<QString, qdropboxjson_entry> valueMap;

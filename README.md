@@ -32,7 +32,7 @@ The next features to be implemented are:
 You can generate a documentation of of all classes by:
     
     qmake
-    make doc
+    make documentation
 
 This will generate a directory called doxy/ that contains a HTML documentation. Input files
 to generate a LaTeX based configuration are supplied as well.

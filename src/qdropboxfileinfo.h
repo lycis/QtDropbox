@@ -6,6 +6,10 @@
 #include <QString>
 #include "qdropboxjson.h"
 
+//! Provides information and metadata about files and directories
+/*!
+  \todo implement!
+ */
 class QTDROPBOXSHARED_EXPORT QDropboxFileInfo : public QObject
 {
     Q_OBJECT
