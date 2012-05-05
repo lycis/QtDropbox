@@ -11,7 +11,8 @@ QDropboxFileInfo::QDropboxFileInfo(QDropboxJson json, QObject *parent) :
     dataFromJson(json);
 }
 
-QDropboxFileInfo::QDropboxFileInfo(QDropboxFileInfo &other)
+QDropboxFileInfo::QDropboxFileInfo(QDropboxFileInfo &other) :
+    QObject(0)
 {
     copyFrom(other);
 }
@@ -23,10 +24,12 @@ void QDropboxFileInfo::copyFrom(QDropboxFileInfo &other)
 QDropboxFileInfo &QDropboxFileInfo::operator =(QDropboxFileInfo &other)
 {
     copyFrom(other);
+    return *this;
 }
 
 void QDropboxFileInfo::dataFromJson(QDropboxJson json)
 {
+    //! \todo implement!
 }
 
 void QDropboxFileInfo::_init()

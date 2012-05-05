@@ -36,7 +36,7 @@ QDropboxFile::~QDropboxFile()
 
 bool QDropboxFile::isSequential()
 {
-    return false;
+    return true;
 }
 
 bool QDropboxFile::open(QIODevice::OpenMode mode)
@@ -78,10 +78,12 @@ bool QDropboxFile::open(QIODevice::OpenMode mode)
 
 void QDropboxFile::close()
 {
+    //! \todo implement!
 }
 
 void QDropboxFile::setApi(QDropbox *dropbox)
 {
+    //! \todo implement!
 }
 
 QDropbox *QDropboxFile::api()
@@ -206,6 +208,7 @@ void QDropboxFile::networkRequestFinished(QNetworkReply *rply)
         rplyFileWrite(rply);
         stopEventLoop();
         break;
+    //! \todo implement reaction for notWaiting/default
     }
 }
 
@@ -386,6 +389,10 @@ void QDropboxFile::stopEventLoop()
 
 bool QDropboxFile::putFile()
 {
+    // if we don't have write acces do not write!
+    if(mode()&QIODevice::WriteOnly != QIODevice::WriteOnly)
+        return false;
+
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "QDropboxFile::putFile()" << endl;
 #endif
@@ -435,6 +442,6 @@ void QDropboxFile::_init(QDropbox *api, QString filename, qint64 bufferTh)
     _evLoop          = NULL;
     _waitMode        = notWaiting;
     _bufferThreshold = bufferTh;
-    _overwrite       = false;
+    _overwrite       = true;
     return;
 }
