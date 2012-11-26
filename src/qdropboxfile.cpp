@@ -390,7 +390,7 @@ void QDropboxFile::stopEventLoop()
 bool QDropboxFile::putFile()
 {
     // if we don't have write acces do not write!
-    if(mode()&QIODevice::WriteOnly != QIODevice::WriteOnly)
+    if(isMode(QIODevice::WriteOnly))
         return false;
 
 #ifdef QTDROPBOX_DEBUG
