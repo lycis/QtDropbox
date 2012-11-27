@@ -22,7 +22,19 @@ public:
 
     QDropboxFileInfo& operator =(QDropboxFileInfo& other);
 
-	QString size();
+	QString   size();
+	quint64   revision();
+	bool      thumbExists();
+	quint64   bytes();
+	QDateTime modified();
+	QDateTime clientModified();
+	QString   icon();
+	QString   root();
+	QString   path();
+	bool      isDir();
+	QString   mimeType();
+	bool      isDeleted();
+	QString   revisionHash();
 
 signals:
     
@@ -33,13 +45,18 @@ private:
     void _init();
 
     QString   _size;
-    QString   _revision;
+    quint64   _revision;
     bool      _thumbExists;
     quint64   _bytes;
     QDateTime _modified;
     QDateTime _clientModified;
     QString   _icon;
     QString   _root;
+	QString   _path;
+	bool      _isDir;
+	QString   _mimeType;
+	bool      _isDeleted;
+	QString   _revisionHash;
 };
 
 #endif // QDROPBOXFILEINFO_H
