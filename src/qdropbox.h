@@ -21,6 +21,7 @@
 #include "qtdropbox_global.h"
 #include "qdropboxjson.h"
 #include "qdropboxaccount.h"
+#include "qdropboxfileinfo.h"
 
 typedef int qdropbox_request_type;
 
@@ -32,6 +33,7 @@ const qdropbox_request_type QDROPBOX_REQ_ACCTOKN = 0x05;
 const qdropbox_request_type QDROPBOX_REQ_ACCINFO = 0x06;
 const qdropbox_request_type QDROPBOX_REQ_RQBTOKN = 0x07;
 const qdropbox_request_type QDROPBOX_REQ_BACCTOK = 0x08;
+const qdropbox_request_type QDROPBOX_REQ_METADAT = 0x09;
 
 //! Internally used struct to handle network requests sent from QDropbox
 /*!
@@ -76,6 +78,16 @@ struct qdropbox_request{
 
   Should the token or token secret you are using be already expired the signal tokenExpired()
   will be emitted. In that case you have to prompt the user for reauthorization.
+
+  <h3>Using blocking requests</h3>
+  Every function that requests information from the server has a blocking and non-blocking function.
+  A blocking request will wait until the server has responded to your query before returning while a
+  non-blocking request will return immediately. Usually a blocking function directly returns a result
+  and a non-blocking function will emit an according signal as the request has finished.
+
+  \warning The use of a blocking function will reset the current error flag. So after calling a blocking
+  function the function error() will return QDropbox::NoError if no error occurred or the error that
+  occurred when processing the blocking request.
 
   \todo Provide blocking and non-blocking functionality for all requests.
 
@@ -346,6 +358,18 @@ public:
      */
     static QString generateNonce(qint32 length);
 
+	/*!
+	  Get the file metadata for a file speciified by the filename.
+
+	  \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
+	*/
+	QDropboxFileInfo metadata(QString file);
+
+	/*!
+	  Resets the last error. Use this when you reacted on an error to delete the error flag.
+	*/
+	void clearError();
+
 signals:
     /*!
       This signal is emitted whenever an error occurs. The error is passed
@@ -406,6 +430,13 @@ signals:
      */
     void accountInfo(QString accountJson);
 
+	/*!
+	  Emitted when metadata information about a file or directory was received. This will
+	  only be relevant for non-blocking use of metadata(...);
+
+	  \param metadataJson JSON string that contains the metadata information
+	*/
+	void metadataReceived(QString metadataJson);
 
 public slots:
 
@@ -460,6 +491,8 @@ private:
     void parseToken(QString response);
     void parseAccountInfo(QString response);
 	void checkReleaseEventLoop(int reqnr);
+	void parseMetadata(QString response);
+	
 };
 
 #endif // QDROPBOX_H

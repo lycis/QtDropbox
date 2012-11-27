@@ -15,7 +15,7 @@ class QTDROPBOXSHARED_EXPORT QDropboxFileInfo : public QObject
     Q_OBJECT
 public:
     QDropboxFileInfo(QObject *parent = 0);
-    QDropboxFileInfo(QDropboxJson json, QObject *parent = 0);
+    QDropboxFileInfo(QDropboxJson* json, QObject *parent = 0);
     QDropboxFileInfo(QDropboxFileInfo &other);
 
     void copyFrom(QDropboxFileInfo &other);

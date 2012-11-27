@@ -450,3 +450,9 @@ void QDropboxFile::_init(QDropbox *api, QString filename, qint64 bufferTh)
     _overwrite       = true;
     return;
 }
+
+
+QDropboxFileInfo QDropboxFile::metadata()
+{
+	return _api->metadata(_filename);
+}

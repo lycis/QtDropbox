@@ -13,6 +13,7 @@
 #include "qtdropbox_global.h"
 #include "qdropboxjson.h"
 #include "qdropbox.h"
+#include "qdropboxfileinfo.h"
 
 const QString QDROPBOXFILE_CONTENT_URL = "https://api-content.dropbox.com";
 
@@ -161,6 +162,11 @@ public:
       Returns the current state of the overwrite flag.
      */
     bool overwrite();
+
+	/*!
+	  Return the metadata of the file as a QDropboxFileInfo object.
+	*/
+	QDropboxFileInfo metadata();
 
 protected:
     qint64 readData(char *data, qint64 maxlen);

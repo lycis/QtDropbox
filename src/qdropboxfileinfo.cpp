@@ -5,7 +5,7 @@ QDropboxFileInfo::QDropboxFileInfo(QObject *parent) :
 {
 }
 
-QDropboxFileInfo::QDropboxFileInfo(QDropboxJson json, QObject *parent) :
+QDropboxFileInfo::QDropboxFileInfo(QDropboxJson* json, QObject *parent) :
     QObject(parent)
 {
     dataFromJson(json);
