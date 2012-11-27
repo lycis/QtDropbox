@@ -128,38 +128,47 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
         errorState = QDropbox::BadInput;
         errorText  = "";
         emit errorOccured(errorState);
+		checkReleaseEventLoop(nr);
         return;
         break;
     case QDROPBOX_ERROR_EXPIRED_TOKEN:
+		errorState = QDropbox::TokenExpired;
+		errorText  = "";
         emit tokenExpired();
+		checkReleaseEventLoop(nr);
         return;
         break;
     case QDROPBOX_ERROR_BAD_OAUTH_REQUEST:
         errorState = QDropbox::BadOAuthRequest;
         errorText  = "";
         emit errorOccured(errorState);
+		checkReleaseEventLoop(nr);
         return;
         break;
     case QDROPBOX_ERROR_FILE_NOT_FOUND:
         emit fileNotFound();
+		checkReleaseEventLoop(nr);
         return;
         break;
     case QDROPBOX_ERROR_WRONG_METHOD:
         errorState = QDropbox::WrongHttpMethod;
         errorText  = "";
         emit errorOccured(errorState);
+		checkReleaseEventLoop(nr);
         return;
         break;
     case QDROPBOX_ERROR_REQUEST_CAP:
         errorState = QDropbox::MaxRequestsExceeded;
         errorText = "";
         emit errorOccured(errorState);
+		checkReleaseEventLoop(nr);
         return;
         break;
     case QDROPBOX_ERROR_USER_OVER_QUOTA:
         errorState = QDropbox::UserOverQuota;
         errorText = "";
         emit errorOccured(errorState);
+		checkReleaseEventLoop(nr);
         return;
         break;
     default:
@@ -239,6 +248,9 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
         case QDROPBOX_REQ_ACCTOKN:
             responseAccessToken(response);
             break;
+		case QDROPBOX_REQ_BACCTOK:
+			responseBlockingAccessToken(response);
+			break;
         case QDROPBOX_REQ_ACCINFO:
             parseAccountInfo(response);
             break;
@@ -659,7 +671,7 @@ QUrl QDropbox::authorizeLink()
     return link;
 }
 
-int QDropbox::requestAccessToken()
+int QDropbox::requestAccessToken(bool blocking)
 {
     QUrl url;
     url.setUrl(apiurl.toString());
@@ -686,8 +698,25 @@ int QDropbox::requestAccessToken()
 
     QUrl query(url.toString(QUrl::RemoveQuery));
     int reqnr = sendRequest(query, "POST", postData);
-    requestMap[reqnr].type = QDROPBOX_REQ_ACCTOKN;
+
+	if(blocking)
+	{
+		requestMap[reqnr].type = QDROPBOX_REQ_BACCTOK;
+		startEventLoop();
+	}
+	else
+		requestMap[reqnr].type = QDROPBOX_REQ_ACCTOKN;
+
     return reqnr;
+}
+
+bool QDropbox::requestAccessTokenAndWait()
+{
+	requestAccessToken(true);
+#ifdef QTDROPBOX_DEBUG
+	qDebug() << "requestTokenAndWait() finished: error = " << error() << endl;
+#endif
+	return (error() == NoError);
 }
 
 QDropboxAccount &QDropbox::accountInfo()
@@ -749,5 +778,27 @@ void QDropbox::responseBlockedTokenRequest(QString response)
 {
 	responseTokenRequest(response);
 	stopEventLoop();
+	return;
+}
+
+void QDropbox::responseBlockingAccessToken(QString response)
+{
+	responseAccessToken(response);
+	stopEventLoop();
+	return;
+}
+
+// check if the event loop has to be stopped after a blocking request was sent
+void QDropbox::checkReleaseEventLoop(int reqnr)
+{
+	switch(requestMap[reqnr].type)
+	{
+	case QDROPBOX_REQ_RQBTOKN:
+	case QDROPBOX_REQ_BACCTOK:
+		stopEventLoop(); // release local event loop
+		break;
+	default:
+		break;
+	}
 	return;
 }

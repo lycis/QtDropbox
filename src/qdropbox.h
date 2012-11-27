@@ -31,6 +31,7 @@ const qdropbox_request_type QDROPBOX_REQ_REDIREC = 0x04;
 const qdropbox_request_type QDROPBOX_REQ_ACCTOKN = 0x05;
 const qdropbox_request_type QDROPBOX_REQ_ACCINFO = 0x06;
 const qdropbox_request_type QDROPBOX_REQ_RQBTOKN = 0x07;
+const qdropbox_request_type QDROPBOX_REQ_BACCTOK = 0x08;
 
 //! Internally used struct to handle network requests sent from QDropbox
 /*!
@@ -110,7 +111,8 @@ public:
                                              bad nonce etc.). Dropbox API error 403 */
         WrongHttpMethod,                /*!< The REST API request used a wrong HTTP method. Dropbox API error 405 */
         MaxRequestsExceeded,            /*!< The maximum amount of requests was exceeded. Dropbox API error 503 */
-        UserOverQuota                   /*!< The user exceeded his or her storage quota. Dropbox API error 507 */
+        UserOverQuota,                  /*!< The user exceeded his or her storage quota. Dropbox API error 507 */
+		TokenExpired                    /*!< The access token has expired. Dropbox API error 401*/
     };
 
     /*!
@@ -301,9 +303,18 @@ public:
       retrieves an access token from the Dropbox API that you'll have to use to access
       Dropbox services.
 
-      \todo Provide a blocking interface.
+	  \param blocking <i>internal only</i> indidicates if the call should block
      */
-    int requestAccessToken();
+    int requestAccessToken(bool blocking = false);
+
+	/*!
+	  This functions works exactly like requestAccessToken(...) but blocks until the answer
+	  from the server was received.
+
+	  \return <i>true</i> if the access token could be requested without error or <i>false</i>
+	          if an error occured.
+	*/
+	bool requestAccessTokenAndWait();
 
     /*!
       By using this function the account information of the connected user will be
@@ -445,8 +456,10 @@ private:
 	void responseBlockedTokenRequest(QString response);
     int responseDropboxLogin(QString response, int reqnr);
     void responseAccessToken(QString response);
+	void responseBlockingAccessToken(QString response);
     void parseToken(QString response);
     void parseAccountInfo(QString response);
+	void checkReleaseEventLoop(int reqnr);
 };
 
 #endif // QDROPBOX_H
