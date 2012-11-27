@@ -799,7 +799,7 @@ QDropboxFileInfo QDropbox::metadata(QString file)
 	int reqnr = sendRequest(url);
 	requestMap[reqnr].type = QDROPBOX_REQ_METADAT;
 	startEventLoop();
-	QDropboxFileInfo fi(&_tempJson, this);
+	QDropboxFileInfo fi(_tempJson.strContent(), this);
 	return fi;
 }
 

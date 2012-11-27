@@ -1,24 +1,27 @@
 #include "qdropboxfileinfo.h"
 
 QDropboxFileInfo::QDropboxFileInfo(QObject *parent) :
-    QObject(parent)
+    QDropboxJson(parent)
 {
 }
 
-QDropboxFileInfo::QDropboxFileInfo(QDropboxJson* json, QObject *parent) :
-    QObject(parent)
+QDropboxFileInfo::QDropboxFileInfo(QString jsonStr, QObject *parent) :
+    QDropboxJson(jsonStr, parent)
 {
-    dataFromJson(json);
+    dataFromJson();
 }
 
 QDropboxFileInfo::QDropboxFileInfo(QDropboxFileInfo &other) :
-    QObject(0)
+    QDropboxJson(0)
 {
     copyFrom(other);
 }
 
 void QDropboxFileInfo::copyFrom(QDropboxFileInfo &other)
 {
+	parseString(other.strContent());
+	dataFromJson();
+	return;
 }
 
 QDropboxFileInfo &QDropboxFileInfo::operator =(QDropboxFileInfo &other)
@@ -27,9 +30,18 @@ QDropboxFileInfo &QDropboxFileInfo::operator =(QDropboxFileInfo &other)
     return *this;
 }
 
-void QDropboxFileInfo::dataFromJson(QDropboxJson json)
+void QDropboxFileInfo::dataFromJson()
 {
-    //! \todo implement!
+	if(!isValid())
+		return;
+
+	_size        = getString("size");
+	_revision    = getString("revision");
+	_thumbExists = getBool("thumb_exists");
+	_bytes       = getUInt("bytes");
+	_icon        = getString("icon");
+	_root        = getString("root");
+	return;
 }
 
 void QDropboxFileInfo::_init()
@@ -43,4 +55,9 @@ void QDropboxFileInfo::_init()
     _icon           = "";
     _root           = "";
     return;
+}
+
+QString QDropboxFileInfo::size()
+{
+	return _size;
 }

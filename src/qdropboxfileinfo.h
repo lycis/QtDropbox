@@ -10,23 +10,26 @@
 /*!
   \todo implement!
  */
-class QTDROPBOXSHARED_EXPORT QDropboxFileInfo : public QObject
+class QTDROPBOXSHARED_EXPORT QDropboxFileInfo : public QDropboxJson
 {
     Q_OBJECT
 public:
     QDropboxFileInfo(QObject *parent = 0);
-    QDropboxFileInfo(QDropboxJson* json, QObject *parent = 0);
+    QDropboxFileInfo(QString jsonStr, QObject *parent = 0);
     QDropboxFileInfo(QDropboxFileInfo &other);
 
     void copyFrom(QDropboxFileInfo &other);
 
     QDropboxFileInfo& operator =(QDropboxFileInfo& other);
+
+	QString size();
+
 signals:
     
 public slots:
 
 private:
-    void dataFromJson(QDropboxJson json);
+    void dataFromJson();
     void _init();
 
     QString   _size;
