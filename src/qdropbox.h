@@ -30,6 +30,7 @@ const qdropbox_request_type QDROPBOX_REQ_AULOGIN = 0x03;
 const qdropbox_request_type QDROPBOX_REQ_REDIREC = 0x04;
 const qdropbox_request_type QDROPBOX_REQ_ACCTOKN = 0x05;
 const qdropbox_request_type QDROPBOX_REQ_ACCINFO = 0x06;
+const qdropbox_request_type QDROPBOX_REQ_RQBTOKN = 0x07;
 
 //! Internally used struct to handle network requests sent from QDropbox
 /*!
@@ -271,9 +272,18 @@ public:
       your application. In this case just provide the token and token secret received
       by using requestAccessToken() to QDropbox.
 
-      \todo Provide a blocking interface.
+      \param blocking <i>internal only</i> indidicates if the call should block
      */
-    int requestToken();
+    int requestToken(bool blocking = false);
+
+	/*!
+	  This functions works exactly like requestToken(...) but will block until the
+	  answer (e.g. the token or an error) has arrived from the server.
+
+	  \return <i>true</i> if the token was received successfully or <i>false</i> if an
+	          error occured
+	*/
+	bool requestTokenAndWait();
     /*!
       This function should do automatic authorization.
       \warning This functions is currently not supported by the Dropbox API. You need
@@ -432,6 +442,7 @@ private:
     void prepareApiUrl();
     int sendRequest(QUrl request, QString type = "GET", QByteArray postdata = 0, QString host = "");
     void responseTokenRequest(QString response);
+	void responseBlockedTokenRequest(QString response);
     int responseDropboxLogin(QString response, int reqnr);
     void responseAccessToken(QString response);
     void parseToken(QString response);

@@ -229,6 +229,9 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
             // requested a tiken
             responseTokenRequest(response);
             break;
+		case QDROPBOX_REQ_RQBTOKN:
+			responseBlockedTokenRequest(response);
+			break;
         case QDROPBOX_REQ_AULOGIN:
             delayed_nr = responseDropboxLogin(response, nr);
             delayed_finish = true;
@@ -481,7 +484,7 @@ void QDropbox::parseToken(QString response)
 
     if(!split.at(0).startsWith("oauth_token_secret") ||
        !split.at(1).startsWith("oauth_token"))
-    {
+	{
         errorState = QDropbox::APIError;
         errorText  = "The Dropbox API did not respond as expected.";
         emit errorOccured(errorState);
@@ -589,7 +592,7 @@ QString QDropbox::apiVersion()
     return _version;
 }
 
-int QDropbox::requestToken()
+int QDropbox::requestToken(bool blocking)
 {
     QString sigmeth = signatureMethodString();
 
@@ -614,9 +617,21 @@ int QDropbox::requestToken()
 #endif
 
     int reqnr = sendRequest(url);
-    requestMap[reqnr].type = QDROPBOX_REQ_RQTOKEN;
+	if(blocking)
+	{
+		requestMap[reqnr].type = QDROPBOX_REQ_RQBTOKN;
+		startEventLoop();
+	}
+	else
+		requestMap[reqnr].type = QDROPBOX_REQ_RQTOKEN;
 
     return reqnr;
+}
+
+bool QDropbox::requestTokenAndWait()
+{
+	requestToken(true);
+	return (error() == NoError);
 }
 
 int QDropbox::authorize(QString email, QString pwd)
@@ -728,4 +743,11 @@ void QDropbox::stopEventLoop()
 #endif
     _evLoop->exit();
     return;
+}
+
+void QDropbox::responseBlockedTokenRequest(QString response)
+{
+	responseTokenRequest(response);
+	stopEventLoop();
+	return;
 }
