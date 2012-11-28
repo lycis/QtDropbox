@@ -17,6 +17,8 @@
   object will be invalid. This can checked by using isValid().
 
   See https://www.dropbox.com/developers/reference/api#account-info for details.
+
+  \todo implement as child of QDropboxJson
  */
 class QTDROPBOXSHARED_EXPORT QDropboxAccount : public QObject
 {

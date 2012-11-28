@@ -22,10 +22,12 @@ and somewhat tested features here:
 * Connect to dropbox
 * Request account information
 * Access files (read/write)
+* Accessing file/directory metadata
 
 The next features to be implemented are:
 * Documentation
-* Accessing file/directory metadata
+
+Postponed to next version:
 * Acessing the directory structure
 
 ## Documentation

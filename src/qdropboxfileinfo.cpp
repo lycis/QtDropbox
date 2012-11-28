@@ -21,6 +21,7 @@ void QDropboxFileInfo::copyFrom(QDropboxFileInfo &other)
 {
 	parseString(other.strContent());
 	dataFromJson();
+	setParent(other.parent());
 	return;
 }
 
