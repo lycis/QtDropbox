@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QMap>
 #include <QList>
+#include <QDateTime>
 
 #ifdef QTDROPBOX_DEBUG
 #include <QDebug>
@@ -177,6 +178,12 @@ public:
       Returns the stored JSON's string representation.
      */
     QString strContent();
+
+	/*!
+	  Returns a stored string values as QDateTime timestamp. The timestamp will be invalid
+	  if the string could not be converted.
+	*/
+	QDateTime getTimestamp(QString key, bool force = false);
 
     //! \todo operator=
     

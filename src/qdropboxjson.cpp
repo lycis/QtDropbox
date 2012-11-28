@@ -358,6 +358,23 @@ bool QDropboxJson::getBool(QString key, bool force)
     return true;
 }
 
+QDateTime QDropboxJson::getTimestamp(QString key, bool force)
+{
+	if(!valueMap.contains(key))
+		return QDateTime();
+
+	qdropboxjson_entry e;
+	e = valueMap.value(key);
+
+	if(!force && e.type != QDROPBOXJSON_TYPE_STR)
+		return QDateTime();
+
+	QString dval = e.value.value->mid(1, e.value.value->size()-8);
+
+	return QDateTime::fromString(dval, 
+		                         "ddd dd MMM yyyy hh:mm:ss");
+}
+
 QString QDropboxJson::strContent()
 {
     return _strContent;

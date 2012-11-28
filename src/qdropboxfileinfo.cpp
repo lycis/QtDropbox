@@ -46,6 +46,8 @@ void QDropboxFileInfo::dataFromJson()
 	_mimeType     = getString("mime_type");
 	_isDeleted    = getBool("is_deleted");
 	_revisionHash = getString("rev");
+	_modified     = getTimestamp("modified");
+	_clientModified = getTimestamp("client_modified");
 	return;
 }
 
