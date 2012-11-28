@@ -168,6 +168,16 @@ public:
 	*/
 	QDropboxFileInfo metadata();
 
+	/*!
+	  Check if the file has changed on the dropbox while it was opened locally.
+	  This function will return false if the file was not previously opened and an error
+	  occured during the retrieval of the file metadata. Hence it is safer to open the file
+	  first and then check hasChanged()
+
+	  \returns <i>true</i> if the file has changed or <i>false</i> if it has not.
+	*/
+	bool hasChanged();
+
 protected:
     qint64 readData(char *data, qint64 maxlen);
     qint64 writeData(const char *data, qint64 len);
@@ -204,6 +214,8 @@ private:
 
     bool _overwrite;
 
+	QDropboxFileInfo *_metadata;
+
     void obtainToken();
     void connectSignals();
 
@@ -214,6 +226,7 @@ private:
     void startEventLoop();
     void stopEventLoop();
     bool putFile();
+	void obtainMetadata();
 
     void _init(QDropbox *api, QString filename, qint64 bufferTh);
 };

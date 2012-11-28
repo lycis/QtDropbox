@@ -73,6 +73,8 @@ bool QDropboxFile::open(QIODevice::OpenMode mode)
             return false;
     }
 
+	obtainMetadata();
+
     return true;
 }
 
@@ -448,11 +450,40 @@ void QDropboxFile::_init(QDropbox *api, QString filename, qint64 bufferTh)
     _waitMode        = notWaiting;
     _bufferThreshold = bufferTh;
     _overwrite       = true;
+	_metadata        = NULL;
     return;
 }
 
 
 QDropboxFileInfo QDropboxFile::metadata()
 {
+	if(_metadata == NULL)
+		obtainMetadata();
+
 	return _api->metadata(_filename);
+}
+
+bool QDropboxFile::hasChanged()
+{
+	if(_metadata == NULL)
+	{
+		if(!metadata().isValid()) // get metadata
+			return false;         // if metadata was invalid
+	}
+
+	QDropboxFileInfo serverMetadata = _api->metadata(_filename);
+#ifdef QTDROPBOX_DEBUG
+	qDebug() << "QDropboxFile::hasChanged() local  revision hash = " << _metadata->revisionHash() << endl;
+	qDebug() << "QDropboxFile::hasChanged() remote revision hash = " << serverMetadata.revisionHash() << endl;
+#endif
+	return serverMetadata.revisionHash().compare(_metadata->revisionHash())!=0;
+}
+
+void QDropboxFile::obtainMetadata()
+{
+	// get metadata of this file
+	_metadata = new QDropboxFileInfo(_api->metadata(_filename).strContent(), this);
+	if(!_metadata->isValid())
+		_metadata->clear();
+	return;
 }
