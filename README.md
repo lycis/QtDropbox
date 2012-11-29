@@ -24,8 +24,12 @@ and somewhat tested features here:
 * Access files (read/write)
 * Accessing file/directory metadata
 
+Currently in progress:
+* Fixing various todo and bug tasks
+
 The next features to be implemented are:
-* Documentation
+* Complete documentation
+* Examples
 
 Postponed to next version:
 * Acessing the directory structure
