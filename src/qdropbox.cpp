@@ -767,7 +767,7 @@ QDropboxAccount &QDropbox::accountInfo()
     int reqnr = sendRequest(url);
     requestMap[reqnr].type = QDROPBOX_REQ_ACCINFO;
     startEventLoop();
-    QDropboxAccount a(&_tempJson, this);
+    QDropboxAccount a(_tempJson.strContent(), this);
     _account = a;
     QDropboxAccount& r = _account;
 

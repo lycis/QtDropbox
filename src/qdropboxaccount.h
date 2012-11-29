@@ -20,7 +20,7 @@
 
   \todo implement as child of QDropboxJson
  */
-class QTDROPBOXSHARED_EXPORT QDropboxAccount : public QObject
+class QTDROPBOXSHARED_EXPORT QDropboxAccount : public QDropboxJson
 {
     Q_OBJECT
 public:
@@ -31,14 +31,6 @@ public:
       \param parent Parent QObject.
      */
     QDropboxAccount(QObject *parent = 0);
-
-    /*!
-      Creates an instance with data based on the data of the given JSON.
-
-      \param json Pointer to the QDropboxJson that contains the data.
-      \param parent Parent QObject.
-     */
-    QDropboxAccount(QDropboxJson *json, QObject *parent = 0);
 
     /*!
       This constructor creates an object based on the data contained in the
@@ -55,21 +47,6 @@ public:
       \param other Original QDropboxAccount
      */
     QDropboxAccount(QDropboxAccount& other);
-
-    /*!
-      Interprets the data contained in the QDropboxJson and replaces the
-      currently held data of the object by those from the JSON. This may
-      invalidate QDropboxAccount if any error occurs during this process.
-
-      \param json Pointer to the QDropboxJson containing the data.
-     */
-    void setJson(QDropboxJson *json);
-
-    /*!
-      Use this function to verify if the instance of QDropboxAccount contains
-      valid data. If it returns false the data are not complete or even wrong.
-     */
-    bool isValid();
 
     /*!
       Returns the referal link of the user.
@@ -122,9 +99,7 @@ public:
      */
     void copyFrom(QDropboxAccount& a);
 
-private:
-    bool valid;
-    
+private:  
     QUrl    _referralLink;
     QString _displayName;
     quint64 _uid;
@@ -133,6 +108,8 @@ private:
     quint64 _quotaShared;
     quint64 _quota;
     quint64 _quotaNormal;
+
+	void _init();
 };
 
 #endif // QDROPBOXACCOUNT_H

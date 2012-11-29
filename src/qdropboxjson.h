@@ -55,6 +55,8 @@ struct qdropboxjson_entry{
 
   \warning Currently arrays in JSONs are not supported.
   \todo Implement support for arrays.
+  \todo Implemement setter functions and toString() for JSON generation (altough not necessary it
+        would be a nice feature)
  */
 class QTDROPBOXSHARED_EXPORT QDropboxJson : public QObject
 {
@@ -187,9 +189,11 @@ public:
 
     //! \todo operator=
     
+protected:
+		bool valid;
+
 private:
     QMap<QString, qdropboxjson_entry> valueMap;
-    bool                      valid;
 
     void emptyList();
     qdropboxjson_entry_type interpretType(QString value);
