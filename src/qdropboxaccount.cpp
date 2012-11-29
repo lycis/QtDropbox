@@ -1,46 +1,36 @@
 #include "qdropboxaccount.h"
 
 QDropboxAccount::QDropboxAccount(QObject *parent) :
-    QObject(parent)
+    QDropboxJson(parent)
 {
-    valid = false;
-}
-
-QDropboxAccount::QDropboxAccount(QDropboxJson *json, QObject *parent) :
-    QObject(parent)
-{
-    valid = false;
-    setJson(json);
 }
 
 QDropboxAccount::QDropboxAccount(QString jsonString, QObject *parent) :
-    QObject(parent)
+    QDropboxJson(jsonString, parent)
 {
-    valid = false;
-    QDropboxJson json(jsonString);
-    setJson(&json);
+	_init();
 }
 
 QDropboxAccount::QDropboxAccount(QDropboxAccount& other) :
-    QObject()
+    QDropboxJson()
 {
     copyFrom(other);
 }
 
-void QDropboxAccount::setJson(QDropboxJson *json)
+void QDropboxAccount::_init()
 {
-    if(!json->isValid())
+    if(!isValid())
     {
         valid = false;
         return;
     }
 
-    if(!json->hasKey("referral_link") ||
-       !json->hasKey("display_name")  ||
-       !json->hasKey("uid") ||
-       !json->hasKey("country") ||
-       !json->hasKey("quota_info") ||
-       !json->hasKey("email"))
+    if(!hasKey("referral_link") ||
+       !hasKey("display_name")  ||
+       !hasKey("uid") ||
+       !hasKey("country") ||
+       !hasKey("quota_info") ||
+       !hasKey("email"))
     {
 #ifdef QTDROPBOX_DEBUG
         qDebug() << "json invalid 1" << endl;
@@ -49,7 +39,7 @@ void QDropboxAccount::setJson(QDropboxJson *json)
         return;
     }
 
-    QDropboxJson* quota = json->getJson("quota_info");
+    QDropboxJson* quota = getJson("quota_info");
     if(!quota->hasKey("shared") ||
        !quota->hasKey("quota") ||
        !quota->hasKey("normal"))
@@ -61,11 +51,11 @@ void QDropboxAccount::setJson(QDropboxJson *json)
         return;
     }
 
-    _referralLink.setUrl(json->getString("referral_link"), QUrl::StrictMode);
-    _displayName = json->getString("display_name");
-    _uid         = json->getInt("uid");
-    _country     = json->getString("country");
-    _email       = json->getString("email");
+    _referralLink.setUrl(getString("referral_link"), QUrl::StrictMode);
+    _displayName = getString("display_name");
+    _uid         = getInt("uid");
+    _country     = getString("country");
+    _email       = getString("email");
 
     _quotaShared = quota->getUInt("shared", true);
     _quota       = quota->getUInt("quota", true);
@@ -86,11 +76,6 @@ void QDropboxAccount::setJson(QDropboxJson *json)
     qDebug() << "== account data end ==" << endl;
 #endif
     return;
-}
-
-bool QDropboxAccount::isValid()
-{
-    return valid;
 }
 
 QUrl QDropboxAccount::referralLink()
