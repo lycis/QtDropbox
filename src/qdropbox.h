@@ -34,6 +34,7 @@ const qdropbox_request_type QDROPBOX_REQ_ACCINFO = 0x06;
 const qdropbox_request_type QDROPBOX_REQ_RQBTOKN = 0x07;
 const qdropbox_request_type QDROPBOX_REQ_BACCTOK = 0x08;
 const qdropbox_request_type QDROPBOX_REQ_METADAT = 0x09;
+const qdropbox_request_type QDROPBOX_REQ_BACCINF = 0x0A;
 
 //! Internally used struct to handle network requests sent from QDropbox
 /*!
@@ -331,10 +332,19 @@ public:
 
     /*!
       By using this function the account information of the connected user will be
-      retrieved. The returned instance of QDropboxAccount contains current information
-      about the user account.
+      retrieved. When the account information was obtained the signal QDropbox::accountInfoReceived()
+	  will be emitted.
+
+	  \param blocking <i>internal only</i> indidicates if the call should block
      */
-    QDropboxAccount& accountInfo();
+    void accountInfo(bool blocking = false);
+
+	/*!
+	  Works exactly like accountInfo() but blocks until the data was received from the server.
+	  It returns an instance of QDropboxAccount containing the requested data. You do not have
+	  to react on the accountInfoReceived() signal when using this function.
+	 */
+	QDropboxAccount accountInfoAndWait(); 
 
     /*!
       This function is public for internal QtDropbox API use. It is used to sign
@@ -429,7 +439,7 @@ signals:
 
       \param accountJson JSON that contains the account information data.
      */
-    void accountInfo(QString accountJson);
+    void accountInfoReceived(QString accountJson);
 
 	/*!
 	  Emitted when metadata information about a file or directory was received. This will
@@ -493,6 +503,7 @@ private:
     void parseAccountInfo(QString response);
 	void checkReleaseEventLoop(int reqnr);
 	void parseMetadata(QString response);
+	void parseBlockingAccountInfo(QString response);
 	
 };
 

@@ -257,6 +257,9 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
         case QDROPBOX_REQ_ACCINFO:
             parseAccountInfo(response);
             break;
+		case QDROPBOX_REQ_BACCINF:
+			parseBlockingAccountInfo(response);
+			break;
         default:
             errorState  = QDropbox::ResponseToUnknownRequest;
             errorText   = "Received a response to an unknown request";
@@ -539,12 +542,10 @@ void QDropbox::parseAccountInfo(QString response)
         qDebug() << "error: " << errorText << endl;
 #endif
         emit errorOccured(errorState);
-        stopEventLoop();
         return;
     }
 
-    emit accountInfo(response);
-    stopEventLoop();
+    emit accountInfoReceived(response);
     return;
 }
 
@@ -747,7 +748,7 @@ bool QDropbox::requestAccessTokenAndWait()
 	return (error() == NoError);
 }
 
-QDropboxAccount &QDropbox::accountInfo()
+void QDropbox::accountInfo(bool blocking)
 {
 	clearError();
 
@@ -765,18 +766,30 @@ QDropboxAccount &QDropbox::accountInfo()
     url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
 
     int reqnr = sendRequest(url);
-    requestMap[reqnr].type = QDROPBOX_REQ_ACCINFO;
-    startEventLoop();
-    QDropboxAccount a(_tempJson.strContent(), this);
+	if(blocking)
+	{
+		requestMap[reqnr].type = QDROPBOX_REQ_BACCINF;
+		startEventLoop();
+	}
+	else
+		requestMap[reqnr].type = QDROPBOX_REQ_ACCINFO;
+    return;
+}
+
+QDropboxAccount QDropbox::accountInfoAndWait()
+{
+	accountInfo(true);
+	QDropboxAccount a(_tempJson.strContent(), this);
     _account = a;
-    QDropboxAccount& r = _account;
+	return _account;
+}
 
-#ifdef QTDROPBOX_DEBUG
-    qDebug() << "account info loop finished" << endl;
-    qDebug() << r.quota() << endl;
-#endif
-
-    return r;
+void QDropbox::parseBlockingAccountInfo(QString response)
+{
+	clearError();
+	parseAccountInfo(response);
+	stopEventLoop();
+	return;
 }
 
 QDropboxFileInfo QDropbox::metadata(QString file)
@@ -851,6 +864,7 @@ void QDropbox::checkReleaseEventLoop(int reqnr)
 	{
 	case QDROPBOX_REQ_RQBTOKN:
 	case QDROPBOX_REQ_BACCTOK:
+	case QDROPBOX_REQ_BACCINF:
 		stopEventLoop(); // release local event loop
 		break;
 	default:
