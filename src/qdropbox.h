@@ -90,6 +90,7 @@ struct qdropbox_request{
   occurred when processing the blocking request.
 
   \todo Provide blocking and non-blocking functionality for all requests.
+  \bug HMAC-SHA1 authentication is not working
 
  */
 class QTDROPBOXSHARED_EXPORT QDropbox : public QObject
