@@ -80,12 +80,16 @@ bool QDropboxFile::open(QIODevice::OpenMode mode)
 
 void QDropboxFile::close()
 {
-    //! \todo implement!
+	if(isMode(QIODevice::WriteOnly))
+		flush();
+	QIODevice::close();
+	return;
 }
 
 void QDropboxFile::setApi(QDropbox *dropbox)
 {
-    //! \todo implement!
+    _api = dropbox;
+	return;
 }
 
 QDropbox *QDropboxFile::api()
@@ -391,14 +395,6 @@ void QDropboxFile::stopEventLoop()
 
 bool QDropboxFile::putFile()
 {
-    // if we don't have write acces do not write!
-	if(!isMode(QIODevice::ReadOnly))
-	{
-		#ifdef QTDROPBOX_DEBUG
-		qDebug() << "QDropboxFile::putFile() writeonly!" << endl;
-		#endif
-        return false;
-	}
 
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "QDropboxFile::putFile()" << endl;
