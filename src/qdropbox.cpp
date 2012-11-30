@@ -299,9 +299,46 @@ void QDropbox::networkReplyFinished(QNetworkReply *rply)
     requestFinished(reqnr, rply);
 }
 
-QString QDropbox::hmacsha1(QByteArray key, QByteArray baseString)
+QString QDropbox::hmacsha1(QString base, QString key)
 {
-    int blockSize = 64; // HMAC-SHA-1 block size, defined in SHA-1 standard
+    // inner pad
+    QByteArray ipad;
+    ipad.fill(char(0), 64);
+    for(int i = 0; i < key.length(); ++i)
+        ipad[i] = key[i].toAscii();
+
+    // outer pad
+    QByteArray opad;
+    opad.fill(char(0), 64);
+    for(int i = 0; i < key.length(); ++i)
+        opad[i] = key[i].toAscii();
+
+    // XOR operation for inner pad
+    for(int i = 0; i < ipad.length(); ++i)
+        ipad[i] = ipad[i] ^ 0x36;
+
+    // XOR operation for outer pad
+    for(int i = 0; i < opad.length(); ++i)
+        opad[i] = opad[i] ^ 0x5c;
+
+    // Hashes inner pad
+    QByteArray innerSha1 = QCryptographicHash::hash(
+        ipad + base.toAscii(),
+        QCryptographicHash::Sha1
+        );
+
+    // Hashes outer pad
+    QByteArray outerSha1 = QCryptographicHash::hash(
+        opad + innerSha1,
+        QCryptographicHash::Sha1
+        );
+
+    return outerSha1.toBase64();
+}
+
+/*QString QDropbox::hmacsha1(QByteArray key, QByteArray baseString)
+{
+    int blockSize = 64; // HMAC-::hmacsha1SHA-1 block size, defined in SHA-1 standard
     if (key.length() > blockSize) { // if key is longer than block size (64), reduce key length with SHA-1 compression
         key = QCryptographicHash::hash(key, QCryptographicHash::Sha1);
     }
@@ -323,7 +360,7 @@ QString QDropbox::hmacsha1(QByteArray key, QByteArray baseString)
     total.append(QCryptographicHash::hash(part, QCryptographicHash::Sha1));
     QByteArray hashed = QCryptographicHash::hash(total, QCryptographicHash::Sha1);
     return hashed.toBase64();
-}
+}*/
 
 QString QDropbox::generateNonce(qint32 length)
 {
@@ -349,11 +386,12 @@ QString QDropbox::oAuthSign(QUrl base, QString method)
     QString key     = QString("%1&%2").arg(_appSharedSecret).arg(oauthTokenSecret);
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "baseurl = " << baseurl << " endbase";
+	qDebug() << "key = " << key << " endkey";
 #endif
 
     QString signature = "";
     if(oauthMethod == QDropbox::HMACSHA1)
-        signature = hmacsha1(key.toUtf8(), baseurl.toUtf8());
+        signature = hmacsha1(baseurl.toUtf8(), key.toUtf8());
     else
     {
         errorState = QDropbox::UnknownAuthMethod;
@@ -367,15 +405,15 @@ QString QDropbox::oAuthSign(QUrl base, QString method)
     qDebug() << "signature = " << signature << "(base64 = " << QByteArray(signature.toUtf8()).toBase64() << endl;
 
 #endif
-    return QUrl::toPercentEncoding(signature.toUtf8());
+    return signature.toUtf8();
 }
 
 void QDropbox::prepareApiUrl()
 {
-    if(oauthMethod == QDropbox::Plaintext)
+    //if(oauthMethod == QDropbox::Plaintext)
         apiurl.setScheme("https");
-    else
-        apiurl.setScheme("http");
+    //else
+      //  apiurl.setScheme("http");
 }
 
 int QDropbox::sendRequest(QUrl request, QString type, QByteArray postdata, QString host)
@@ -707,11 +745,15 @@ int QDropbox::requestAccessToken(bool blocking)
     url.addQueryItem("oauth_consumer_key",_appKey);
     url.addQueryItem("oauth_nonce", nonce);
     url.addQueryItem("oauth_signature_method", signatureMethodString());
-    url.addQueryItem("oauth_timestamp", QString::number((int) QDateTime::currentMSecsSinceEpoch()/1000));
+    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
     url.addQueryItem("oauth_token", oauthToken);
     url.addQueryItem("oauth_version", _version);
     url.setPath(QString("%1/oauth/access_token").
                 arg(_version.left(1)));
+
+#ifdef QTDROPBOX_DEBUG
+	qDebug() << "requestToken = " << url.queryItemValue("oauth_token");
+#endif
 
     QString signature = oAuthSign(url);
     url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
@@ -748,16 +790,18 @@ bool QDropbox::requestAccessTokenAndWait()
 	return (error() == NoError);
 }
 
-void QDropbox::accountInfo(bool blocking)
+void QDropbox::requestAccountInfo(bool blocking)
 {
 	clearError();
+
+	timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
 
     QUrl url;
     url.setUrl(apiurl.toString());
     url.addQueryItem("oauth_consumer_key",_appKey);
     url.addQueryItem("oauth_nonce", nonce);
     url.addQueryItem("oauth_signature_method", signatureMethodString());
-    url.addQueryItem("oauth_timestamp", QString::number((int) QDateTime::currentMSecsSinceEpoch()/1000));
+    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
     url.addQueryItem("oauth_token", oauthToken);
     url.addQueryItem("oauth_version", _version);
     url.setPath(QString("%1/account/info").arg(_version.left(1)));
@@ -776,9 +820,9 @@ void QDropbox::accountInfo(bool blocking)
     return;
 }
 
-QDropboxAccount QDropbox::accountInfoAndWait()
+QDropboxAccount QDropbox::requestAccountInfoAndWait()
 {
-	accountInfo(true);
+	requestAccountInfo(true);
 	QDropboxAccount a(_tempJson.strContent(), this);
     _account = a;
 	return _account;
@@ -792,16 +836,18 @@ void QDropbox::parseBlockingAccountInfo(QString response)
 	return;
 }
 
-QDropboxFileInfo QDropbox::metadata(QString file)
+QDropboxFileInfo QDropbox::requestMetadata(QString file)
 {
 	clearError();
+
+	timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
 
 	QUrl url;
 	url.setUrl(apiurl.toString());
 	 url.addQueryItem("oauth_consumer_key",_appKey);
     url.addQueryItem("oauth_nonce", nonce);
     url.addQueryItem("oauth_signature_method", signatureMethodString());
-    url.addQueryItem("oauth_timestamp", QString::number((int) QDateTime::currentMSecsSinceEpoch()/1000));
+    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
     url.addQueryItem("oauth_token", oauthToken);
     url.addQueryItem("oauth_version", _version);
 	url.setPath(QString("%1/metadata/%2").arg(_version.left(1), file));

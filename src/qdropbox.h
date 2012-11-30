@@ -92,6 +92,7 @@ struct qdropbox_request{
 
   \todo Provide blocking and non-blocking functionality for all requests.
   \bug HMAC-SHA1 authentication is not working
+  \todo provide possibility to change nounce length in constructor
 
  */
 class QTDROPBOXSHARED_EXPORT QDropbox : public QObject
@@ -337,14 +338,14 @@ public:
 
 	  \param blocking <i>internal only</i> indidicates if the call should block
      */
-    void accountInfo(bool blocking = false);
+    void requestAccountInfo(bool blocking = false);
 
 	/*!
 	  Works exactly like accountInfo() but blocks until the data was received from the server.
 	  It returns an instance of QDropboxAccount containing the requested data. You do not have
 	  to react on the accountInfoReceived() signal when using this function.
 	 */
-	QDropboxAccount accountInfoAndWait(); 
+	QDropboxAccount requestAccountInfoAndWait(); 
 
     /*!
       This function is public for internal QtDropbox API use. It is used to sign
@@ -374,7 +375,7 @@ public:
 
 	  \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
 	*/
-	QDropboxFileInfo metadata(QString file);
+	QDropboxFileInfo requestMetadata(QString file);
 
 	/*!
 	  Resets the last error. Use this when you reacted on an error to delete the error flag.
@@ -491,7 +492,7 @@ private:
 
     QDropboxAccount _account;
 
-    QString hmacsha1(QByteArray key, QByteArray baseString);
+	QString hmacsha1(QString key, QString baseString);
     void prepareApiUrl();
     int sendRequest(QUrl request, QString type = "GET", QByteArray postdata = 0, QString host = "");
     void responseTokenRequest(QString response);
