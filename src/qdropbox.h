@@ -91,7 +91,6 @@ struct qdropbox_request{
   function the function error() will return QDropbox::NoError if no error occurred or the error that
   occurred when processing the blocking request.
 
-  \todo Provide blocking and non-blocking functionality for all requests.
   \bug HMAC-SHA1 authentication is not working
   \todo provide possibility to change nounce length in constructor
 
@@ -314,6 +313,7 @@ public:
       to open a web browser with the returned URL.
      */
     QUrl authorizeLink();
+
     /*!
       This function should be invoked after the user authorized your application. It
       retrieves an access token from the Dropbox API that you'll have to use to access
@@ -372,12 +372,22 @@ public:
     static QString generateNonce(qint32 length);
 
 	/*!
-	  Get the file metadata for a file speciified by the filename.
+	  Get the file metadata for a file speciified by the filename. When the Dropbox
+	  API server answeres the request the signal QDropbox::metadataReceived() will be
+	  emitted.
 
 	  \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
+	  \param blocking <i>internal only</i> indidicates if the call should block
 	*/
 	void requestMetadata(QString file, bool blocking = false);
 
+	/*!
+	  Works exactly like QDropbox::requestMetadata() but blocks until the metadata
+	  was received from the Dropbox server and returns an instance of QDropboxFileInfo
+	  that contains the metadata of the requested file.
+
+	  \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
+	 */
 	QDropboxFileInfo requestMetadataAndWait(QString file);
 
 	/*!
