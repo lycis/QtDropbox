@@ -35,6 +35,7 @@ const qdropbox_request_type QDROPBOX_REQ_RQBTOKN = 0x07;
 const qdropbox_request_type QDROPBOX_REQ_BACCTOK = 0x08;
 const qdropbox_request_type QDROPBOX_REQ_METADAT = 0x09;
 const qdropbox_request_type QDROPBOX_REQ_BACCINF = 0x0A;
+const qdropbox_request_type QDROPBOX_REQ_BMETADA = 0x0B;
 
 //! Internally used struct to handle network requests sent from QDropbox
 /*!
@@ -375,7 +376,9 @@ public:
 
 	  \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
 	*/
-	QDropboxFileInfo requestMetadata(QString file);
+	void requestMetadata(QString file, bool blocking = false);
+
+	QDropboxFileInfo requestMetadataAndWait(QString file);
 
 	/*!
 	  Resets the last error. Use this when you reacted on an error to delete the error flag.
@@ -494,10 +497,10 @@ private:
 
 	QString hmacsha1(QString key, QString baseString);
     void prepareApiUrl();
-    int sendRequest(QUrl request, QString type = "GET", QByteArray postdata = 0, QString host = "");
+    int  sendRequest(QUrl request, QString type = "GET", QByteArray postdata = 0, QString host = "");
     void responseTokenRequest(QString response);
 	void responseBlockedTokenRequest(QString response);
-    int responseDropboxLogin(QString response, int reqnr);
+    int  responseDropboxLogin(QString response, int reqnr);
     void responseAccessToken(QString response);
 	void responseBlockingAccessToken(QString response);
     void parseToken(QString response);
@@ -505,6 +508,7 @@ private:
 	void checkReleaseEventLoop(int reqnr);
 	void parseMetadata(QString response);
 	void parseBlockingAccountInfo(QString response);
+	void parseBlockingMetadata(QString response);
 	
 };
 

@@ -460,7 +460,7 @@ QDropboxFileInfo QDropboxFile::metadata()
 	if(_metadata == NULL)
 		obtainMetadata();
 
-	return _api->requestMetadata(_filename);
+	return _api->requestMetadataAndWait(_filename);
 }
 
 bool QDropboxFile::hasChanged()
@@ -471,7 +471,7 @@ bool QDropboxFile::hasChanged()
 			return false;         // if metadata was invalid
 	}
 
-	QDropboxFileInfo serverMetadata = _api->requestMetadata(_filename);
+	QDropboxFileInfo serverMetadata = _api->requestMetadataAndWait(_filename);
 #ifdef QTDROPBOX_DEBUG
 	qDebug() << "QDropboxFile::hasChanged() local  revision hash = " << _metadata->revisionHash() << endl;
 	qDebug() << "QDropboxFile::hasChanged() remote revision hash = " << serverMetadata.revisionHash() << endl;
@@ -482,7 +482,7 @@ bool QDropboxFile::hasChanged()
 void QDropboxFile::obtainMetadata()
 {
 	// get metadata of this file
-	_metadata = new QDropboxFileInfo(_api->requestMetadata(_filename).strContent(), this);
+	_metadata = new QDropboxFileInfo(_api->requestMetadataAndWait(_filename).strContent(), this);
 	if(!_metadata->isValid())
 		_metadata->clear();
 	return;

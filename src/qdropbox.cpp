@@ -251,6 +251,8 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
 		case QDROPBOX_REQ_METADAT:
 			parseMetadata(response);
 			break;
+		case QDROPBOX_REQ_BMETADA:
+			parseBlockingMetadata(response);
 		case QDROPBOX_REQ_BACCTOK:
 			responseBlockingAccessToken(response);
 			break;
@@ -609,7 +611,7 @@ void QDropbox::parseMetadata(QString response)
 	}
 
 	emit metadataReceived(response);
-	stopEventLoop();
+	return;
 }
 
 void QDropbox::setKey(QString key)
@@ -836,7 +838,7 @@ void QDropbox::parseBlockingAccountInfo(QString response)
 	return;
 }
 
-QDropboxFileInfo QDropbox::requestMetadata(QString file)
+void QDropbox::requestMetadata(QString file, bool blocking)
 {
 	clearError();
 
@@ -856,8 +858,20 @@ QDropboxFileInfo QDropbox::requestMetadata(QString file)
 	url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
 	
 	int reqnr = sendRequest(url);
-	requestMap[reqnr].type = QDROPBOX_REQ_METADAT;
-	startEventLoop();
+	if(blocking)
+	{
+		requestMap[reqnr].type = QDROPBOX_REQ_BMETADA;
+		startEventLoop();
+	}
+	else
+		requestMap[reqnr].type = QDROPBOX_REQ_METADAT;
+	//QDropboxFileInfo fi(_tempJson.strContent(), this);
+	return;
+}
+
+QDropboxFileInfo QDropbox::requestMetadataAndWait(QString file)
+{
+	requestMetadata(file, true);
 	QDropboxFileInfo fi(_tempJson.strContent(), this);
 	return fi;
 }
@@ -899,6 +913,14 @@ void QDropbox::responseBlockingAccessToken(QString response)
 {
 	clearError();
 	responseAccessToken(response);
+	stopEventLoop();
+	return;
+}
+
+void QDropbox::parseBlockingMetadata(QString response)
+{
+	clearError();
+	parseMetadata(response);
 	stopEventLoop();
 	return;
 }
