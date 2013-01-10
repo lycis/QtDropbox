@@ -423,7 +423,7 @@ bool QDropboxFile::putFile()
     QNetworkRequest rq(request);
     _conManager.put(rq, *_buffer);
 
-    _waitMode = waitForWrite;
+    _waitMode = waitForWrite;	
     startEventLoop();
 
     if(lastErrorCode != 0)
@@ -447,6 +447,8 @@ void QDropboxFile::_init(QDropbox *api, QString filename, qint64 bufferTh)
     _bufferThreshold = bufferTh;
     _overwrite       = true;
 	_metadata        = NULL;
+	lastErrorCode    = 0;
+	lastErrorMessage = "";
     return;
 }
 

@@ -176,7 +176,7 @@ public:
 
 	  \returns <i>true</i> if the file has changed or <i>false</i> if it has not.
 	*/
-	bool hasChanged();
+	bool hasChanged();	
 
 protected:
     qint64 readData(char *data, qint64 maxlen);
