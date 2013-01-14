@@ -11,13 +11,13 @@ QDropboxFileInfo::QDropboxFileInfo(QString jsonStr, QObject *parent) :
     dataFromJson();
 }
 
-QDropboxFileInfo::QDropboxFileInfo(QDropboxFileInfo &other) :
+QDropboxFileInfo::QDropboxFileInfo(const QDropboxFileInfo &other) :
     QDropboxJson(0)
 {
     copyFrom(other);
 }
 
-void QDropboxFileInfo::copyFrom(QDropboxFileInfo &other)
+void QDropboxFileInfo::copyFrom(const QDropboxFileInfo &other)
 {
 	parseString(other.strContent());
 	dataFromJson();
@@ -70,38 +70,38 @@ void QDropboxFileInfo::_init()
     return;
 }
 
-QString QDropboxFileInfo::revisionHash()
+QString QDropboxFileInfo::revisionHash()  const
 {
 	return _revisionHash;
 }
 
-bool QDropboxFileInfo::isDeleted()
+bool QDropboxFileInfo::isDeleted()  const
 {
 	return _isDeleted;
 }
 
 
-QString QDropboxFileInfo::mimeType()
+QString QDropboxFileInfo::mimeType()  const
 {
 	return _mimeType;
 }
 
-bool QDropboxFileInfo::isDir()
+bool QDropboxFileInfo::isDir()  const
 {
 	return _isDir;
 }
 
-QString QDropboxFileInfo::path()
+QString QDropboxFileInfo::path()  const
 {
 	return _path;
 }
 
-QString QDropboxFileInfo::root()
+QString QDropboxFileInfo::root()  const
 {
 	return _root;
 }
 
-QString QDropboxFileInfo::icon()
+QString QDropboxFileInfo::icon()  const
 {
 	return _icon;
 }
@@ -116,22 +116,22 @@ QDateTime QDropboxFileInfo::modified()
 	return _modified;
 }
 
-quint64 QDropboxFileInfo::bytes()
+quint64 QDropboxFileInfo::bytes()  const
 {
 	return _bytes;
 }
 
-bool QDropboxFileInfo::thumbExists()
+bool QDropboxFileInfo::thumbExists()  const
 {
 	return _thumbExists;
 }
 
-quint64 QDropboxFileInfo::revision()
+quint64 QDropboxFileInfo::revision() const
 {
 	return _revision;
 }
 
-QString QDropboxFileInfo::size()
+QString QDropboxFileInfo::size() const
 {
 	return _size;
 }

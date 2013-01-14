@@ -46,7 +46,7 @@ public:
 
 	   \param other original instance
 	 */
-    QDropboxFileInfo(QDropboxFileInfo &other);
+    QDropboxFileInfo(const QDropboxFileInfo &other);
 
 	/*!
 	  Copies the values from an other QDropboxFileInfo instance to the
@@ -54,7 +54,7 @@ public:
 
 	  \param other original instance
 	*/
-    void copyFrom(QDropboxFileInfo &other);
+    void copyFrom(const QDropboxFileInfo &other);
 
 	/*!
 	  Works exactly like copyFrom() only as an operator.
@@ -66,68 +66,68 @@ public:
 	/*!
 	  Human readable file size.
 	*/
-	QString   size();
+    QString   size() const;
 
 	/*!
 	  Current revision number.
 	 */
-	quint64   revision();
+    quint64   revision() const;
 
 	/*!
 	  Indicates whether a thumbnail is available.
 	 */
-	bool      thumbExists();
+    bool      thumbExists()  const;
 
 	/*!
 	  File size in bytes.
 	 */
-	quint64   bytes();
+    quint64   bytes()  const;
 
 	/*!
 	  Timestamp of last modification.
 	  \bug Currently not working
 	 */
-	QDateTime modified();
+    QDateTime modified();
 
 	/*!
 	  Timestamp of desktop client upload.
 	 */
-	QDateTime clientModified();
+    QDateTime clientModified();
 
 	/*!
 	  Icon name.
 	 */
-	QString   icon();
+    QString   icon() const;
 
 	/*!
 	  Root directors. Can be either <i>/dropbox</i> or <i>/sandbox</i>
 	*/
-	QString   root();
+    QString   root() const;
 
 	/*!
 	  Full canonical path of the file.
 	*/
-	QString   path();
+    QString   path()  const;
 
 	/*!
 	  Indicates whether the selected item is a directory.
 	*/
-	bool      isDir();
+    bool      isDir()  const;
 
 	/*!
 	  Mime-Type of the item.
 	*/
-	QString   mimeType();
+    QString   mimeType()  const;
 
 	/*!
 	  Indiciates that the item was deleted from the server.
 	*/
-	bool      isDeleted();
+    bool      isDeleted()  const;
 
 	/*!
 	  Current revision as hash string. Use this for e.g. change check.
 	*/
-	QString   revisionHash();
+    QString   revisionHash()  const;
 
 signals:
     
