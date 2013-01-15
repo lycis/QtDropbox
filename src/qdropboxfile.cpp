@@ -272,7 +272,15 @@ bool QDropboxFile::getFileContent(QString filename)
 #ifdef QTDROPBOX_DEBUG
         qDebug() << "QDropboxFile::getFileContent ReadError: " << lastErrorCode << lastErrorMessage << endl;
 #endif
-        return false;
+		if(lastErrorCode ==  QDROPBOX_ERROR_FILE_NOT_FOUND)
+		{
+			_buffer->clear();
+#ifdef QTDROPBOX_DEBUG
+        qDebug() << "QDropboxFile::getFileContent: file does not exist" << endl;
+#endif
+		}
+		else
+			return false;
     }
 
     return true;

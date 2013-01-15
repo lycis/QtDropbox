@@ -933,6 +933,7 @@ void QDropbox::checkReleaseEventLoop(int reqnr)
 	case QDROPBOX_REQ_RQBTOKN:
 	case QDROPBOX_REQ_BACCTOK:
 	case QDROPBOX_REQ_BACCINF:
+    case QDROPBOX_REQ_BMETADA:
 		stopEventLoop(); // release local event loop
 		break;
 	default:
