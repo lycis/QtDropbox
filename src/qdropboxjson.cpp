@@ -13,7 +13,7 @@ QDropboxJson::QDropboxJson(QString strJson, QObject *parent) :
     parseString(strJson);
 }
 
-QDropboxJson::QDropboxJson(QDropboxJson &other) :
+QDropboxJson::QDropboxJson(const QDropboxJson &other) :
     QObject(other.parent())
 {
     valid = false;
@@ -375,7 +375,7 @@ QDateTime QDropboxJson::getTimestamp(QString key, bool force)
 		                         "ddd dd MMM yyyy hh:mm:ss");
 }
 
-QString QDropboxJson::strContent()
+QString QDropboxJson::strContent() const
 {
     return _strContent;
 }

@@ -45,47 +45,47 @@ public:
 
       \param other Original QDropboxAccount
      */
-    QDropboxAccount(QDropboxAccount& other);
+    QDropboxAccount(const QDropboxAccount& other);
 
     /*!
       Returns the referal link of the user.
      */
-    QUrl    referralLink();
+    QUrl    referralLink()  const;
 
     /*!
       Returns the display name of the account.
      */
-    QString displayName();
+    QString displayName()  const;
 
     /*!
       Returns the Dropbox UID of the account.
      */
-    qint64  uid();
+    qint64  uid()  const;
 
     /*!
       Returns the country the account is associated to.
      */
-    QString country();
+    QString country()  const;
 
     /*!
       Returns the E-Mail address the owner of the account uses.
      */
-    QString email();
+    QString email()  const;
 
     /*!
       Returns the user's used quota in shared folders in bytes.
      */
-    quint64  quotaShared();
+    quint64  quotaShared()  const;
 
     /*!
       Returns the user's total quota of allocated bytes.
      */
-    quint64  quota();
+    quint64  quota()  const;
 
     /*!
       Returns the user's quota outside of shared folders in bytes.
      */
-    quint64  quotaNormal();
+    quint64  quotaNormal()  const;
 
     /*!
       Overloaded operator to copy a QDropboxAccount by using =. Internally
@@ -96,7 +96,7 @@ public:
     /*!
       This function is used to copy the data from an other QDropboxAccount.
      */
-    void copyFrom(QDropboxAccount& a);
+    void copyFrom(const QDropboxAccount& a);
 
 private:  
     QUrl    _referralLink;

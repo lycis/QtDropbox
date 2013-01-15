@@ -83,7 +83,7 @@ public:
 
       \param other The QDropboxJson to be copied.
      */
-    QDropboxJson(QDropboxJson &other);
+    QDropboxJson(const QDropboxJson &other);
 
     /*!
       Cleans up the JSON on destruction.
@@ -180,13 +180,13 @@ public:
     /*!
       Returns the stored JSON's string representation.
      */
-    QString strContent();
+    QString strContent() const;
 
 	/*!
 	  Returns a stored string values as QDateTime timestamp. The timestamp will be invalid
 	  if the string could not be converted.
 	*/
-	QDateTime getTimestamp(QString key, bool force = false);
+    QDateTime getTimestamp(QString key, bool force = false);
 
     //! \todo operator=
     

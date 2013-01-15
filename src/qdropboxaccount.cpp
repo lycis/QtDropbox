@@ -11,7 +11,7 @@ QDropboxAccount::QDropboxAccount(QString jsonString, QObject *parent) :
 	_init();
 }
 
-QDropboxAccount::QDropboxAccount(QDropboxAccount& other) :
+QDropboxAccount::QDropboxAccount(const QDropboxAccount& other) :
     QDropboxJson()
 {
     copyFrom(other);
@@ -78,42 +78,42 @@ void QDropboxAccount::_init()
     return;
 }
 
-QUrl QDropboxAccount::referralLink()
+QUrl QDropboxAccount::referralLink()  const
 {
     return _referralLink;
 }
 
-QString QDropboxAccount::displayName()
+QString QDropboxAccount::displayName()  const
 {
     return _displayName;
 }
 
-qint64 QDropboxAccount::uid()
+qint64 QDropboxAccount::uid()  const
 {
     return _uid;
 }
 
-QString QDropboxAccount::country()
+QString QDropboxAccount::country()  const
 {
     return _country;
 }
 
-QString QDropboxAccount::email()
+QString QDropboxAccount::email()  const
 {
     return _email;
 }
 
-quint64 QDropboxAccount::quotaShared()
+quint64 QDropboxAccount::quotaShared()  const
 {
     return _quotaShared;
 }
 
-quint64 QDropboxAccount::quota()
+quint64 QDropboxAccount::quota()  const
 {
     return _quota;
 }
 
-quint64 QDropboxAccount::quotaNormal()
+quint64 QDropboxAccount::quotaNormal()  const
 {
     return _quotaNormal;
 }
@@ -124,7 +124,7 @@ QDropboxAccount &QDropboxAccount::operator =(QDropboxAccount &a)
     return *this;
 }
 
-void QDropboxAccount::copyFrom(QDropboxAccount &other)
+void QDropboxAccount::copyFrom(const QDropboxAccount &other)
 {
     this->setParent(other.parent());
     qDebug() << "creating account from account" << endl;
