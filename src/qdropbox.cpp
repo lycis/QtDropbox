@@ -262,6 +262,13 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
 		case QDROPBOX_REQ_BACCINF:
 			parseBlockingAccountInfo(response);
 			break;
+        case QDROPBOX_REQ_SHRDLNK:
+            parseSharedLink(response);
+            break;
+
+        case QDROPBOX_REQ_BSHRDLN:
+            parseBlockingSharedLink(response);
+            break;
         default:
             errorState  = QDropbox::ResponseToUnknownRequest;
             errorText   = "Received a response to an unknown request";
@@ -589,6 +596,29 @@ void QDropbox::parseAccountInfo(QString response)
     return;
 }
 
+void QDropbox::parseSharedLink(QString response)
+{
+#ifdef QTDROPBOX_DEBUG
+    qDebug() << "== shared link ==" << response << "== shared link end ==";
+#endif
+
+    //QDropboxJson json;
+    //json.parseString(response);
+    _tempJson.parseString(response);
+    if(!_tempJson.isValid())
+    {
+        errorState = QDropbox::APIError;
+        errorText  = "Dropbox API did not send correct answer for file/directory shared link.";
+#ifdef QTDROPBOX_DEBUG
+        qDebug() << "error: " << errorText << endl;
+#endif
+        emit errorOccured(errorState);
+        stopEventLoop();
+        return;
+    }
+    emit sharedLinkReceived(response);
+}
+
 void QDropbox::parseMetadata(QString response)
 {
 #ifdef QTDROPBOX_DEBUG
@@ -876,6 +906,52 @@ QDropboxFileInfo QDropbox::requestMetadataAndWait(QString file)
 	return fi;
 }
 
+void QDropbox::requestSharedLink(QString file, bool blocking)
+{
+    QUrl url;
+    url.setUrl(apiurl.toString());
+    url.addQueryItem("oauth_consumer_key",_appKey);
+    url.addQueryItem("oauth_nonce", nonce);
+    url.addQueryItem("oauth_signature_method", signatureMethodString());
+    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
+    url.addQueryItem("oauth_token", oauthToken);
+    url.addQueryItem("oauth_version", _version);
+    url.setPath(QString("%1/shares/%2").arg(_version.left(1), file));
+
+    QString signature = oAuthSign(url);
+    url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+
+    int reqnr = sendRequest(url);
+    if(blocking)
+    {
+        requestMap[reqnr].type = QDROPBOX_REQ_BSHRDLN;
+        startEventLoop();
+    }
+    else
+        requestMap[reqnr].type = QDROPBOX_REQ_SHRDLNK;
+
+    return;
+}
+
+QUrl QDropbox::requestSharedLinkAndWait(QString file)
+{
+    requestSharedLink(file,true);
+    QDropboxJson json(_tempJson.strContent());
+    QString urlString = json.getString("url");
+    return QUrl(urlString);
+}
+
+void QDropbox::startEventLoop()
+{
+#ifdef QTDROPBOX_DEBUG
+    qDebug() << "QDropbox::startEventLoop()" << endl;
+#endif
+    if(_evLoop == NULL)
+        _evLoop = new QEventLoop(this);
+    _evLoop->exec();
+    return;
+}
+
 void QDropbox::startEventLoop()
 {
 #ifdef QTDROPBOX_DEBUG
@@ -923,6 +999,13 @@ void QDropbox::parseBlockingMetadata(QString response)
 	parseMetadata(response);
 	stopEventLoop();
 	return;
+}
+
+void QDropbox::parseBlockingSharedLink(QString response)
+{
+    clearError();
+    parseSharedLink(response);
+    stopEventLoop();
 }
 
 // check if the event loop has to be stopped after a blocking request was sent
