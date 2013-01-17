@@ -952,17 +952,6 @@ void QDropbox::startEventLoop()
     return;
 }
 
-void QDropbox::startEventLoop()
-{
-#ifdef QTDROPBOX_DEBUG
-    qDebug() << "QDropbox::startEventLoop()" << endl;
-#endif
-    if(_evLoop == NULL)
-        _evLoop = new QEventLoop(this);
-    _evLoop->exec();
-    return;
-}
-
 void QDropbox::stopEventLoop()
 {
 #ifdef QTDROPBOX_DEBUG
@@ -1031,3 +1020,4 @@ void QDropbox::clearError()
 	errorText  = "";
 	return;
 }
+
