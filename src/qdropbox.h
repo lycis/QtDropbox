@@ -36,6 +36,8 @@ const qdropbox_request_type QDROPBOX_REQ_BACCTOK = 0x08;
 const qdropbox_request_type QDROPBOX_REQ_METADAT = 0x09;
 const qdropbox_request_type QDROPBOX_REQ_BACCINF = 0x0A;
 const qdropbox_request_type QDROPBOX_REQ_BMETADA = 0x0B;
+const qdropbox_request_type QDROPBOX_REQ_SHRDLNK = 0x0C;
+const qdropbox_request_type QDROPBOX_REQ_BSHRDLN = 0x0D;
 
 //! Internally used struct to handle network requests sent from QDropbox
 /*!
@@ -389,6 +391,21 @@ public:
 	 */
 	QDropboxFileInfo requestMetadataAndWait(QString file);
 
+	 /*!
+	 * \brief Creates and returns a Dropbox link to files or folders users can use to view a preview of the file in a web browser.
+	 * \param path from the file i.e. /dropbox/hello.txt
+	 * \param blocking
+	 */
+         void requestSharedLink(QString file, bool blocking = false);
+
+	/*!
+	* \brief Works exactly like QDropbox::requestSharedLink() but blocks until link
+	* was receivied from the Dropbox Server.
+	* \param path from the file i.e. /dropbox/hello.txt
+	* \return Url to the file
+	*/
+	QUrl requestSharedLinkAndWait(QString file);
+    
 	/*!
 	  Resets the last error. Use this when you reacted on an error to delete the error flag.
 	*/
@@ -461,6 +478,12 @@ signals:
 	  \param metadataJson JSON string that contains the metadata information
 	*/
 	void metadataReceived(QString metadataJson);
+	
+	/*!
+	Emmited when shared link was received. Only relevant for non-blocking use of sharedLink()
+	\param sharedLinkJson string than contains the share link information.
+	*/
+	void sharedLinkReceived(QString sharedLink);
 
 public slots:
 
@@ -514,10 +537,12 @@ private:
 	void responseBlockingAccessToken(QString response);
     void parseToken(QString response);
     void parseAccountInfo(QString response);
+    void parseSharedLink(QString response);
 	void checkReleaseEventLoop(int reqnr);
 	void parseMetadata(QString response);
 	void parseBlockingAccountInfo(QString response);
 	void parseBlockingMetadata(QString response);
+	void parseBlockingSharedLink(QString response);
 	
 };
 
