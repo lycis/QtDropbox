@@ -261,7 +261,7 @@ public:
 
       \param s token secret string
      */
-    void setSecret(QString s);
+    void setTokenSecret(QString s);
     /*!
       Returns the currently used token secret. This function may be used to get an
       authorized token secret after iniating a new connection (e.g. to save it).

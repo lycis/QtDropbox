@@ -486,6 +486,8 @@ void QDropbox::responseTokenRequest(QString response)
 
 int QDropbox::responseDropboxLogin(QString response, int reqnr)
 {
+    Q_UNUSED(reqnr);
+
     // extract login form
     QDomDocument xml;
     QString err;
@@ -677,7 +679,7 @@ QString QDropbox::token()
     return oauthToken;
 }
 
-void QDropbox::setSecret(QString s)
+void QDropbox::setTokenSecret(QString s)
 {
     oauthTokenSecret = s;
     return;
@@ -750,7 +752,9 @@ int QDropbox::authorize(QString email, QString pwd)
     QUrl dropbox_authorize;
     dropbox_authorize.setPath(QString("%1/oauth/authorize")
                            .arg(_version.left(1)));
+#ifdef QTDROPBOX_DEBUG
     qDebug() << "oauthToken = " << oauthToken << endl;
+#endif
     dropbox_authorize.addQueryItem("oauth_token", oauthToken);
     int reqnr = sendRequest(dropbox_authorize, "GET", 0, "www.dropbox.com");
     requestMap[reqnr].type = QDROPBOX_REQ_AULOGIN;

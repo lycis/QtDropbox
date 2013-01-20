@@ -171,7 +171,9 @@ void QDropboxJson::parseString(QString strJson)
             key = "";
             jsonValue = 0;
 
+#ifdef QTDROPBOX_DEBUG
             qDebug() << "jsonValue = " << e.value.json << endl;
+#endif
 
             // ignore next ,
             i = j+1;
