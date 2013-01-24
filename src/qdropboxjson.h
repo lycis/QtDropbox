@@ -57,7 +57,6 @@ struct qdropboxjson_entry{
   \todo Implement support for arrays.
   \todo Implemement setter functions and toString() for JSON generation (altough not necessary it
         would be a nice feature)
-   \bug getTimestamp() is not working correctly because of a localisation issue with date formatting
  */
 class QTDROPBOXSHARED_EXPORT QDropboxJson : public QObject
 {
@@ -185,6 +184,7 @@ public:
 	/*!
 	  Returns a stored string values as QDateTime timestamp. The timestamp will be invalid
 	  if the string could not be converted.
+	  \bug getTimestamp() is not working correctly because of a localisation issue with date formatting
 	*/
     QDateTime getTimestamp(QString key, bool force = false);
 

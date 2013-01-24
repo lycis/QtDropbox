@@ -93,7 +93,7 @@ struct qdropbox_request{
   function the function error() will return QDropbox::NoError if no error occurred or the error that
   occurred when processing the blocking request.
 
-  \bug HMAC-SHA1 authentication is not working
+  \bug HMAC-SHA1 authentication is not working (does not have to be in 1.0)
 
  */
 class QTDROPBOXSHARED_EXPORT QDropbox : public QObject
@@ -102,7 +102,7 @@ class QTDROPBOXSHARED_EXPORT QDropbox : public QObject
 public:
     //! Method for oAuth authentication
     /*! These methods are used for authentication with the oAuth protocol
-        \bug Currently HMAC-SHA1 encoding does not work.
+        \bug Currently HMAC-SHA1 encoding does not work. (does not have to be in 1.0)
      */
     enum OAuthMethod{
         Plaintext, /*!< Plaintext authentication, HTTPS is automatically used. */
