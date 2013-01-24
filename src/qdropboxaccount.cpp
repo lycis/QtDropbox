@@ -127,8 +127,10 @@ QDropboxAccount &QDropboxAccount::operator =(QDropboxAccount &a)
 void QDropboxAccount::copyFrom(const QDropboxAccount &other)
 {
     this->setParent(other.parent());
+#ifdef QTDROPBOX_DEBUG
     qDebug() << "creating account from account" << endl;
     qDebug() << "taken reflink: " << other.referralLink().toString() << endl;
+#endif
     _referralLink = other.referralLink();
     _displayName  = other.displayName();
     _uid          = other.uid();
