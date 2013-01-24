@@ -37,8 +37,6 @@ const QString QDROPBOXFILE_CONTENT_URL = "https://api-content.dropbox.com";
 
   \todo QDropboxFile has to be a random access device (reimplement seek() and pos())
 
-  \todo Implement changed() function to check if a newer version of the file is
-        available.
  */
 class QTDROPBOXSHARED_EXPORT QDropboxFile : public QIODevice
 {

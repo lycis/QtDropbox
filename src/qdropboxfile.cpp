@@ -215,8 +215,13 @@ void QDropboxFile::networkRequestFinished(QNetworkReply *rply)
         stopEventLoop();
         break;
     case notWaiting:
+		break; // when we are not waiting for anything, we don't do anything - simple!
     default:
-    //! \todo implement reaction for notWaiting/default
+#ifdef QTDROPBOX_DEBUG
+		// debug information only - this should not happen, but if it does we 
+		// ignore replies when not waiting for anything
+		qDebug() << "QDropboxFile::networkRequestFinished(...) got reply in unknown state (" << _waitMode << ")" << endl;
+#endif
         break;
     }
 }
