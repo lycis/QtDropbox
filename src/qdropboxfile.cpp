@@ -214,7 +214,10 @@ void QDropboxFile::networkRequestFinished(QNetworkReply *rply)
         rplyFileWrite(rply);
         stopEventLoop();
         break;
+    case notWaiting:
+    default:
     //! \todo implement reaction for notWaiting/default
+        break;
     }
 }
 

@@ -128,7 +128,7 @@ public:
         WrongHttpMethod,                /*!< The REST API request used a wrong HTTP method. Dropbox API error 405 */
         MaxRequestsExceeded,            /*!< The maximum amount of requests was exceeded. Dropbox API error 503 */
         UserOverQuota,                  /*!< The user exceeded his or her storage quota. Dropbox API error 507 */
-		TokenExpired                    /*!< The access token has expired. Dropbox API error 401*/
+        TokenExpired                    /*!< The access token has expired. Dropbox API error 401*/
     };
 
     /*!
@@ -261,7 +261,7 @@ public:
 
       \param s token secret string
      */
-    void setSecret(QString s);
+    void setTokenSecret(QString s);
     /*!
       Returns the currently used token secret. This function may be used to get an
       authorized token secret after iniating a new connection (e.g. to save it).
@@ -294,14 +294,14 @@ public:
      */
     int requestToken(bool blocking = false);
 
-	/*!
-	  This functions works exactly like requestToken(...) but will block until the
-	  answer (e.g. the token or an error) has arrived from the server.
+    /*!
+      This functions works exactly like requestToken(...) but will block until the
+      answer (e.g. the token or an error) has arrived from the server.
 
-	  \return <i>true</i> if the token was received successfully or <i>false</i> if an
-	          error occured
-	*/
-	bool requestTokenAndWait();
+      \return <i>true</i> if the token was received successfully or <i>false</i> if an
+              error occured
+    */
+    bool requestTokenAndWait();
     /*!
       This function should do automatic authorization.
       \warning This functions is currently not supported by the Dropbox API. You need
@@ -320,34 +320,34 @@ public:
       retrieves an access token from the Dropbox API that you'll have to use to access
       Dropbox services.
 
-	  \param blocking <i>internal only</i> indidicates if the call should block
+      \param blocking <i>internal only</i> indidicates if the call should block
      */
     int requestAccessToken(bool blocking = false);
 
-	/*!
-	  This functions works exactly like requestAccessToken(...) but blocks until the answer
-	  from the server was received.
+    /*!
+      This functions works exactly like requestAccessToken(...) but blocks until the answer
+      from the server was received.
 
-	  \return <i>true</i> if the access token could be requested without error or <i>false</i>
-	          if an error occured.
-	*/
-	bool requestAccessTokenAndWait();
+      \return <i>true</i> if the access token could be requested without error or <i>false</i>
+              if an error occured.
+    */
+    bool requestAccessTokenAndWait();
 
     /*!
       By using this function the account information of the connected user will be
       retrieved. When the account information was obtained the signal QDropbox::accountInfoReceived()
-	  will be emitted.
+      will be emitted.
 
-	  \param blocking <i>internal only</i> indidicates if the call should block
+      \param blocking <i>internal only</i> indidicates if the call should block
      */
     void requestAccountInfo(bool blocking = false);
 
-	/*!
-	  Works exactly like accountInfo() but blocks until the data was received from the server.
-	  It returns an instance of QDropboxAccount containing the requested data. You do not have
-	  to react on the accountInfoReceived() signal when using this function.
-	 */
-	QDropboxAccount requestAccountInfoAndWait(); 
+    /*!
+      Works exactly like accountInfo() but blocks until the data was received from the server.
+      It returns an instance of QDropboxAccount containing the requested data. You do not have
+      to react on the accountInfoReceived() signal when using this function.
+     */
+    QDropboxAccount requestAccountInfoAndWait();
 
     /*!
       This function is public for internal QtDropbox API use. It is used to sign
@@ -372,44 +372,44 @@ public:
      */
     static QString generateNonce(qint32 length);
 
-	/*!
-	  Get the file metadata for a file speciified by the filename. When the Dropbox
-	  API server answeres the request the signal QDropbox::metadataReceived() will be
-	  emitted.
+    /*!
+      Get the file metadata for a file speciified by the filename. When the Dropbox
+      API server answeres the request the signal QDropbox::metadataReceived() will be
+      emitted.
 
-	  \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
-	  \param blocking <i>internal only</i> indidicates if the call should block
-	*/
-	void requestMetadata(QString file, bool blocking = false);
+      \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
+      \param blocking <i>internal only</i> indidicates if the call should block
+    */
+    void requestMetadata(QString file, bool blocking = false);
 
-	/*!
-	  Works exactly like QDropbox::requestMetadata() but blocks until the metadata
-	  was received from the Dropbox server and returns an instance of QDropboxFileInfo
-	  that contains the metadata of the requested file.
+    /*!
+      Works exactly like QDropbox::requestMetadata() but blocks until the metadata
+      was received from the Dropbox server and returns an instance of QDropboxFileInfo
+      that contains the metadata of the requested file.
 
-	  \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
-	 */
-	QDropboxFileInfo requestMetadataAndWait(QString file);
+      \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
+     */
+    QDropboxFileInfo requestMetadataAndWait(QString file);
 
-	 /*!
-	 * \brief Creates and returns a Dropbox link to files or folders users can use to view a preview of the file in a web browser.
-	 * \param path from the file i.e. /dropbox/hello.txt
-	 * \param blocking
-	 */
-         void requestSharedLink(QString file, bool blocking = false);
+    /*!
+     * \brief Creates and returns a Dropbox link to files or folders users can use to view a preview of the file in a web browser.
+     * \param path from the file i.e. /dropbox/hello.txt
+     * \param blocking
+     */
+    void requestSharedLink(QString file, bool blocking = false);
 
-	/*!
-	* \brief Works exactly like QDropbox::requestSharedLink() but blocks until link
-	* was receivied from the Dropbox Server.
-	* \param path from the file i.e. /dropbox/hello.txt
-	* \return Url to the file
-	*/
-	QUrl requestSharedLinkAndWait(QString file);
+    /*!
+    * \brief Works exactly like QDropbox::requestSharedLink() but blocks until link
+    * was receivied from the Dropbox Server.
+    * \param path from the file i.e. /dropbox/hello.txt
+    * \return Url to the file
+    */
+    QUrl requestSharedLinkAndWait(QString file);
     
-	/*!
-	  Resets the last error. Use this when you reacted on an error to delete the error flag.
-	*/
-	void clearError();
+    /*!
+      Resets the last error. Use this when you reacted on an error to delete the error flag.
+    */
+    void clearError();
 
 signals:
     /*!
@@ -471,19 +471,19 @@ signals:
      */
     void accountInfoReceived(QString accountJson);
 
-	/*!
-	  Emitted when metadata information about a file or directory was received. This will
-	  only be relevant for non-blocking use of metadata(...);
+    /*!
+      Emitted when metadata information about a file or directory was received. This will
+      only be relevant for non-blocking use of metadata(...);
 
-	  \param metadataJson JSON string that contains the metadata information
-	*/
-	void metadataReceived(QString metadataJson);
-	
-	/*!
-	Emmited when shared link was received. Only relevant for non-blocking use of sharedLink()
-	\param sharedLinkJson string than contains the share link information.
-	*/
-	void sharedLinkReceived(QString sharedLink);
+      \param metadataJson JSON string that contains the metadata information
+    */
+    void metadataReceived(QString metadataJson);
+
+    /*!
+    Emmited when shared link was received. Only relevant for non-blocking use of sharedLink()
+    \param sharedLinkJson string than contains the share link information.
+    */
+    void sharedLinkReceived(QString sharedLink);
 
 public slots:
 
@@ -492,6 +492,12 @@ private slots:
     void networkReplyFinished(QNetworkReply* rply);
 
 private:
+    enum {
+        SHA1_DIGEST_LENGTH      = 20,
+        SHA1_BLOCK_SIZE         = 64,
+        HMAC_BUF_LEN            = 4096
+    } ;
+
     QNetworkAccessManager conManager;
 
     Error   errorState;
@@ -527,23 +533,23 @@ private:
 
     QDropboxAccount _account;
 
-	QString hmacsha1(QString key, QString baseString);
+    QString hmacsha1(QString key, QString baseString);
     void prepareApiUrl();
     int  sendRequest(QUrl request, QString type = "GET", QByteArray postdata = 0, QString host = "");
     void responseTokenRequest(QString response);
-	void responseBlockedTokenRequest(QString response);
+    void responseBlockedTokenRequest(QString response);
     int  responseDropboxLogin(QString response, int reqnr);
     void responseAccessToken(QString response);
-	void responseBlockingAccessToken(QString response);
+    void responseBlockingAccessToken(QString response);
     void parseToken(QString response);
     void parseAccountInfo(QString response);
     void parseSharedLink(QString response);
-	void checkReleaseEventLoop(int reqnr);
-	void parseMetadata(QString response);
-	void parseBlockingAccountInfo(QString response);
-	void parseBlockingMetadata(QString response);
-	void parseBlockingSharedLink(QString response);
-	
+    void checkReleaseEventLoop(int reqnr);
+    void parseMetadata(QString response);
+    void parseBlockingAccountInfo(QString response);
+    void parseBlockingMetadata(QString response);
+    void parseBlockingSharedLink(QString response);
+
 };
 
 #endif // QDROPBOX_H
