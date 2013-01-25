@@ -371,10 +371,11 @@ QDateTime QDropboxJson::getTimestamp(QString key, bool force)
 	if(!force && e.type != QDROPBOXJSON_TYPE_STR)
 		return QDateTime();
 
-	QString dval = e.value.value->mid(1, e.value.value->size()-8);
+    // Dropbox date time format "Sat, 21 Aug 2010 22:31:20 +0000"
+    QString dval = e.value.value->mid(0, e.value.value->size()-6);
 
-	return QDateTime::fromString(dval, 
-		                         "ddd dd MMM yyyy hh:mm:ss");
+    return QDateTime::fromString(dval,
+                                 "ddd, dd MMM yyyy hh:mm:ss");
 }
 
 QString QDropboxJson::strContent() const
