@@ -371,10 +371,20 @@ QDateTime QDropboxJson::getTimestamp(QString key, bool force)
 	if(!force && e.type != QDROPBOXJSON_TYPE_STR)
 		return QDateTime();
 
-    // Dropbox date time format "Sat, 21 Aug 2010 22:31:20 +0000"
-    QString dval = e.value.value->left(QString("Sat, 21 Aug 2010 22:31:20").size());
+    // Dropbox date time format "Sat 21 Aug 2010 22:31:20 +0000"
+	QString day   = e.value.value->mid(1, 3);
+	QString part1 = e.value.value->mid(5, 2);
+	QString month = e.value.value->mid(8, 3);
+	QString part2 = e.value.value->mid(12,14);
+	        part2 = part2.mid(0, part2.size()-1);
+	        month = translateMonth(month);
+			day   = translateDay(day);
+	QString dval = QString("%1 %2 %3 %4").arg(day).arg(part1).arg(month).arg(part2);
 
-    return QDateTime::fromString(dval, "ddd, dd MMM yyyy hh:mm:ss");
+	QDateTime dtime = QDateTime::fromString(dval, "ddd dd MMM yyyy hh:mm:ss");
+	bool b = dtime.isValid();
+
+    return dtime;
 }
 
 QString QDropboxJson::strContent() const
@@ -427,4 +437,33 @@ qdropboxjson_entry_type QDropboxJson::interpretType(QString value)
         return QDROPBOXJSON_TYPE_FLOAT;
 
     return QDROPBOXJSON_TYPE_UNKNOWN;
+}
+
+QString QDropboxJson::translateMonth(QString month)
+{
+	QStringList months;
+	months << "Jan" << "Feb" << "Mar" << "Apr" << "May" << "Jun"
+		   << "Jul" << "Aug" << "Sep" << "Oct" << "Nov" << "Dec";
+
+	for(int i=1; i<=12; ++i)
+	{
+		if(months.at(i-1).compare(month) == 0)
+			return QDate::shortMonthName(i);
+	}
+
+	return "<unknown>";
+}
+
+QString QDropboxJson::translateDay(QString day)
+{
+	QStringList days;
+	days << "Mon" << "Tue" << "Wed" << "Thu" << "Fri" << "Sat" << "Sun";
+
+	for(int i=1; i<=7; ++i)
+	{
+		if(days.at(i-1).compare(day) == 0)
+			return QDate::shortDayName(i);
+	}
+
+	return "<unknown>";
 }
