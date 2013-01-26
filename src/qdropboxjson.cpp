@@ -63,7 +63,7 @@ void QDropboxJson::parseString(QString strJson)
 
     for(int i=0; i<strJson.size(); ++i)
     {
-        switch(strJson.at(i).toAscii())
+        switch(strJson.at(i).toLatin1())
         {
         case '"':
             if(!isKey)
@@ -130,9 +130,9 @@ void QDropboxJson::parseString(QString strJson)
             int j;
             for(j=i+1; openBrackets > 0 && j < strJson.size(); ++j)
             {
-                if(strJson.at(j).toAscii() == '{')
+                if(strJson.at(j).toLatin1() == '{')
                     openBrackets++;
-                else if(strJson.at(j).toAscii() == '}')
+                else if(strJson.at(j).toLatin1() == '}')
                     openBrackets--;
             }
 

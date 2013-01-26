@@ -314,13 +314,13 @@ QString QDropbox::hmacsha1(QString base, QString key)
     QByteArray ipad;
     ipad.fill(char(0), 64);
     for(int i = 0; i < key.length(); ++i)
-        ipad[i] = key[i].toAscii();
+        ipad[i] = key[i].toLatin1();
 
     // outer pad
     QByteArray opad;
     opad.fill(char(0), 64);
     for(int i = 0; i < key.length(); ++i)
-        opad[i] = key[i].toAscii();
+        opad[i] = key[i].toLatin1();
 
     // XOR operation for inner pad
     for(int i = 0; i < ipad.length(); ++i)
@@ -332,7 +332,7 @@ QString QDropbox::hmacsha1(QString base, QString key)
 
     // Hashes inner pad
     QByteArray innerSha1 = QCryptographicHash::hash(
-        ipad + base.toAscii(),
+        ipad + base.toLatin1(),
         QCryptographicHash::Sha1
         );
 
@@ -364,12 +364,12 @@ QString QDropbox::hmacsha1(QString base, QString key)
     if (key.length() > SHA1_BLOCK_SIZE)
     {
         SHA1_Key = QCryptographicHash::hash(
-                    key.toAscii(),
+                    key.toLatin1(),
                     QCryptographicHash::Sha1
                     );
     }
     else
-        SHA1_Key = key.toAscii();
+        SHA1_Key = key.toLatin1();
 
     // STEP 2
     for (int i = 0; i < ipad.length(); i++)
@@ -379,7 +379,7 @@ QString QDropbox::hmacsha1(QString base, QString key)
 
     // STEP 3
     QByteArray innerSha1 = ipad;
-    innerSha1.append(base.toAscii().toBase64());
+    innerSha1.append(base.toLatin1().toBase64());
 
     // STEP 4
     QByteArray szReport = QCryptographicHash::hash(
@@ -412,7 +412,7 @@ QString QDropbox::hmacsha1(QString baseString, QString key)
 {
     int blockSize = 64; // HMAC-::hmacsha1SHA-1 block size, defined in SHA-1 standard
     if (key.length() > blockSize) { // if key is longer than block size (64), reduce key length with SHA-1 compression
-        key = QCryptographicHash::hash(key.toAscii(), QCryptographicHash::Sha1);
+        key = QCryptographicHash::hash(key.toLatin1(), QCryptographicHash::Sha1);
     }
 
     QByteArray innerPadding(blockSize, char(0x36)); // initialize inner padding with char "6"
@@ -421,14 +421,14 @@ QString QDropbox::hmacsha1(QString baseString, QString key)
     // Hamming distance (http://en.wikipedia.org/wiki/Hamming_distance)
 
     for (int i = 0; i < key.length(); i++) {
-        innerPadding[i] = innerPadding[i] ^ key.toAscii().at(i); // XOR operation between every byte in key and innerpadding, of key length
-        outerPadding[i] = outerPadding[i] ^ key.toAscii().at(i); // XOR operation between every byte in key and outerpadding, of key length
+        innerPadding[i] = innerPadding[i] ^ key.toLatin1().at(i); // XOR operation between every byte in key and innerpadding, of key length
+        outerPadding[i] = outerPadding[i] ^ key.toLatin1().at(i); // XOR operation between every byte in key and outerpadding, of key length
     }
 
     // result = hash ( outerPadding CONCAT hash ( innerPadding CONCAT baseString ) ).toBase64
     QByteArray total = outerPadding;
     QByteArray part = innerPadding;
-    part.append(baseString.toAscii());
+    part.append(baseString.toLatin1());
     total.append(QCryptographicHash::hash(part, QCryptographicHash::Sha1));
     QByteArray hashed = QCryptographicHash::hash(total, QCryptographicHash::Sha1);
     return hashed.toBase64();
