@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QList>
 #include <QDateTime>
+#include <QStringList>
 
 #ifdef QTDROPBOX_DEBUG
 #include <QDebug>
@@ -198,6 +199,9 @@ private:
 
     void emptyList();
     qdropboxjson_entry_type interpretType(QString value);
+	QString translateMonth(QString month);
+	QString translateDay(QString day);
+
     QString _strContent;
 };
 
