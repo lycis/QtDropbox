@@ -185,11 +185,13 @@ public:
 	/*!
 	  Returns a stored string values as QDateTime timestamp. The timestamp will be invalid
 	  if the string could not be converted.
-	  \bug getTimestamp() is not working correctly because of a localisation issue with date formatting
 	*/
     QDateTime getTimestamp(QString key, bool force = false);
 
-    //! \todo operator=
+	/**!
+	  Overloaded operator to copy a QDropboxJson.
+	*/
+    QDropboxJson& operator =(QDropboxJson&);
     
 protected:
 		bool valid;

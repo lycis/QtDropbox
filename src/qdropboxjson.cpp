@@ -381,10 +381,7 @@ QDateTime QDropboxJson::getTimestamp(QString key, bool force)
 			day   = translateDay(day);
 	QString dval = QString("%1 %2 %3 %4").arg(day).arg(part1).arg(month).arg(part2);
 
-	QDateTime dtime = QDateTime::fromString(dval, "ddd dd MMM yyyy hh:mm:ss");
-	bool b = dtime.isValid();
-
-    return dtime;
+    return QDateTime::fromString(dval, "ddd dd MMM yyyy hh:mm:ss");
 }
 
 QString QDropboxJson::strContent() const
@@ -466,4 +463,11 @@ QString QDropboxJson::translateDay(QString day)
 	}
 
 	return "<unknown>";
+}
+
+QDropboxJson& QDropboxJson::operator=(QDropboxJson& other)
+{
+	/*!< \todo use toString() */
+	parseString(other.strContent());
+	return *this;
 }
