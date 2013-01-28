@@ -13,18 +13,18 @@ Please read on if you plan to contribute your ideas and/or code to the project a
 > Our mission is to create a library for C++/Qt to provide easy access to the services of [Dropbox](http://www.dropbox.com/).
 
 ### Linking External Libraries
-A great part about providing *easy* access is to keep the projecets dependencies as little as possible. There are many
-really cool libraries out there that would provide great enhancement to the featuers of the features. Whenever you
+A great part about providing *easy* access is to keep the projects dependencies as little as possible. There are many
+really cool libraries out there that would provide great enhancement to the features of the features. Whenever you
 think that a certain library would make things easier for us keep one thing in mind: *Just because it is easy for us
 it will be more complex for the users of QtDropbox as they have to satisfy another dependency.*
 
 So how to add third party libraries? If you add them make sure the user of QtDropbox has to activate the library with a
 specific switch. So the user can always choose to disable a specific third party library and just go by using the plain
 old features provided by QtDropbox itself. As you can guess this requires you to *extend* and *not replace* the feature
-set provded by QtDropbox.
+set provided by QtDropbox.
 
 #### Example
-You found a great library that could be used to enhance the capabilites of QDropboxJson (used to interpet JSON objects 
+You found a great library that could be used to enhance the capabilities of QDropboxJson (used to interpret JSON objects 
 returned by Dropbox). Of course you can use this library th extend QDropboxJson but make sure the user has a possibility
 to exclude the third party library from the project: The user has to compile QtDropbox with a specific switch (e.g.
 the user has to add `DEFINES += USE_EXT_JSONLIB` to `qtdropbox.pro`).
@@ -42,7 +42,7 @@ library.
 I usually think writing about a polite and friendly tone is not necessary but... Please be polite and friendly in your
 communication - if you are not we feel free to ignore and/or delete your requests. Furthermore keep in mind that we
 are working on this project in our spare time and that we are all working in different time zones. Communication can
-be slow but your requests will be answered. We appologise for any inconvenience caused thereby.
+be slow but your requests will be answered. We apologise for any inconvenience caused thereby.
 
 ### E-Mail
 You can reach the maintainer of the project by mailing to qtdropbox (at) deder (dot) at. If you want to join the team
@@ -54,7 +54,7 @@ some time to process your mails. In case of problems it may be faster to open a 
 possibility that somebody might read it.
 
 ### Bug Reports
-Whenver you want to file a bug report and hence broken or missing functionality please open a new issue at github. If
+Whenever you want to file a bug report and hence broken or missing functionality please open a new issue at github. If
 you want to request a feature please do so by opening an issue too.
 
 ### Patches
@@ -67,7 +67,7 @@ keep in mind that the project mailing address is only read by the principal main
 ## Coding Conventions
 The coding conventions of QtDropbox are not very strict. There are only a few requirements to the code:
 
-1. Intendation has to be 4 characters wide.
+1. Indentation has to be 4 characters wide.
 1. Add meaningful debug output to functions.
 1. Keep nested statements simple. (rule of thumb: not more than 2 nested statements)
 1. Private member start with _ (underscore)
