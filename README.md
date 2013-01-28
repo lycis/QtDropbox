@@ -52,3 +52,5 @@ There are some files apart this README that may provide some useful information:
   Installation and usage instructions
 * doc/
   Generally everthing inside this directory is information.
+* doc/DEVELOPMENT.md
+  Development guidelines. Please read if you want to contribute!
