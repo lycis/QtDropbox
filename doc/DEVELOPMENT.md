@@ -76,3 +76,7 @@ The coding conventions of QtDropbox are not very strict. There are only a few re
 For all other issues use your built-in common sense or refer to a [C++ Coding Standard](http://www.possibility.com/Cpp/CppCodingStandard.html).
 
 The main goal of every code is to work and to be maintainable - so please keep it readable!
+
+## Unit Testing
+Whenever you change any functionality you should execute all unit test cases as a form of regression testing. Additionally
+you should create new unit tests for not yet covered test cases (e.g. newly implemented functions) and fixed user problems.
