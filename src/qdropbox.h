@@ -6,8 +6,6 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QHttpRequestHeader>
-#include <QHttpResponseHeader>
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QUrl>
