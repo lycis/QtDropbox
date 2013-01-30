@@ -15,14 +15,12 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 
-SOURCES += qdropboxtest.cpp \
-    main.cpp \
-    qdropboxjsontest.cpp
+SOURCES += \
+    qtdropboxtest.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 HEADERS += \
-    qdropboxtest.hpp \
-    qdropboxjsontest.hpp
+    qtdropboxtest.hpp
 
 LIBS += -L../lib/
 INCLUDEPATH += ../qtdropbox/
