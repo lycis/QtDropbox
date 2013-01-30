@@ -5,7 +5,7 @@ QtDropboxTest::QtDropboxTest()
 }
 
 /*!
- * \brief Simple string read
+ * \brief QDropboxJson: Simple string read
  * JSON represents an object with single string value. The test
  * tries to read the string value.
  */
@@ -17,7 +17,7 @@ void QtDropboxTest::testCase1()
 }
 
 /*!
- * \brief Simple int read
+ * \brief QDropboxJson: Simple int read
  * JSON represents an object with a single integer value. The test
  * tries to read that value.
  */
@@ -29,7 +29,7 @@ void QtDropboxTest::testCase2()
 }
 
 /*!
- * \brief Invalidity check
+ * \brief QDropboxJson: Invalidity check
  * JSON is invalid. Test confirms invalidity of the JSON.
  */
 void QtDropboxTest::testCase3()
@@ -39,7 +39,7 @@ void QtDropboxTest::testCase3()
 }
 
 /*!
- * \brief Simple boolean read
+ * \brief QDropboxJson: Simple boolean read
  * JSON contains a single boolean value. Test accesses this value.
  */
 void QtDropboxTest::testCase4()
@@ -50,7 +50,7 @@ void QtDropboxTest::testCase4()
 }
 
 /*!
- * \brief Simple floating point read
+ * \brief QDropboxJson: Simple floating point read
  * JSON contains a single double value. Test reads it.
  */
 void QtDropboxTest::testCase5()
@@ -61,7 +61,7 @@ void QtDropboxTest::testCase5()
 }
 
 /*!
- * \brief Subjson read
+ * \brief QDropboxJson: Subjson read
  * JSON contains a subjson that is read, but not evaluated.
  */
 void QtDropboxTest::testCase6()
@@ -76,7 +76,7 @@ void QtDropboxTest::testCase6()
 }
 
 /*!
- * \brief Simple unsigned integer read.
+ * \brief QDropboxJson: Simple unsigned integer read.
  * JSON contains single unsigned integer that is read.
  */
 void QtDropboxTest::testCase7()
