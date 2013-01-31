@@ -192,6 +192,10 @@ void QDropboxJson::parseString(QString strJson)
             QString *valuePointer = new QString(value.trimmed());
             qdropboxjson_entry e;
             e.value.value = valuePointer;
+			if(e.type != QDROPBOXJSON_TYPE_JSON)
+				e.value.json  = NULL;
+			else
+				e.value.value = NULL;
             e.type        = interpretType(value.trimmed());
             valueMap[key] = e;
 
@@ -399,6 +403,7 @@ void QDropboxJson::emptyList()
             delete e.value.json;
         else
             delete e.value.value;
+		valueMap.remove(keys.at(i));
     }
     valueMap.empty();
     return;

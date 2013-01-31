@@ -4,6 +4,7 @@ QtDropboxTest::QtDropboxTest()
 {
 }
 
+
 /*!
  * \brief QDropboxJson: Simple string read
  * JSON represents an object with single string value. The test
@@ -12,7 +13,7 @@ QtDropboxTest::QtDropboxTest()
 void QtDropboxTest::testCase1()
 {
     QDropboxJson json("{\"string\":\"asdf\"}");
-    QVERIFY2(json.isValid(), "validity");
+    QVERIFY2(json.isValid(), "json validity");
     QVERIFY2(json.getString("string").compare("asdf") == 0, "string value does not match");
 }
 
@@ -24,18 +25,18 @@ void QtDropboxTest::testCase1()
 void QtDropboxTest::testCase2()
 {
     QDropboxJson json("{\"int\":1234}");
-    QVERIFY2(json.isValid(), "validity");
+    QVERIFY2(json.isValid(), "json validity");
     QVERIFY2(json.getInt("int") == 1234, "integer value does not match");
 }
 
 /*!
- * \brief QDropboxJson: Invalidity check
+ * \brief QDropboxJson: Injson validity check
  * JSON is invalid. Test confirms invalidity of the JSON.
  */
 void QtDropboxTest::testCase3()
 {
     QDropboxJson json("{\"test\":\"foo\"");
-    QVERIFY2(!json.isValid(), "invalidity not confirmed");
+    QVERIFY2(!json.isValid(), "injson validity not confirmed");
 }
 
 /*!
@@ -45,7 +46,7 @@ void QtDropboxTest::testCase3()
 void QtDropboxTest::testCase4()
 {
     QDropboxJson json("{\"bool\":true}");
-    QVERIFY2(json.isValid(), "validity");
+    QVERIFY2(json.isValid(), "json validity");
     QVERIFY2(json.getBool("bool"), "boolean value does not match");
 }
 
@@ -56,7 +57,7 @@ void QtDropboxTest::testCase4()
 void QtDropboxTest::testCase5()
 {
     QDropboxJson json("{\"double\":14.323667}");
-    QVERIFY2(json.isValid(), "validity");
+    QVERIFY2(json.isValid(), "json validity");
     QVERIFY2(json.getDouble("double"), "double value does not match");
 }
 
@@ -67,7 +68,7 @@ void QtDropboxTest::testCase5()
 void QtDropboxTest::testCase6()
 {
     QDropboxJson json("{\"json\": {\"string\":\"abcd\"}}");
-    QVERIFY2(json.isValid(), "validity");
+    QVERIFY2(json.isValid(), "json validity");
 
     QDropboxJson* subjson = json.getJson("json");
 
@@ -82,8 +83,20 @@ void QtDropboxTest::testCase6()
 void QtDropboxTest::testCase7()
 {
     QDropboxJson json("{\"uint\":4294967295}");
-    QVERIFY2(json.isValid(), "validity");
+    QVERIFY2(json.isValid(), "json validity");
     QVERIFY2(json.getUInt("uint") == 4294967295, "unsigned int value does not match");
+}
+
+/**
+ * @brief QDropboxJson: Test if clear works correctly
+ */
+void QtDropboxTest::testCase8()
+{
+    QDropboxJson json("{\"uint\":4294967295}");
+    QVERIFY2(json.isValid(), "json validity");
+    json.clear();
+    QVERIFY2(json.getUInt("uint") == 0, "internal list not cleared");
+    QVERIFY2(json.strContent().isEmpty(), "json string is not cleared");
 }
 
 QTEST_MAIN(QtDropboxTest)
