@@ -20,6 +20,7 @@ private Q_SLOTS:
     void testCase6();
     void testCase7();
     void testCase8();
+    void testCase9();
 };
 
 #endif // QDROPBOXJSONTEST_H

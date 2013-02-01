@@ -188,6 +188,13 @@ public:
 	*/
     QDateTime getTimestamp(QString key, bool force = false);
 
+	/*!
+	  Returnes a stored array as a list of string items. If the key does not exist or is not
+	  stored as array the function returns an empty list. If you need the items in a specific
+	  data type you have to do equivalent casting your self!
+	*/
+	QStringList getArray(QString key, bool force = false);
+
 	/**!
 	  Overloaded operator to copy a QDropboxJson.
 	*/

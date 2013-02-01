@@ -476,3 +476,30 @@ QDropboxJson& QDropboxJson::operator=(QDropboxJson& other)
 	parseString(other.strContent());
 	return *this;
 }
+
+QStringList QDropboxJson::getArray(QString key, bool force)
+{
+	QStringList list;
+	 if(!valueMap.contains(key))
+        return list;
+
+    qdropboxjson_entry e;
+    e = valueMap.value(key);
+
+    if(!force && e.type != QDROPBOXJSON_TYPE_ARRAY)
+        return list;
+
+	list = e.value.value->split(",");
+	for(int i=0; i<list.size(); ++i) // format items
+	{
+		QString item = list.at(i);
+		list.removeAt(i);
+		if(item.startsWith("\"")) // remove leading quote
+			item = item.mid(1);
+		if(item.endsWith("\"")) // remove trailing quote
+			item = item.left(item.size()-1);
+		list.append(item.trimmed());
+	}
+
+    return list;
+}

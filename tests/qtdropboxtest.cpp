@@ -99,4 +99,20 @@ void QtDropboxTest::testCase8()
     QVERIFY2(json.strContent().isEmpty(), "json string is not cleared");
 }
 
+/**
+ * @brief QDropboxJson: Test if array interpretation and access are working.
+ */
+void QtDropboxTest::testCase9()
+{
+    QDropboxJson json("{\"array\": [1, \"test\", true, 7.3]}");
+    QVERIFY2(json.isValid(), "json validity");
+
+    QStringList l = json.getArray("array");
+    QVERIFY2(l.size() == 4, "array list has wrong size");
+    QVERIFY2(l.at(0).compare("1") == 0, "int element not correctly formatted");
+    QVERIFY2(l.at(1).compare("test") == 0, "string element not correctly formatted");
+    QVERIFY2(l.at(2).compare("true") == 0, "boolean element not correctly formatted");
+    QVERIFY2(l.at(3).compare("7.3") == 0, "double element not correctly formatted");
+}
+
 QTEST_MAIN(QtDropboxTest)
