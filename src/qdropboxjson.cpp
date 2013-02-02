@@ -154,11 +154,6 @@ void QDropboxJson::parseString(QString strJson)
                 return;
             }
 
-            if(isArray)
-            {
-                // @TODO
-            }
-
 #ifdef QTDROPBOX_DEBUG
             qDebug() << "subjson " << key << " = " << jsonValue << endl;
 #endif
@@ -184,18 +179,56 @@ void QDropboxJson::parseString(QString strJson)
             //continue;
         }
 
+		 if(isArray)
+         {
+			 // value is an array value -> parse array
+			 bool inString = false;
+			 bool arrayEnd = false;
+			 int j = i+1;
+			 buffer = "[";
+			 for(;!arrayEnd && j<strJson.size();++j)
+			 {
+				 QChar arrC = strJson.at(j);
+				 switch(arrC.toLatin1())
+				 {
+				 case '"': 
+					 inString = !inString;
+					 break;
+				 case ']':
+					 buffer += "]";
+					 if(!inString)
+						 arrayEnd = true;
+					 break;
+				 case '\\':
+					 if(strJson.at(j+1) == '"') // escaped double quote
+					 {
+						 buffer += "\"";
+						 j++;
+					 }
+					 else
+						 buffer += "\\";
+					 break;
+				 default:
+					 buffer += arrC;
+					 break;
+				 }
+			 }
+			 
+			 // save array value string (buffer)
+			 value = buffer;
+			 i = j;
+			 insertValue = true;
+			 isArray = false;
+		 }
+
         if(insertValue)
         {
 #ifdef QTDROPBOX_DEBUG
             qDebug() << "insert value " << key << " with content = " << value.trimmed() << " and type = " << interpretType(value.trimmed()) << endl;
 #endif
-            QString *valuePointer = new QString(value.trimmed());
             qdropboxjson_entry e;
-            e.value.value = valuePointer;
-			if(e.type != QDROPBOXJSON_TYPE_JSON)
-				e.value.json  = NULL;
-			else
-				e.value.value = NULL;
+			QString *valuePointer = new QString(value.trimmed());
+			e.value.value = valuePointer;
             e.type        = interpretType(value.trimmed());
             valueMap[key] = e;
 
@@ -489,17 +522,13 @@ QStringList QDropboxJson::getArray(QString key, bool force)
     if(!force && e.type != QDROPBOXJSON_TYPE_ARRAY)
         return list;
 
-	list = e.value.value->split(",");
-	for(int i=0; i<list.size(); ++i) // format items
+	QString arrayStr = e.value.value->mid(1, e.value.value->length()-2);
+	list = arrayStr.split(",");
+	QStringList returnList;
+	for(int i=0; i<list.size(); ++i)
 	{
-		QString item = list.at(i);
-		list.removeAt(i);
-		if(item.startsWith("\"")) // remove leading quote
-			item = item.mid(1);
-		if(item.endsWith("\"")) // remove trailing quote
-			item = item.left(item.size()-1);
-		list.append(item.trimmed());
+		QString value = list.at(i);
+		returnList.append(value.trimmed());
 	}
-
-    return list;
+    return returnList;
 }
