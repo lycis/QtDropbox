@@ -501,3 +501,12 @@ void QDropboxFile::obtainMetadata()
 		_metadata->clear();
 	return;
 }
+
+QList<QDropboxFileInfo> QDropboxFile::revisions(int max)
+{
+	QList<QDropboxFileInfo> revisions = _api->requestRevisionsAndWait(_filename, max);
+	if(_api->error() != QDropbox::NoError)
+		revisions.clear();
+
+	return revisions;
+}

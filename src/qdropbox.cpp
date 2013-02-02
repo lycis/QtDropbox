@@ -253,6 +253,7 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
             break;
         case QDROPBOX_REQ_BMETADA:
             parseBlockingMetadata(response);
+			break;
         case QDROPBOX_REQ_BACCTOK:
             responseBlockingAccessToken(response);
             break;
@@ -265,10 +266,15 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
         case QDROPBOX_REQ_SHRDLNK:
             parseSharedLink(response);
             break;
-
         case QDROPBOX_REQ_BSHRDLN:
             parseBlockingSharedLink(response);
             break;
+		case QDROPBOX_REQ_REVISIO:
+			parseRevisions(response);
+			break;
+		case QDROPBOX_REQ_BREVISI:
+			parseBlockingRevisions(response);
+			break;
         default:
             errorState  = QDropbox::ResponseToUnknownRequest;
             errorText   = "Received a response to an unknown request";
@@ -987,6 +993,8 @@ QDropboxFileInfo QDropbox::requestMetadataAndWait(QString file)
 
 void QDropbox::requestSharedLink(QString file, bool blocking)
 {
+	clearError();
+
     QUrl url;
     url.setUrl(apiurl.toString());
     url.addQueryItem("oauth_consumer_key",_appKey);
@@ -1074,6 +1082,7 @@ void QDropbox::parseBlockingSharedLink(QString response)
     clearError();
     parseSharedLink(response);
     stopEventLoop();
+	return;
 }
 
 // check if the event loop has to be stopped after a blocking request was sent
@@ -1085,12 +1094,79 @@ void QDropbox::checkReleaseEventLoop(int reqnr)
     case QDROPBOX_REQ_BACCTOK:
     case QDROPBOX_REQ_BACCINF:
     case QDROPBOX_REQ_BMETADA:
+	case QDROPBOX_REQ_BREVISI:
         stopEventLoop(); // release local event loop
         break;
     default:
         break;
     }
     return;
+}
+
+void QDropbox::requestRevisions(QString file, int max, bool blocking)
+{
+	clearError();
+
+	QUrl url;
+    url.setUrl(apiurl.toString());
+    url.addQueryItem("oauth_consumer_key",_appKey);
+    url.addQueryItem("oauth_nonce", nonce);
+    url.addQueryItem("oauth_signature_method", signatureMethodString());
+    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
+    url.addQueryItem("oauth_token", oauthToken);
+    url.addQueryItem("oauth_version", _version);
+    url.setPath(QString("%1/revisions/%2").arg(_version.left(1), file));
+
+    QString signature = oAuthSign(url);
+    url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+
+    int reqnr = sendRequest(url);
+    if(blocking)
+    {
+        requestMap[reqnr].type = QDROPBOX_REQ_BREVISI;
+        startEventLoop();
+    }
+    else
+        requestMap[reqnr].type = QDROPBOX_REQ_REVISIO;
+
+    return;
+}
+
+QList<QDropboxFileInfo> QDropbox::requestRevisionsAndWait(QString file, int max)
+{
+	clearError();
+	requestRevisions(file, max, true);
+	QList<QDropboxFileInfo> revisionList;
+
+	if(errorState != QDropbox::NoError || !_tempJson.isValid())
+		return revisionList;
+	
+	return revisionList;
+}
+
+void QDropbox::parseRevisions(QString response)
+{
+    QDropboxJson json;
+    _tempJson.parseString(response);
+    if(!_tempJson.isValid())
+    {
+        errorState = QDropbox::APIError;
+        errorText  = "Dropbox API did not send correct answer for file/directory metadata.";
+        emit errorOccured(errorState);
+        stopEventLoop();
+        return;
+    }
+
+    emit revisionsReceived(response);
+    return;
+}
+
+void QDropbox::parseBlockingRevisions(QString response)
+{
+	clearError();
+	parseRevisions(response);
+	stopEventLoop();
+	return;
 }
 
 void QDropbox::clearError()

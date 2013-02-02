@@ -36,6 +36,8 @@ const qdropbox_request_type QDROPBOX_REQ_BACCINF = 0x0A;
 const qdropbox_request_type QDROPBOX_REQ_BMETADA = 0x0B;
 const qdropbox_request_type QDROPBOX_REQ_SHRDLNK = 0x0C;
 const qdropbox_request_type QDROPBOX_REQ_BSHRDLN = 0x0D;
+const qdropbox_request_type QDROPBOX_REQ_REVISIO = 0x0E;
+const qdropbox_request_type QDROPBOX_REQ_BREVISI = 0x0F;
 
 //! Internally used struct to handle network requests sent from QDropbox
 /*!
@@ -409,6 +411,25 @@ public:
     */
     void clearError();
 
+	/*!
+	  Requests the latest revisions of a file. When the request is answered by the Dropbox server
+	  the signal QDropbox::revisionsReceived() will be emitted.
+
+	  \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
+	  \param max Defines the maximum amount of revisions to be requested.
+	  \param blocking <i>internal only</i> indidicates if the call should block
+	 */
+	void requestRevisions(QString file, int max = 10, bool blocking = false);
+
+	/*!
+	  Works exactly like QDropbox::requestRevisions but blocks until the list of revisisions was
+	  received.
+
+	  \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
+	  \param max Defines the maximum amount of revisions to be requested.
+	 */
+	QList<QDropboxFileInfo> requestRevisionsAndWait(QString file, int max = 10);
+
 signals:
     /*!
       This signal is emitted whenever an error occurs. The error is passed
@@ -483,6 +504,12 @@ signals:
     */
     void sharedLinkReceived(QString sharedLink);
 
+	/*!
+	  Emitted when revisions of a file were received. Only relevant for non-blocking use
+	  of requestRevisions().
+	*/
+	void revisionsReceived(QString revisionJson);
+
 public slots:
 
 private slots:
@@ -547,7 +574,8 @@ private:
     void parseBlockingAccountInfo(QString response);
     void parseBlockingMetadata(QString response);
     void parseBlockingSharedLink(QString response);
-
+	void parseRevisions(QString response);
+	void parseBlockingRevisions(QString response);
 };
 
 #endif // QDROPBOX_H

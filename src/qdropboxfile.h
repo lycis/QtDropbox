@@ -176,6 +176,13 @@ public:
 	*/
 	bool hasChanged();	
 
+	/*!
+	  Gets and returns all available revisions of the file.
+	  \param max When defined the function will only list up to the specified amount of revisions.
+	  \returns A list of the latest revisions of the file.
+	*/
+	QList<QDropboxFileInfo> revisions(int max = 10);
+
 protected:
     qint64 readData(char *data, qint64 maxlen);
     qint64 writeData(const char *data, qint64 len);
