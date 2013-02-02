@@ -3,26 +3,32 @@
 QDropboxJson::QDropboxJson(QObject *parent) :
     QObject(parent)
 {
-    valid = false;
+    _init();
 }
 
 QDropboxJson::QDropboxJson(QString strJson, QObject *parent) :
     QObject(parent)
 {
-    valid = false;
+    _init();
     parseString(strJson);
 }
 
 QDropboxJson::QDropboxJson(const QDropboxJson &other) :
     QObject(other.parent())
 {
-    valid = false;
+    _init();
     parseString(other.strContent());
 }
 
 QDropboxJson::~QDropboxJson()
 {
     emptyList();
+}
+
+void QDropboxJson::_init()
+{
+	valid          = false;
+	_anonymousArray = false;
 }
 
 void QDropboxJson::parseString(QString strJson)
@@ -45,8 +51,21 @@ void QDropboxJson::parseString(QString strJson)
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "string does not start with { " << endl;
 #endif
-        valid = false;
-        return;
+
+		if(strJson.startsWith("[") && strJson.endsWith("]"))
+		{
+#ifdef QTDROPBOX_DEBUG
+			qDebug() << "JSON is anonymous array" << endl;
+#endif
+			_anonymousArray = true;
+			// fix json to be parseable by the algorithm below
+			strJson = "{\"_anonArray\":"+strJson+"}";
+		}
+		else
+		{
+			valid = false;
+			return;
+		}
     }
 
     QString buffer   = "";
@@ -142,7 +161,6 @@ void QDropboxJson::parseString(QString strJson)
 			 // value is an array value -> parse array
 			 bool inString    = false;
 			 bool arrayEnd    = false;
-			 bool inArrayJson = false;
 			 int j = i+1;
 			 buffer = "[";
 			 for(;!arrayEnd && j<strJson.size();++j)
@@ -510,7 +528,7 @@ int QDropboxJson::parseSubJson(QString strJson, int start, qdropboxjson_entry *j
 	buffer = strJson.mid(start, j-start);
 #ifdef QTDROPBOX_DEBUG
 	qDebug() << "brackets = " << openBrackets << endl;
-	qDebug() << "json data(" << i << ":" << j-i << ") = " << buffer << endl;
+	qDebug() << "json data(" << start << ":" << j-start << ") = " << buffer << endl;
 #endif
 	jsonValue = new QDropboxJson();
 	jsonValue->parseString(buffer);
@@ -525,11 +543,21 @@ int QDropboxJson::parseSubJson(QString strJson, int start, qdropboxjson_entry *j
 		return j;
 	}
 
-#ifdef QTDROPBOX_DEBUG
-	qDebug() << "subjson " << key << " = " << jsonValue << endl;
-#endif
 	// insert new
 	jsonEntry->value.json = jsonValue;
 	jsonEntry->type       = QDROPBOXJSON_TYPE_JSON;
 	return j;
+}
+
+bool QDropboxJson::isAnonymousArray()
+{
+	return _anonymousArray;
+}
+
+QStringList QDropboxJson::getArray()
+{
+	if(!isAnonymousArray())
+		return QStringList();
+
+	return getArray("_anonArray");
 }

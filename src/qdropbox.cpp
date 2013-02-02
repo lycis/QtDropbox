@@ -1140,7 +1140,7 @@ QList<QDropboxFileInfo> QDropbox::requestRevisionsAndWait(QString file, int max)
 
 	if(errorState != QDropbox::NoError || !_tempJson.isValid())
 		return revisionList;
-	
+
 	return revisionList;
 }
 

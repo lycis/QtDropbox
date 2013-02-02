@@ -194,22 +194,45 @@ public:
 	*/
 	QStringList getArray(QString key, bool force = false);
 
+	/*!
+	  Returns the content of a stored array as a list of string items <i>if the JSON contains
+	  an anynmous array</i> (see also isAnonymousArray()). As with getArray(QString key, bool force = false)
+	  you have to parse the content of the array your self.
+	*/
+	QStringList getArray();
+
 	/**!
 	  Overloaded operator to copy a QDropboxJson.
 	*/
     QDropboxJson& operator =(QDropboxJson&);
+
+	/**!
+	  A JSON may be an anonymous array like this:
+	  \code
+	  [
+	    "a": "valueA",
+		"b": "valueB"
+	  ]
+	  \endcode
+
+	  Use this function to identify a JSON that is an anonymous array.
+	  \returns <code>true</code> if the JSON is an anonymous array.
+	*/
+	bool isAnonymousArray();
     
 protected:
 		bool valid;
 
 private:
     QMap<QString, qdropboxjson_entry> valueMap;
+	bool _anonymousArray;
 
     void emptyList();
     qdropboxjson_entry_type interpretType(QString value);
 	QString translateMonth(QString month);
 	QString translateDay(QString day);
 	int parseSubJson(QString str, int start, qdropboxjson_entry *jsonEntry);
+	void _init();
 
     QString _strContent;
 };
