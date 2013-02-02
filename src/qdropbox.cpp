@@ -1141,6 +1141,15 @@ QList<QDropboxFileInfo> QDropbox::requestRevisionsAndWait(QString file, int max)
 	if(errorState != QDropbox::NoError || !_tempJson.isValid())
 		return revisionList;
 
+	QStringList responseList = _tempJson.getArray();
+	for(int i=0; i<responseList.size(); ++i)
+	{
+		QString revData = responseList.at(i);
+		QDropboxFileInfo revision;
+		revision.parseString(revData);
+		revisionList.append(revision);
+	}
+
 	return revisionList;
 }
 
