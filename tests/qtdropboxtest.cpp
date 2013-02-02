@@ -115,4 +115,16 @@ void QtDropboxTest::testCase9()
     QVERIFY2(l.at(3).compare("7.3") == 0, "double element not correctly formatted");
 }
 
+void QtDropboxTest::testCase10()
+{
+    QDropboxJson json("{\"jsonarray\":[{\"key\":\"value\"}]}");
+    QVERIFY2(json.isValid(), "json validity");
+
+    QStringList l = json.getArray("jsonarray");
+    QVERIFY2(l.size() == 1, "array list has wrong size");
+    QDropboxJson arrayJson(l.at(0));
+    QVERIFY2(arrayJson.isValid(), "json from array is invalid");
+    QVERIFY2(arrayJson.getString("key").compare("value") != 0, "json from array contains wrong value");
+}
+
 QTEST_MAIN(QtDropboxTest)

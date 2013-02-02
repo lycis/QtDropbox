@@ -55,7 +55,6 @@ struct qdropboxjson_entry{
   may return nonsense data. Use this flag with care and only if you know what you're doing.
 
   \warning Currently arrays in JSONs are not supported.
-  \todo Implement support for arrays.
   \todo Implemement setter functions and toString() for JSON generation (altough not necessary it
         would be a nice feature)
  */
@@ -210,6 +209,7 @@ private:
     qdropboxjson_entry_type interpretType(QString value);
 	QString translateMonth(QString month);
 	QString translateDay(QString day);
+	int parseSubJson(QString str, int start, qdropboxjson_entry *jsonEntry);
 
     QString _strContent;
 };

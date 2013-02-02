@@ -59,7 +59,6 @@ void QDropboxJson::parseString(QString strJson)
     bool isArray     = false;
     bool openQuotes  = false;
 
-    QDropboxJson *jsonValue;
 
     for(int i=0; i<strJson.size(); ++i)
     {
@@ -124,54 +123,13 @@ void QDropboxJson::parseString(QString strJson)
         if(isJson)
         {
             // create new json object with data until }
-            int openBrackets = 1;
-            buffer = "";
-
-            int j;
-            for(j=i+1; openBrackets > 0 && j < strJson.size(); ++j)
-            {
-                if(strJson.at(j).toLatin1() == '{')
-                    openBrackets++;
-                else if(strJson.at(j).toLatin1() == '}')
-                    openBrackets--;
-            }
-
-            buffer = strJson.mid(i, j-i);
-#ifdef QTDROPBOX_DEBUG
-            qDebug() << "brackets = " << openBrackets << endl;
-            qDebug() << "json data(" << i << ":" << j-i << ") = " << buffer << endl;
-#endif
-            jsonValue = new QDropboxJson;
-            jsonValue->parseString(buffer);
-
-            // invalid sub json means invalid json
-            if(!jsonValue->isValid())
-            {
-#ifdef QTDROPBOX_DEBUG
-                qDebug() << "subjson invalid!" << endl;
-                #endif
-                valid = false;
-                return;
-            }
-
-#ifdef QTDROPBOX_DEBUG
-            qDebug() << "subjson " << key << " = " << jsonValue << endl;
-#endif
-            // insert new
             qdropboxjson_entry e;
-            e.value.json = jsonValue;
-            e.type       = QDROPBOXJSON_TYPE_JSON;
+			int offset = parseSubJson(strJson, i, &e);
             valueMap[key] = e;
-
             key = "";
-            jsonValue = 0;
-
-#ifdef QTDROPBOX_DEBUG
-            qDebug() << "jsonValue = " << e.value.json << endl;
-#endif
 
             // ignore next ,
-            i = j+1;
+            i = offset+1;
             buffer      = "";
             isJson      = false;
             insertValue = false;
@@ -182,8 +140,9 @@ void QDropboxJson::parseString(QString strJson)
 		 if(isArray)
          {
 			 // value is an array value -> parse array
-			 bool inString = false;
-			 bool arrayEnd = false;
+			 bool inString    = false;
+			 bool arrayEnd    = false;
+			 bool inArrayJson = false;
 			 int j = i+1;
 			 buffer = "[";
 			 for(;!arrayEnd && j<strJson.size();++j)
@@ -531,4 +490,46 @@ QStringList QDropboxJson::getArray(QString key, bool force)
 		returnList.append(value.trimmed());
 	}
     return returnList;
+}
+
+int QDropboxJson::parseSubJson(QString strJson, int start, qdropboxjson_entry *jsonEntry)
+{
+	int openBrackets = 1;
+	QString buffer = "";
+    QDropboxJson* jsonValue = NULL;
+
+	int j;
+	for(j=start+1; openBrackets > 0 && j < strJson.size(); ++j)
+	{
+		if(strJson.at(j).toLatin1() == '{')
+			openBrackets++;
+		else if(strJson.at(j).toLatin1() == '}')
+			openBrackets--;
+	}
+
+	buffer = strJson.mid(start, j-start);
+#ifdef QTDROPBOX_DEBUG
+	qDebug() << "brackets = " << openBrackets << endl;
+	qDebug() << "json data(" << i << ":" << j-i << ") = " << buffer << endl;
+#endif
+	jsonValue = new QDropboxJson();
+	jsonValue->parseString(buffer);
+
+	// invalid sub json means invalid json
+	if(!jsonValue->isValid())
+	{
+#ifdef QTDROPBOX_DEBUG
+		qDebug() << "subjson invalid!" << endl;
+#endif
+		valid = false;
+		return j;
+	}
+
+#ifdef QTDROPBOX_DEBUG
+	qDebug() << "subjson " << key << " = " << jsonValue << endl;
+#endif
+	// insert new
+	jsonEntry->value.json = jsonValue;
+	jsonEntry->type       = QDROPBOXJSON_TYPE_JSON;
+	return j;
 }
