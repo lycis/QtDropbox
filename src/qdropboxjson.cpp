@@ -415,7 +415,8 @@ void QDropboxJson::emptyList()
             delete e.value.value;
 		valueMap.remove(keys.at(i));
     }
-    valueMap.empty();
+    valueMap.clear();
+    _strContent = "";
     return;
 }
 
