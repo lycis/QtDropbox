@@ -25,7 +25,7 @@ void QDropboxFileInfo::copyFrom(const QDropboxFileInfo &other)
 	return;
 }
 
-QDropboxFileInfo &QDropboxFileInfo::operator =(QDropboxFileInfo &other)
+QDropboxFileInfo &QDropboxFileInfo::operator=(const QDropboxFileInfo &other)
 {
     copyFrom(other);
     return *this;
