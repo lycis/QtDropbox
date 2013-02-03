@@ -37,8 +37,6 @@ void QDropboxJson::parseString(QString strJson)
     qDebug() << "parse string = " << strJson << endl;
 #endif
 
-    _strContent = strJson;
-
     // clear all existing data
     emptyList();
 
@@ -402,7 +400,42 @@ QDateTime QDropboxJson::getTimestamp(QString key, bool force)
 
 QString QDropboxJson::strContent() const
 {
-    return _strContent;
+	if(valueMap.size() == 0)
+		return "";
+
+    QString content = "{";
+	QList<QString> keys = valueMap.keys();
+	for(int i=0; i<keys.size(); ++i)
+	{
+		QString value = "";
+		qdropboxjson_entry e = valueMap.value(keys.at(i));
+		switch(e.type)
+		{
+		case QDROPBOXJSON_TYPE_ARRAY:
+			value = QString("[%1]");
+			break;
+		case QDROPBOXJSON_TYPE_BOOL:
+		case QDROPBOXJSON_TYPE_FLOAT:
+		case QDROPBOXJSON_TYPE_NUM:
+		case QDROPBOXJSON_TYPE_UINT:
+		case QDROPBOXJSON_TYPE_UNKNOWN:
+		case QDROPBOXJSON_TYPE_JSON:
+			value = QString("%1");
+			break;
+		case QDROPBOXJSON_TYPE_STR:
+			value = QString("\"%1\"");
+			break;
+		}
+
+		if(e.type != QDROPBOXJSON_TYPE_JSON)
+			value.arg(*e.value.value);
+		else
+			value.arg(e.value.json->strContent());
+
+		content.append(QString("\"%1\": %2").arg(keys.at(i)).arg(value));
+	}
+	content.append("}");
+	return content;
 }
 
 void QDropboxJson::emptyList()

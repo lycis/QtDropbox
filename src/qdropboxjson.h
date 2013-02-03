@@ -233,8 +233,6 @@ private:
 	QString translateDay(QString day);
 	int parseSubJson(QString str, int start, qdropboxjson_entry *jsonEntry);
 	void _init();
-
-    QString _strContent;
 };
 
 #endif // QDROPBOXJSON_H

@@ -115,6 +115,9 @@ void QtDropboxTest::testCase9()
     QVERIFY2(l.at(3).compare("7.3") == 0, "double element not correctly formatted");
 }
 
+/**
+ * @brief QDropboxJson: Test if json in array is accessible.
+ */
 void QtDropboxTest::testCase10()
 {
     QDropboxJson json("{\"jsonarray\":[{\"key\":\"value\"}]}");
