@@ -300,6 +300,20 @@ qint64 QDropboxJson::getInt(QString key, bool force)
     return e.value.value->toInt();
 }
 
+void QDropboxJson::setInt(QString key, qint64 value)
+{
+    if(valueMap.contains(key)){
+        valueMap[key].value.value->setNum(value);
+    }else{
+        qdropboxjson_entry e;
+        QString *valuePointer = new QString();
+        valuePointer->setNum(value);
+        e.value.value = valuePointer;
+        e.type        = NumberType;
+        valueMap[key] = e;
+    }
+}
+
 quint64 QDropboxJson::getUInt(QString key, bool force)
 {
     if(!valueMap.contains(key))

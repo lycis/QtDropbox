@@ -127,7 +127,7 @@ public:
 
       \param key The requested key.
      */
-    bool     hasKey(QString key);
+    bool hasKey(QString key);
 
     /*!
       Returns the data type of the value mapped to the key.
@@ -140,7 +140,9 @@ public:
       not map 0 is returned. If the force flag is set the check of the data type
       is omitted and it is tried to convert the value regardless of the real data type.
      */
-    qint64        getInt(QString key, bool force = false);
+    qint64 getInt(QString key, bool force = false);
+
+    void setInt(QString key, qint64 value);
 
     /*!
       Returns a stored unsigned integer value identified by the given key. If the key does
