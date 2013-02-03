@@ -1115,6 +1115,7 @@ void QDropbox::requestRevisions(QString file, int max, bool blocking)
     url.addQueryItem("oauth_timestamp", QString::number(timestamp));
     url.addQueryItem("oauth_token", oauthToken);
     url.addQueryItem("oauth_version", _version);
+	url.addQueryItem("rev_limit", QString::number(max));
     url.setPath(QString("%1/revisions/%2").arg(_version.left(1), file));
 
     QString signature = oAuthSign(url);
