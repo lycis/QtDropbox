@@ -61,7 +61,7 @@ public:
 
 	  \param other original instance
 	*/
-    QDropboxFileInfo& operator =(QDropboxFileInfo& other);
+    QDropboxFileInfo& operator=(const QDropboxFileInfo& other);
 
 	/*!
 	  Human readable file size.
