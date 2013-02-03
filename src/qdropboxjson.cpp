@@ -170,6 +170,7 @@ void QDropboxJson::parseString(QString strJson)
 				 {
 				 case '"': 
 					 inString = !inString;
+					 buffer += arrC;
 					 break;
 				 case ']':
 					 buffer += "]";
@@ -325,7 +326,8 @@ QString QDropboxJson::getString(QString key, bool force)
     if(!force && e.type != QDROPBOXJSON_TYPE_STR)
         return "";
 
-    return e.value.value->mid(1, e.value.value->size()-2);
+	QString value = e.value.value->mid(1, e.value.value->size()-2);
+    return value;
 }
 
 QDropboxJson* QDropboxJson::getJson(QString key)
@@ -490,7 +492,7 @@ QDropboxJson& QDropboxJson::operator=(QDropboxJson& other)
 QStringList QDropboxJson::getArray(QString key, bool force)
 {
 	QStringList list;
-	 if(!valueMap.contains(key))
+	if(!valueMap.contains(key))
         return list;
 
     qdropboxjson_entry e;
@@ -500,14 +502,46 @@ QStringList QDropboxJson::getArray(QString key, bool force)
         return list;
 
 	QString arrayStr = e.value.value->mid(1, e.value.value->length()-2);
-	list = arrayStr.split(",");
-	QStringList returnList;
-	for(int i=0; i<list.size(); ++i)
+	QString buffer = "";
+	bool inString = false;
+	int  inJson   = 0;
+	for(int i=0; i<arrayStr.size(); ++i)
 	{
-		QString value = list.at(i);
-		returnList.append(value.trimmed());
+		QChar c = arrayStr.at(i);
+		if( ((c != ',' && c != ' ') || inString) &&
+			(c != '"' || inJson > 0))
+			buffer += c;
+		switch(c.toLatin1())
+		{
+		case '"':
+			if(i > 0 && arrayStr.at(i-1).toLatin1() == '\\')
+			{
+				buffer += c;
+				break;
+			}
+			else
+				inString = !inString;
+			break;
+		case '{':
+			inJson++;
+			break;
+		case '}':
+			inJson--;
+			break;
+		case ',':
+			if(inJson == 0 && !inString)
+			{
+				list.append(buffer);
+				buffer = "";
+			}
+			break;
+		}
 	}
-    return returnList;
+
+	if(!buffer.isEmpty())
+		list.append(buffer);
+
+    return list;
 }
 
 int QDropboxJson::parseSubJson(QString strJson, int start, qdropboxjson_entry *jsonEntry)

@@ -122,9 +122,10 @@ void QtDropboxTest::testCase10()
 
     QStringList l = json.getArray("jsonarray");
     QVERIFY2(l.size() == 1, "array list has wrong size");
+
     QDropboxJson arrayJson(l.at(0));
     QVERIFY2(arrayJson.isValid(), "json from array is invalid");
-    QVERIFY2(arrayJson.getString("key").compare("value") != 0, "json from array contains wrong value");
+    QVERIFY2(arrayJson.getString("key").compare("value") == 0, "json from array contains wrong value");
 }
 
 QTEST_MAIN(QtDropboxTest)
