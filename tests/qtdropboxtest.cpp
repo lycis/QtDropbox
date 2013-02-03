@@ -10,7 +10,7 @@ QtDropboxTest::QtDropboxTest()
  * JSON represents an object with single string value. The test
  * tries to read the string value.
  */
-void QtDropboxTest::testCase1()
+void QtDropboxTest::jsonCase1()
 {
     QDropboxJson json("{\"string\":\"asdf\"}");
     QVERIFY2(json.isValid(), "json validity");
@@ -22,7 +22,7 @@ void QtDropboxTest::testCase1()
  * JSON represents an object with a single integer value. The test
  * tries to read that value.
  */
-void QtDropboxTest::testCase2()
+void QtDropboxTest::jsonCase2()
 {
     QDropboxJson json("{\"int\":1234}");
     QVERIFY2(json.isValid(), "json validity");
@@ -33,7 +33,7 @@ void QtDropboxTest::testCase2()
  * \brief QDropboxJson: Injson validity check
  * JSON is invalid. Test confirms invalidity of the JSON.
  */
-void QtDropboxTest::testCase3()
+void QtDropboxTest::jsonCase3()
 {
     QDropboxJson json("{\"test\":\"foo\"");
     QVERIFY2(!json.isValid(), "injson validity not confirmed");
@@ -43,7 +43,7 @@ void QtDropboxTest::testCase3()
  * \brief QDropboxJson: Simple boolean read
  * JSON contains a single boolean value. Test accesses this value.
  */
-void QtDropboxTest::testCase4()
+void QtDropboxTest::jsonCase4()
 {
     QDropboxJson json("{\"bool\":true}");
     QVERIFY2(json.isValid(), "json validity");
@@ -54,7 +54,7 @@ void QtDropboxTest::testCase4()
  * \brief QDropboxJson: Simple floating point read
  * JSON contains a single double value. Test reads it.
  */
-void QtDropboxTest::testCase5()
+void QtDropboxTest::jsonCase5()
 {
     QDropboxJson json("{\"double\":14.323667}");
     QVERIFY2(json.isValid(), "json validity");
@@ -65,7 +65,7 @@ void QtDropboxTest::testCase5()
  * \brief QDropboxJson: Subjson read
  * JSON contains a subjson that is read, but not evaluated.
  */
-void QtDropboxTest::testCase6()
+void QtDropboxTest::jsonCase6()
 {
     QDropboxJson json("{\"json\": {\"string\":\"abcd\"}}");
     QVERIFY2(json.isValid(), "json validity");
@@ -80,7 +80,7 @@ void QtDropboxTest::testCase6()
  * \brief QDropboxJson: Simple unsigned integer read.
  * JSON contains single unsigned integer that is read.
  */
-void QtDropboxTest::testCase7()
+void QtDropboxTest::jsonCase7()
 {
     QDropboxJson json("{\"uint\":4294967295}");
     QVERIFY2(json.isValid(), "json validity");
@@ -90,7 +90,7 @@ void QtDropboxTest::testCase7()
 /**
  * @brief QDropboxJson: Test if clear works correctly
  */
-void QtDropboxTest::testCase8()
+void QtDropboxTest::jsonCase8()
 {
     QDropboxJson json("{\"uint\":4294967295}");
     QVERIFY2(json.isValid(), "json validity");
@@ -102,7 +102,7 @@ void QtDropboxTest::testCase8()
 /**
  * @brief QDropboxJson: Test if array interpretation and access are working.
  */
-void QtDropboxTest::testCase9()
+void QtDropboxTest::jsonCase9()
 {
     QDropboxJson json("{\"array\": [1, \"test\", true, 7.3]}");
     QVERIFY2(json.isValid(), "json validity");
@@ -118,7 +118,7 @@ void QtDropboxTest::testCase9()
 /**
  * @brief QDropboxJson: Test if json in array is accessible.
  */
-void QtDropboxTest::testCase10()
+void QtDropboxTest::jsonCase10()
 {
     QDropboxJson json("{\"jsonarray\":[{\"key\":\"value\"}]}");
     QVERIFY2(json.isValid(), "json validity");
