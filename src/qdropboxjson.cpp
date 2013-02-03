@@ -409,30 +409,15 @@ QString QDropboxJson::strContent() const
 	{
 		QString value = "";
 		qdropboxjson_entry e = valueMap.value(keys.at(i));
-		switch(e.type)
-		{
-		case QDROPBOXJSON_TYPE_ARRAY:
-			value = QString("[%1]");
-			break;
-		case QDROPBOXJSON_TYPE_BOOL:
-		case QDROPBOXJSON_TYPE_FLOAT:
-		case QDROPBOXJSON_TYPE_NUM:
-		case QDROPBOXJSON_TYPE_UINT:
-		case QDROPBOXJSON_TYPE_UNKNOWN:
-		case QDROPBOXJSON_TYPE_JSON:
-			value = QString("%1");
-			break;
-		case QDROPBOXJSON_TYPE_STR:
-			value = QString("\"%1\"");
-			break;
-		}
 
 		if(e.type != QDROPBOXJSON_TYPE_JSON)
-			value.arg(*e.value.value);
+			value = *e.value.value;
 		else
-			value.arg(e.value.json->strContent());
+			value = e.value.json->strContent();
 
 		content.append(QString("\"%1\": %2").arg(keys.at(i)).arg(value));
+		if(i != keys.size()-1)
+			content.append(", ");
 	}
 	content.append("}");
 	return content;
