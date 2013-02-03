@@ -191,10 +191,12 @@ void QDropboxJson::parseString(QString strJson)
 			 }
 			 
 			 // save array value string (buffer)
-			 value = buffer;
-			 i = j;
+			 value       = buffer;
+			 buffer      = "";
+			 i           = j;
 			 insertValue = true;
-			 isArray = false;
+			 isArray     = false;
+			 isKey       = true; // next element is started
 		 }
 
         if(insertValue)
