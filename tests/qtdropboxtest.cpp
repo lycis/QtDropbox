@@ -131,4 +131,37 @@ void QtDropboxTest::jsonCase10()
     QVERIFY2(arrayJson.getString("key").compare("value") == 0, "json from array contains wrong value");
 }
 
+/**
+ * @brief QDropboxJson: Checks if compare() is working by doing a self-comparison.
+ */
+void QtDropboxTest::jsonCase11()
+{
+    QString jsonStr = "{\"int\": 1, \"string\": \"test\", \"bool\": true, \"json\": {\"key\": \"value\"}, "
+                      "\"array\": [1, 3.5, {\"arraykey\": \"arrayvalue\"}]}";
+    QDropboxJson json(jsonStr);
+    QVERIFY2(json.isValid(), "json validity");
+    QVERIFY2(json.compare(json) == 0, "comparing the same json resulted in negative comparison");
+}
+
+/**
+ * @brief QDropboxJson: Test whether strContent() returns the correct JSON
+ * The test case creates a JSON and another JSON that is based on the return value of strContent() of
+ * the first JSON. Both JSONs are compared afterwards and expected to be equal.
+ */
+void QtDropboxTest::jsonCase12()
+{
+    QString jsonStr = "{\"int\": 1, \"string\": \"test\", \"bool\": true, \"json\": {\"key\": \"value\"}, "
+                      "\"array\": [1, 3.5, {\"arraykey\": \"arrayvalue\"}]}";
+    QDropboxJson json(jsonStr);
+    QVERIFY2(json.isValid(), "json validity");
+
+    QString jsonContent = json.strContent();
+    QDropboxJson json2(jsonContent);
+    QString j2c = json2.strContent();
+
+    int compare = json.compare(json2);
+
+    QVERIFY2(compare == 0, "string content of json is incorrect or compare is broken");
+}
+
 QTEST_MAIN(QtDropboxTest)

@@ -613,3 +613,34 @@ QStringList QDropboxJson::getArray()
 
 	return getArray("_anonArray");
 }
+
+int QDropboxJson::compare(const QDropboxJson& other)
+{
+	if(valueMap.size() != other.valueMap.size())
+		return 1;
+
+	QMap<QString, qdropboxjson_entry> yourMap = other.valueMap;
+
+	QList<QString> keys = valueMap.keys();
+	for(int i=0; i<keys.size(); ++i)
+	{
+		QString key = keys.at(i);
+		if(!yourMap.contains(key))
+			return 1;
+
+		qdropboxjson_entry myEntry = valueMap.value(key);
+		qdropboxjson_entry yourEntry = yourMap.value(key);
+		
+		if(myEntry.type != yourEntry.type)
+			return 1;
+
+		if(myEntry.type == QDROPBOXJSON_TYPE_JSON)
+			if(myEntry.value.json->compare(*yourEntry.value.json) != 0)
+				return 1;
+		else
+			if(myEntry.value.value->compare(yourEntry.value.value) != 0)
+				return 1;
+	}
+
+	return 0;
+}

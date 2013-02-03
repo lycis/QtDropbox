@@ -219,6 +219,15 @@ public:
 	  \returns <code>true</code> if the JSON is an anonymous array.
 	*/
 	bool isAnonymousArray();
+
+	/**!
+	  Compares two JSON objects if they are the same.
+	  This means that they have the same keys with the same values.
+
+	  \param other the JSON you wish to compare to
+	  \returns 0 if the JSON objects are equals
+	*/
+	int compare(const QDropboxJson& other);
     
 protected:
 		bool valid;

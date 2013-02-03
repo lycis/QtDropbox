@@ -12,6 +12,8 @@ public:
    QtDropboxTest();
 
 private Q_SLOTS:
+
+   /* QDropboxJson */
     void jsonCase1();
     void jsonCase2();
     void jsonCase3();
@@ -22,6 +24,8 @@ private Q_SLOTS:
     void jsonCase8();
     void jsonCase9();
     void jsonCase10();
+    void jsonCase11();
+    void jsonCase12();
 };
 
 #endif // QDROPBOXJSONTEST_H
