@@ -126,7 +126,7 @@ public:
     bool flush();
 
     /*!
-      Overloaded from QIODEvice.
+      Reimplemented from QIODEvice.
      */
     bool event(QEvent* event);
 
@@ -218,6 +218,8 @@ private:
     qint64 _bufferThreshold;
 
     bool _overwrite;
+
+	int _position;
 
 	QDropboxFileInfo *_metadata;
 

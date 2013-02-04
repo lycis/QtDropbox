@@ -57,12 +57,17 @@ bool QDropboxFile::open(QIODevice::OpenMode mode)
     qDebug() << "QDropboxFile: opening file" << endl;
 #endif
 
-    if(isMode(QIODevice::Truncate))
+	// clear buffer and reset position if this file was opened in write mode
+	// with truncate - or if append was not set
+	if(isMode(QIODevice::WriteOnly) && 
+	   (isMode(QIODevice::Truncate) || !isMode(QIODevice::Append))
+	  )
     {
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "QDropboxFile: _buffer cleared." << endl;
 #endif
         _buffer->clear();
+		_position = 0;
     }
     else
     {
@@ -71,9 +76,14 @@ bool QDropboxFile::open(QIODevice::OpenMode mode)
 #endif
         if(!getFileContent(_filename))
             return false;
+
+		if(isMode(QIODevice::WriteOnly)) // write mode here means append
+			_position = _buffer->size();
+		else if(isMode(QIODevice::ReadOnly)) // read mode here means start at the beginning
+			_position = 0;
     }
 
-	obtainMetadata();
+	obtainMetadata();		 
 
     return true;
 }
@@ -158,24 +168,22 @@ qint64 QDropboxFile::readData(char *data, qint64 maxlen)
     qDebug() << "old size = " << _buffer->size() << endl;
 #endif
 
-    if(_buffer->size() == 0)
+	if(_buffer->size() == 0 || _position >= _buffer->size())
         return 0;
 
     if(_buffer->size() < maxlen)
         maxlen = _buffer->size();
 
-    qint64 newsize = _buffer->size()-maxlen;
-    //data = _buffer->left(maxlen).data();
-    QByteArray tmp = _buffer->left(maxlen);
-    char *d = tmp.data();
-    memcpy(data, d, maxlen);
-    QByteArray newbytes = _buffer->right(newsize);
-    _buffer->clear();
-    _buffer->append(newbytes);
+	QByteArray tmp = _buffer->mid(_position, maxlen);
+	memcpy(data, tmp.data(), maxlen);
+   
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "new size = " << _buffer->size() << endl;
     qDebug() << "new bytes = " << _buffer->toHex() << endl;
 #endif
+
+	_position += maxlen;
+
     return maxlen;
 }
 
@@ -186,7 +194,7 @@ qint64 QDropboxFile::writeData(const char *data, qint64 len)
 #endif
 
 	qint64 oldlen = _buffer->size();
-    _buffer->append(data, len);
+    _buffer->insert(_position, data, len);
 
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "new content: " << _buffer->toHex() << endl;
@@ -196,10 +204,14 @@ qint64 QDropboxFile::writeData(const char *data, qint64 len)
     if(_buffer->size()%_bufferThreshold == 0)
         flush();
 
-	if(_buffer->size() != oldlen+len)
-		return (oldlen-_buffer->size());
+	int written_bytes = len;
 
-    return len;
+	if(_buffer->size() != oldlen+len)
+		written_bytes = (oldlen-_buffer->size());
+
+	_position += written_bytes;
+
+    return written_bytes;
 }
 
 void QDropboxFile::networkRequestFinished(QNetworkReply *rply)
@@ -469,6 +481,7 @@ void QDropboxFile::_init(QDropbox *api, QString filename, qint64 bufferTh)
 	_metadata        = NULL;
 	lastErrorCode    = 0;
 	lastErrorMessage = "";
+	_position        = 0;
     return;
 }
 
