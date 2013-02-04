@@ -19,17 +19,23 @@ to contribute to this project. For details take a look at the
 Because QtDropbox is far from being ready for a release candidate I will list all already available
 and somewhat tested features here:
 
-* Connect to dropbox
-* Request account information
-* Access files (read/write)
-* Accessing file/directory metadata
-
 Currently in progress:
 * Fixing various todo and bug tasks
 
 The next features to be implemented are:
 * Complete documentation
 * Examples
+
+## Features
+### General
+* Connect to Dropbox
+* Access user account information (quotas, user name, share links, ...)
+* Parse JSON strings
+
+## File Access
+* Access files like a local QFile to read and write data
+* Access file and directory metadata
+* Access file revisions
 
 Postponed to next version:
 * Acessing the directory structure
