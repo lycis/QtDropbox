@@ -1146,8 +1146,7 @@ QList<QDropboxFileInfo> QDropbox::requestRevisionsAndWait(QString file, int max)
 	for(int i=0; i<responseList.size(); ++i)
 	{
 		QString revData = responseList.at(i);
-		QDropboxFileInfo revision;
-		revision.parseString(revData);
+		QDropboxFileInfo revision(revData);
 		revisionList.append(revision);
 	}
 

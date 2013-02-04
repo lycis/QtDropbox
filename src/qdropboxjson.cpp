@@ -542,7 +542,7 @@ QStringList QDropboxJson::getArray(QString key, bool force)
 	for(int i=0; i<arrayStr.size(); ++i)
 	{
 		QChar c = arrayStr.at(i);
-		if( ((c != ',' && c != ' ') || inString) &&
+		if( ((c != ',' && c != ' ') || inString || inJson) &&
 			(c != '"' || inJson > 0))
 			buffer += c;
 		switch(c.toLatin1())
