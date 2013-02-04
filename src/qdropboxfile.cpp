@@ -185,6 +185,7 @@ qint64 QDropboxFile::writeData(const char *data, qint64 len)
     qDebug() << "old content: " << _buffer->toHex() << endl;
 #endif
 
+	qint64 oldlen = _buffer->size();
     _buffer->append(data, len);
 
 #ifdef QTDROPBOX_DEBUG
@@ -192,10 +193,13 @@ qint64 QDropboxFile::writeData(const char *data, qint64 len)
 #endif
 
     // flush if the threshold is reached
-    if(_buffer->size()%_bufferThreshold)
+    if(_buffer->size()%_bufferThreshold == 0)
         flush();
 
-    return 0;
+	if(_buffer->size() != oldlen+len)
+		return (oldlen-_buffer->size());
+
+    return len;
 }
 
 void QDropboxFile::networkRequestFinished(QNetworkReply *rply)
