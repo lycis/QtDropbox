@@ -527,3 +527,25 @@ QList<QDropboxFileInfo> QDropboxFile::revisions(int max)
 
 	return revisions;
 }
+
+bool QDropboxFile::seek(qint64 pos)
+{
+	if(pos > _buffer->size())
+		return false;
+
+	QIODevice::seek(pos);
+	_position = pos;
+	return true;
+}
+
+qint64 QDropboxFile::pos()
+{
+	return _position;
+}
+
+bool QDropboxFile::reset()
+{
+	QIODevice::reset();
+	_position = 0;
+	return true;
+}

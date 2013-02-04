@@ -183,6 +183,26 @@ public:
 	*/
 	QList<QDropboxFileInfo> revisions(int max = 10);
 
+	/*!
+	  Reimplemented from QIODevice::seek().
+	  Foreward to the given (byte) position in the file. Unlike QFile::seek() this function does
+	  not seek beyond the file end. When seeking beyond the end of a file this function stops beyond
+	  the last byte of the current content and returns <code>false</code>.
+	*/
+	bool seek(qint64 pos);
+
+	/*!
+	  Reimplemented from QIODevice::pos().
+	  Returns the current position in the file.
+	*/
+	qint64 pos();
+
+	/*!
+	  Reimplemented from QIODevice::reset().
+	  Seeks to the beginning of the file. See seek().
+	*/
+	bool reset();
+
 protected:
     qint64 readData(char *data, qint64 maxlen);
     qint64 writeData(const char *data, qint64 len);
