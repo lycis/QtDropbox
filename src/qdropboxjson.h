@@ -151,6 +151,8 @@ public:
      */
     quint64       getUInt(QString key, bool force = false);
 
+    void setUInt(QString key, quint64 value);
+
     /*!
       Returns a stored string value identified by the given key. If the key does
       not map an empty QString is returned. If the force flag is set the check of the data type
@@ -158,11 +160,15 @@ public:
      */
     QString       getString(QString key, bool force = false);
 
+    void setString(QString key, QString value);
+
     /*!
       Returns a sub JSON identified by the given key. If the key does not map to a
       JSON a NULL pointer will be returned. It is not possible to force a conversion.
      */
     QDropboxJson *getJson(QString key);
+
+    void setJson(QString key, QDropboxJson value);
 
     /*!
       Returns a stored floating point value identified by the given key. If the key does
@@ -171,12 +177,16 @@ public:
      */
     double        getDouble(QString key, bool force = false);
 
+    void setDouble(QString key, double value);
+
     /*!
       Returns a stored boolean value identified by the given key. If the key does
       not map false is returned. If the force flag is set the check of the data type
       is omitted and it is tried to convert the value regardless of the real data type.
      */
     bool          getBool(QString key, bool force = false);
+
+    void setBool(QString key, bool value);
 
     /*!
       Returns the stored JSON's string representation.
@@ -188,6 +198,8 @@ public:
 	  if the string could not be converted.
 	*/
     QDateTime getTimestamp(QString key, bool force = false);
+
+    void setTimestamp(QString key, QDateTime value);
 
 	/*!
 	  Returnes a stored array as a list of string items. If the key does not exist or is not
@@ -241,7 +253,9 @@ private:
     void emptyList();
     qdropboxjson_entry_type interpretType(QString value);
 	QString translateMonth(QString month);
+    QString translateMonth(int month);
 	QString translateDay(QString day);
+    QString translateDay(int day);
 	int parseSubJson(QString str, int start, qdropboxjson_entry *jsonEntry);
 	void _init();
 };

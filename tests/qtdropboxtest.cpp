@@ -164,4 +164,27 @@ void QtDropboxTest::jsonCase12()
     QVERIFY2(compare == 0, "string content of json is incorrect or compare is broken");
 }
 
+void QtDropboxTest::jsonCase13()
+{
+    QDropboxJson json;
+    json.setInt("testInt", 10);
+    QVERIFY2(json.getInt("testInt") == 10, "setInt of json is incorrect");
+
+    json.setUInt("testUInt", 10);
+    QVERIFY2(json.getUInt("testUInt") == 10, "setUInt of json is incorrect");
+
+    json.setDouble("testDouble", 10.0);
+    QVERIFY2(json.getDouble("testDouble") == 10.0, "setDouble of json is incorrect");
+
+    json.setBool("testBool", true);
+    QVERIFY2(json.getBool("testBool"), "setBool of json is incorrect");
+
+    json.setString("testString", "10");
+    QVERIFY2(json.getString("testString").compare("10"), "setString of json is incorrect");
+
+    QDateTime time = QDateTime::currentDateTime();
+    json.setTimestamp("testTimestamp", time);
+    QVERIFY2(json.getTimestamp("testTimestamp").daysTo(time) == 0, "setTimestamp of json is incorrect");
+}
+
 QTEST_MAIN(QtDropboxTest)

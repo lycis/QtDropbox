@@ -310,7 +310,7 @@ void QDropboxJson::setInt(QString key, qint64 value)
         QString *valuePointer = new QString();
         valuePointer->setNum(value);
         e.value.value = valuePointer;
-        e.type        = NumberType;
+        e.type        = QDROPBOXJSON_TYPE_NUM;
         valueMap[key] = e;
     }
 }
@@ -329,6 +329,20 @@ quint64 QDropboxJson::getUInt(QString key, bool force)
     return e.value.value->toUInt();
 }
 
+void QDropboxJson::setUInt(QString key, quint64 value)
+{
+    if(valueMap.contains(key)){
+        valueMap[key].value.value->setNum(value);
+    }else{
+        qdropboxjson_entry e;
+        QString *valuePointer = new QString();
+        valuePointer->setNum(value);
+        e.value.value = valuePointer;
+        e.type        = QDROPBOXJSON_TYPE_UINT;
+        valueMap[key] = e;
+    }
+}
+
 QString QDropboxJson::getString(QString key, bool force)
 {
     if(!valueMap.contains(key))
@@ -342,6 +356,19 @@ QString QDropboxJson::getString(QString key, bool force)
 
 	QString value = e.value.value->mid(1, e.value.value->size()-2);
     return value;
+}
+
+void QDropboxJson::setString(QString key, QString value)
+{
+    if(valueMap.contains(key)){
+        *(valueMap[key].value.value) = value;
+    }else{
+        qdropboxjson_entry e;
+        QString *valuePointer = new QString(value);
+        e.value.value = valuePointer;
+        e.type        = QDROPBOXJSON_TYPE_STR;
+        valueMap[key] = e;
+    }
 }
 
 QDropboxJson* QDropboxJson::getJson(QString key)
@@ -359,6 +386,19 @@ QDropboxJson* QDropboxJson::getJson(QString key)
     return e.value.json;
 }
 
+void QDropboxJson::setJson(QString key, QDropboxJson value)
+{
+    if(valueMap.contains(key)){
+        *(valueMap[key].value.json) = value;
+    }else{
+        qdropboxjson_entry e;
+        QDropboxJson *valuePointer = new QDropboxJson(value);
+        e.value.json = valuePointer;
+        e.type        = QDROPBOXJSON_TYPE_JSON;
+        valueMap[key] = e;
+    }
+}
+
 double QDropboxJson::getDouble(QString key, bool force)
 {
     if(!valueMap.contains(key))
@@ -371,6 +411,20 @@ double QDropboxJson::getDouble(QString key, bool force)
         return 0.0f;
 
     return e.value.value->toDouble();
+}
+
+void QDropboxJson::setDouble(QString key, double value)
+{
+    if(valueMap.contains(key)){
+        valueMap[key].value.value->setNum(value);
+    }else{
+        qdropboxjson_entry e;
+        QString *valuePointer = new QString();
+        valuePointer->setNum(value);
+        e.value.value = valuePointer;
+        e.type        = QDROPBOXJSON_TYPE_FLOAT;
+        valueMap[key] = e;
+    }
 }
 
 bool QDropboxJson::getBool(QString key, bool force)
@@ -390,6 +444,19 @@ bool QDropboxJson::getBool(QString key, bool force)
     return true;
 }
 
+void QDropboxJson::setBool(QString key, bool value)
+{
+    if(valueMap.contains(key)){
+        *(valueMap[key].value.value) = value ? "true" : "false";
+    }else{
+        qdropboxjson_entry e;
+        QString *valuePointer = new QString(value ? "true" : "false");
+        e.value.value = valuePointer;
+        e.type        = QDROPBOXJSON_TYPE_BOOL;
+        valueMap[key] = e;
+    }
+}
+
 QDateTime QDropboxJson::getTimestamp(QString key, bool force)
 {
 	if(!valueMap.contains(key))
@@ -401,17 +468,37 @@ QDateTime QDropboxJson::getTimestamp(QString key, bool force)
 	if(!force && e.type != QDROPBOXJSON_TYPE_STR)
 		return QDateTime();
 
-    // Dropbox date time format "Sat 21 Aug 2010 22:31:20 +0000"
-	QString day   = e.value.value->mid(1, 3);
+    // Dropbox date time format "Sat, 21 Aug 2010 22:31:20 +0000"
+    QString day   = e.value.value->mid(0, 3);
 	QString part1 = e.value.value->mid(5, 2);
 	QString month = e.value.value->mid(8, 3);
 	QString part2 = e.value.value->mid(12,14);
-	        part2 = part2.mid(0, part2.size()-1);
+            part2 = part2.mid(0, part2.size());
 	        month = translateMonth(month);
-			day   = translateDay(day);
-	QString dval = QString("%1 %2 %3 %4").arg(day).arg(part1).arg(month).arg(part2);
+            day   = translateDay(day);
+    QString dval = QString("%1 %2 %3 %4").arg(day).arg(part1).arg(month).arg(part2);
 
     return QDateTime::fromString(dval, "ddd dd MMM yyyy hh:mm:ss");
+}
+
+void QDropboxJson::setTimestamp(QString key, QDateTime value)
+{
+    QString valueToSave;
+    valueToSave += translateDay(value.date().dayOfWeek()) + ", ";
+    valueToSave += QString::number(value.date().day()) + " ";
+    valueToSave += translateMonth(value.date().month()) + " ";
+    valueToSave += QString::number(value.date().year()) + " ";
+    valueToSave += value.toString("hh:mm:ss");
+
+    if(valueMap.contains(key)){
+        *(valueMap[key].value.value) = valueToSave;
+    }else{
+        qdropboxjson_entry e;
+        QString *valuePointer = new QString(valueToSave);
+        e.value.value = valuePointer;
+        e.type        = QDROPBOXJSON_TYPE_STR;
+        valueMap[key] = e;
+    }
 }
 
 QString QDropboxJson::strContent() const
@@ -499,7 +586,20 @@ QString QDropboxJson::translateMonth(QString month)
 			return QDate::shortMonthName(i);
 	}
 
-	return "<unknown>";
+    return "<unknown>";
+}
+
+QString QDropboxJson::translateMonth(int month)
+{
+    QStringList months;
+    months << "Jan" << "Feb" << "Mar" << "Apr" << "May" << "Jun"
+           << "Jul" << "Aug" << "Sep" << "Oct" << "Nov" << "Dec";
+
+    if(month > 0 && (month-1) < months.size()){
+        return months.at(month-1);
+    }
+
+    return "<unknown>";
 }
 
 QString QDropboxJson::translateDay(QString day)
@@ -513,7 +613,19 @@ QString QDropboxJson::translateDay(QString day)
 			return QDate::shortDayName(i);
 	}
 
-	return "<unknown>";
+    return "<unknown>";
+}
+
+QString QDropboxJson::translateDay(int day)
+{
+    QStringList days;
+    days << "Mon" << "Tue" << "Wed" << "Thu" << "Fri" << "Sat" << "Sun";
+
+    if(day > 0 && (day-1) < days.size()){
+        return days.at(day-1);
+    }
+
+    return "<unknown>";
 }
 
 QDropboxJson& QDropboxJson::operator=(QDropboxJson& other)
