@@ -41,7 +41,7 @@ Postponed to next version:
 * Acessing the directory structure
 
 ## Documentation
-You can generate a documentation of of all classes by:
+You can generate a documentation of all classes by:
     
     qmake
     make documentation
