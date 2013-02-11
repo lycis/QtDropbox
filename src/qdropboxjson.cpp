@@ -468,12 +468,11 @@ QDateTime QDropboxJson::getTimestamp(QString key, bool force)
 	if(!force && e.type != QDROPBOXJSON_TYPE_STR)
 		return QDateTime();
 
-    // Dropbox date time format "Sat, 21 Aug 2010 22:31:20 +0000"
+    // Dropbox date time format "Sat 21 Aug 2010 22:31:20 +0000"
     QString day   = e.value.value->mid(0, 3);
-	QString part1 = e.value.value->mid(5, 2);
-	QString month = e.value.value->mid(8, 3);
-	QString part2 = e.value.value->mid(12,14);
-            part2 = part2.mid(0, part2.size());
+    QString part1 = e.value.value->mid(4, 2);
+    QString month = e.value.value->mid(7, 3);
+    QString part2 = e.value.value->mid(11,13);
 	        month = translateMonth(month);
             day   = translateDay(day);
     QString dval = QString("%1 %2 %3 %4").arg(day).arg(part1).arg(month).arg(part2);
@@ -484,7 +483,7 @@ QDateTime QDropboxJson::getTimestamp(QString key, bool force)
 void QDropboxJson::setTimestamp(QString key, QDateTime value)
 {
     QString valueToSave;
-    valueToSave += translateDay(value.date().dayOfWeek()) + ", ";
+    valueToSave += translateDay(value.date().dayOfWeek()) + " ";
     valueToSave += QString::number(value.date().day()) + " ";
     valueToSave += translateMonth(value.date().month()) + " ";
     valueToSave += QString::number(value.date().year()) + " ";

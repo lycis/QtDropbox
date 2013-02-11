@@ -151,7 +151,7 @@ void QtDropboxTest::jsonCase11()
 void QtDropboxTest::jsonCase12()
 {
     QString jsonStr = "{\"int\": 1, \"string\": \"test\", \"bool\": true, \"json\": {\"key\": \"value\"}, "
-                      "\"array\": [1, 3.5, {\"arraykey\": \"arrayvalue\"}]}";
+                      "\"array\": [1, 3.5, {\"arraykey\": \"arrayvalue\"}], \"timestamp\": \"Sat, 21 Aug 2010 22:31:20 +0000\"}";
     QDropboxJson json(jsonStr);
     QVERIFY2(json.isValid(), "json validity");
 
