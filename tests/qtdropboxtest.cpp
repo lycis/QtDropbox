@@ -164,6 +164,11 @@ void QtDropboxTest::jsonCase12()
     QVERIFY2(compare == 0, "string content of json is incorrect or compare is broken");
 }
 
+/**
+ * @brief QDropboxJson: Setter functions
+ * The test verifies if the setter functions are working correctly by setting a value and
+ * reading it afterwards.
+ */
 void QtDropboxTest::jsonCase13()
 {
     QDropboxJson json;
@@ -185,6 +190,115 @@ void QtDropboxTest::jsonCase13()
     QDateTime time = QDateTime::currentDateTime();
     json.setTimestamp("testTimestamp", time);
     QVERIFY2(json.getTimestamp("testTimestamp").daysTo(time) == 0, "setTimestamp of json is incorrect");
+}
+
+/**
+ * @brief QDropbox: Plaintext Connection
+ * This test connects to Dropbox and sends a dummy request to check that the connection in
+ * Plaintext mode. The request is not processed any further! <b>You are required to authorize
+ * the application for access! The Authorization URI will be printed to you and manual interaction
+ * is required to pass this test!</b>
+ */
+void QtDropboxTest::dropboxCase1()
+{
+    QDropbox dropbox(APP_KEY, APP_SECRET);
+    QVERIFY2(connectDropbox(&dropbox, QDropbox::Plaintext), "connection error");
+    QDropboxAccount accInf = dropbox.requestAccountInfoAndWait();
+    QVERIFY2(dropbox.error() == QDropbox::NoError, "error on request");
+    return;
+}
+
+/**
+ * @brief Prompt the user for authorization.
+ */
+void QtDropboxTest::authorizeApplication(QDropbox* d)
+{
+    QTextStream strout(stdout);
+    QTextStream strin(stdin);
+
+    strout << "##########################################" << endl;
+    strout << "# You need to grant this test access to  #" << endl;
+    strout << "# your Dropbox!                          #" << endl;
+    strout << "#                                        #" << endl;
+    strout << "# Go to the following URL to do so.      #" << endl;
+    strout << "##########################################" << endl << endl;
+
+    strout << "URL: " << d->authorizeLink().toString() << endl;
+    QDesktopServices::openUrl(d->authorizeLink());
+    strout << "Press ENTER after you authorized the application!";
+    strout.flush();
+    strin.readLine();
+    strout << endl;
+    d->requestAccessTokenAndWait();
+}
+
+/**
+ * @brief Connect a QDropbox to the Dropbox service
+ * @param d QDropbox object to be connected
+ * @param m Authentication Method
+ * @return <code>true</code> on success
+ */
+bool QtDropboxTest::connectDropbox(QDropbox *d, QDropbox::OAuthMethod m)
+{
+    QFile tokenFile("tokens");
+
+    if(tokenFile.exists()) // reuse old tokens
+    {
+        if(tokenFile.open(QIODevice::ReadOnly|QIODevice::Text))
+        {
+            QTextStream instream(&tokenFile);
+            QString token = instream.readLine().trimmed();
+            QString secret = instream.readLine().trimmed();
+            if(!token.isEmpty() && !secret.isEmpty())
+            {
+                d->setToken(token);
+                d->setTokenSecret(secret);
+                tokenFile.close();
+                return true;
+            }
+        }
+        tokenFile.close();
+    }
+
+    // acquire new token
+    if(!d->requestTokenAndWait())
+    {
+        qCritical() << "error on token request";
+        return false;
+    }
+
+    d->setAuthMethod(m);
+    if(!d->requestAccessTokenAndWait())
+    {
+        int i = 0;
+        for(;i<3; ++i) // we try three times
+        {
+            if(d->error() != QDropbox::TokenExpired)
+                break;
+            authorizeApplication(d);
+        }
+
+       if(i>3)
+       {
+           qCritical() <<  "too many tries for authentication";
+           return false;
+       }
+
+        if(d->error() != QDropbox::NoError)
+        {
+           qCritical() << "Error: " << d->error() << " - " << d->errorString() << endl;
+           return false;
+        }
+    }
+
+    if(!tokenFile.open(QIODevice::WriteOnly|QIODevice::Truncate|QIODevice::Text))
+        return true;
+
+    QTextStream outstream(&tokenFile);
+    outstream << d->token() << endl;
+    outstream << d->tokenSecret() << endl;
+    tokenFile.close();
+    return true;
 }
 
 QTEST_MAIN(QtDropboxTest)

@@ -4,9 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += network testlib xml
-
-QT       -= gui
+QT       += network testlib xml gui
 
 TARGET = qtdropboxtest
 CONFIG   += console
@@ -20,7 +18,8 @@ SOURCES += \
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 HEADERS += \
-    qtdropboxtest.hpp
+    qtdropboxtest.hpp \
+    keys.hpp
 
 LIBS += -L../lib/
 INCLUDEPATH += ../qtdropbox/

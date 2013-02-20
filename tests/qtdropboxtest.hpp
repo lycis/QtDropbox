@@ -2,7 +2,9 @@
 #define QDROPBOXJSONTEST_H
 
 #include <QtTest>
+#include <QDesktopServices>
 #include "qtdropbox.h"
+#include "keys.hpp"
 
 class QtDropboxTest : public QObject
 {
@@ -27,6 +29,13 @@ private Q_SLOTS:
     void jsonCase11();
     void jsonCase12();
     void jsonCase13();
+
+  /* QDropbox */
+    void dropboxCase1();
+
+private:
+    void authorizeApplication(QDropbox *d);
+    bool connectDropbox(QDropbox* d, QDropbox::OAuthMethod m);
 };
 
 #endif // QDROPBOXJSONTEST_H

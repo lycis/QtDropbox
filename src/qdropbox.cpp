@@ -609,6 +609,7 @@ QString QDropbox::signatureMethodString()
 
 void QDropbox::parseToken(QString response)
 {
+	clearError();
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "processing token request" << endl;
 #endif
@@ -788,6 +789,7 @@ QString QDropbox::apiVersion()
 
 int QDropbox::requestToken(bool blocking)
 {
+	clearError();
     QString sigmeth = signatureMethodString();
 
     timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
@@ -857,6 +859,8 @@ QUrl QDropbox::authorizeLink()
 
 int QDropbox::requestAccessToken(bool blocking)
 {
+	clearError();
+
     QUrl url;
     url.setUrl(apiurl.toString());
     url.addQueryItem("oauth_consumer_key",_appKey);
