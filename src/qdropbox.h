@@ -438,7 +438,7 @@ signals:
 
       \param errorcode The occured error.
      */
-    void errorOccured(Error errorcode);
+    void errorOccured(QDropbox::Error errorcode);
     /*!
       Emitted when the used token is expired. Reauthorize the user connection
       by prompting the URL provided by authorizeUrl() to your user to reauthorize.
