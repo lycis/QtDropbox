@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QString>
+#include <QList>
 #include "qdropboxjson.h"
 
 //! Provides information and metadata about files and directories
@@ -16,6 +17,15 @@
   return an instance of this class that contains the required information. If an
   error occured while obtaining the metadata the functon isValid() will return
   <i>false</i>.
+  
+  <b>Traversing the Dropbox file system</b>
+  Walking through the filetree on Dropbox is possible by using the isDir() and contents()
+  functions. The function contents() provides you with the metadata of all the files and
+  directories in a directory. Due to a limitation of the Dropbox REST API these metadata
+  do not contain contents of subdirectories. Calling contents() on metadata that you
+  retrieved by using a previous contents() call will return an empty list. You have to
+  query the metadata of a subdirectory again by using QDropbox::requestMetadata() or 
+  QDropbox::requestMetadataAndWait().
 
   \bug modified() and clientModified() are currently not working due to a bug in 
   QDropboxJson
@@ -48,6 +58,11 @@ public:
 	 */
     QDropboxFileInfo(const QDropboxFileInfo &other);
 
+	/*!
+	  Default destructor. Takes care of cleaning up when the object is destroyed.
+	*/
+	~QDropboxFileInfo();
+	
 	/*!
 	  Copies the values from an other QDropboxFileInfo instance to the
 	  current instance.
@@ -128,6 +143,13 @@ public:
 	  Current revision as hash string. Use this for e.g. change check.
 	*/
     QString   revisionHash()  const;
+	
+	/*!
+	  Returns the content of a directory.
+	  This function will return a list with length 0 (zero) if the item is no
+	  directory.
+	*/
+	QList<QDropboxFileInfo> contents() const;
 
 signals:
     
@@ -150,6 +172,7 @@ private:
 	QString   _mimeType;
 	bool      _isDeleted;
 	QString   _revisionHash;
+	QList<QDropboxFileInfo>* _content;
 };
 
 #endif // QDROPBOXFILEINFO_H

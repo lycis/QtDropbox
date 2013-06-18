@@ -3,18 +3,27 @@
 QDropboxFileInfo::QDropboxFileInfo(QObject *parent) :
     QDropboxJson(parent)
 {
+  _init();
 }
 
 QDropboxFileInfo::QDropboxFileInfo(QString jsonStr, QObject *parent) :
     QDropboxJson(jsonStr, parent)
 {
+    _init();
     dataFromJson();
 }
 
 QDropboxFileInfo::QDropboxFileInfo(const QDropboxFileInfo &other) :
     QDropboxJson(0)
 {
+    _init();
     copyFrom(other);
+}
+
+QDropboxFileInfo::~QDropboxFileInfo()
+{
+  if(_content != NULL)
+    delete _content;
 }
 
 void QDropboxFileInfo::copyFrom(const QDropboxFileInfo &other)
@@ -43,12 +52,30 @@ void QDropboxFileInfo::dataFromJson()
 	_icon         = getString("icon");
 	_root         = getString("root");
 	_path         = getString("path");
-	_isDir        = getBool("is_path");
+	_isDir        = getBool("is_dir");
 	_mimeType     = getString("mime_type");
 	_isDeleted    = getBool("is_deleted");
 	_revisionHash = getString("rev");
 	_modified     = getTimestamp("modified");
 	_clientModified = getTimestamp("client_modified");
+	
+	// create content list
+	if(_isDir)
+	{
+ qDebug() << "fileinfo: generating contents list";
+	  _content = new QList<QDropboxFileInfo>();
+	  QStringList contentsArray = getArray("contents");
+	  for(qint32 i = 0; i<contentsArray.size(); ++i)
+	  {
+	    QDropboxFileInfo contentInfo(contentsArray.at(i));
+		if(!contentInfo.isValid())
+		  continue;
+		
+		_content->append(contentInfo);
+	  }
+	}
+	
+	qDebug() << "fertig";
 	return;
 }
 
@@ -67,6 +94,7 @@ void QDropboxFileInfo::_init()
 	_mimeType       = "";
 	_isDeleted      = false;
 	_revisionHash   = "";
+	_content        = NULL;
     return;
 }
 
@@ -134,4 +162,16 @@ quint64 QDropboxFileInfo::revision() const
 QString QDropboxFileInfo::size() const
 {
 	return _size;
+}
+
+QList<QDropboxFileInfo> QDropboxFileInfo::contents() const
+{
+   if(_content == NULL || !isDir())
+   {
+     QList<QDropboxFileInfo> l;
+	 l.clear();
+     return l;
+   }
+   
+   return *_content;
 }
