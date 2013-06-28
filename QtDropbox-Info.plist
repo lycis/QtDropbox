@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>de_DE</string>
+    <key>CFBundleIdentifier</key>
+    <string>lycis.github.io.QtDropbox</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>QtDropbox</string>
+    <key>CFBundlePackageType</key>
+    <string>FMWK</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1.0</string>
+    <key>CFBundleGetInfoString</key>
+    <string>Created by Alexander Saal</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
+    <key>CFBundleExecutable</key>
+    <string>QtDropbox</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>QtDropbox - by Daniel Eder and/or its subsidiary(-ies)
+
+Copyright © 2013 Daniel Eder. All rights reserved.</string>
+  </dict>
+</plist>
