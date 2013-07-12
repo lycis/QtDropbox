@@ -765,11 +765,15 @@ int QDropboxJson::compare(const QDropboxJson& other)
 			return 1;
 
 		if(myEntry.type == QDROPBOXJSON_TYPE_JSON)
+		{
 			if(myEntry.value.json->compare(*yourEntry.value.json) != 0)
 				return 1;
+		}
 		else
+		{
 			if(myEntry.value.value->compare(yourEntry.value.value) != 0)
 				return 1;
+		}
 	}
 
 	return 0;
