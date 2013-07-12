@@ -5,6 +5,11 @@
 #include <QDateTime>
 #include <QString>
 #include <QList>
+
+#ifdef QTDROPBOX_DEBUG
+#include <QDebug>
+#endif
+
 #include "qdropboxjson.h"
 
 //! Provides information and metadata about files and directories
