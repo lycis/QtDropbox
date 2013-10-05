@@ -35,26 +35,26 @@
           <p>Dropbox API for Qt</p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/lycis">lycis</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
         </div>
 
-        <hr><blockquote>
-<p>QtDropbox is still in development. I expect to release a first release candidate in 2012! If you have some knowdledge in C++, Qt and/or the Dropbox REST API you are welcome as supporting developer (see below)!</p>
-</blockquote>
-
-<hr><h1>Want to access a Dropbox from Qt?</h1>
+        <h1>
+<a name="want-to-access-a-dropbox-from-qt" class="anchor" href="#want-to-access-a-dropbox-from-qt"><span class="octicon octicon-link"></span></a>Want to access a Dropbox from Qt?</h1>
 
 <p>QtDropbox provides an easy to use API that wraps the common REST API of <a href="http://www.dropbox.com">Dropbox</a> in convenient C++ classes and objects for <a href="http://www.qt-project.org">Qt</a>. You don't have to worry about creating and calling any HTTP requests that are used to by oAuth and the Dropbox API - all of these calls are wrapped inside the Qt C++ API of QtDropbox!</p>
 
-<h2>Requirements</h2>
+<h2>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
 
 <p>Everything you nedd to use QtDropbox is provided by Qt itself or this library - there are no additional dependencies. QtDropbox relies on the QtNetwork and QtXml modules.</p>
 
-<h2>Including QtDropbox into your project</h2>
+<h2>
+<a name="including-qtdropbox-into-your-project" class="anchor" href="#including-qtdropbox-into-your-project"><span class="octicon octicon-link"></span></a>Including QtDropbox into your project</h2>
 
 <p>It is fairly easy to use QtDropbox in your own project. There are two tested and supported ways to include QtDropbox. As the project grows other usage methods will follow.</p>
 
-<h3>As dynamic library</h3>
+<h3>
+<a name="as-dynamic-library" class="anchor" href="#as-dynamic-library"><span class="octicon octicon-link"></span></a>As dynamic library</h3>
 
 <p>Build the project by using <code>qmake</code> and <code>make</code> (or any other commands you usually use). Create a folder called qtdropbox. Copy the libqtdropbox.pri file and all header files into that folder. Now copy that folder (and the library as needed) to your project directory. In your project file (.pro) you only need to add this line:</p>
 
@@ -62,33 +62,77 @@
 
 <p>As the project continues some scripts and improvements will be provided to provide some degree of automation for this method.</p>
 
-<h3>Use the source!</h3>
+<h3>
+<a name="use-the-source" class="anchor" href="#use-the-source"><span class="octicon octicon-link"></span></a>Use the source!</h3>
 
 <p>Include the whole <code>src</code> directory in your project and compile the library with your code. It is necessary to add the Qt modules <code>network</code> and <code>xml</code> to use this method.</p>
 
-<h1>Current status</h1>
+<h3>
+<a name="current-status" class="anchor" href="#current-status"><span class="octicon octicon-link"></span></a>Current status</h3>
 
-<p>We are currently improving the library as quickly as possible to provide a first version as soon as possible. Take a look at our <a href="https://github.com/lycis/QtDropbox/issues?milestone=1&amp;state=open">issue tracker</a> to see what's on the roadmap for version 1.0</p>
+<p>Because QtDropbox is far from being ready for a release candidate I will list all already available
+and somewhat tested features here:</p>
 
-<h1>Already Available Features</h1>
+<p>Currently in progress:</p>
 
-<h3>General</h3>
+<ul>
+<li>Complete documentation</li>
+<li>Examples</li>
+</ul><h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<h3>
+<a name="general" class="anchor" href="#general"><span class="octicon octicon-link"></span></a>General</h3>
 
 <ul>
 <li>Connect to Dropbox</li>
 <li>Access user account information (quotas, user name, share links, ...)</li>
 <li>Parse JSON strings</li>
-</ul><h2>File Access</h2>
+</ul><h3>
+<a name="file-access" class="anchor" href="#file-access"><span class="octicon octicon-link"></span></a>File Access</h3>
 
 <ul>
 <li>Access files like a local QFile to read and write data</li>
 <li>Access file and directory metadata</li>
 <li>Access file revisions</li>
-</ul><h2>Postponed to a later version</h2>
+<li>Reading file information and metadata</li>
+</ul><p>Postponed to next version:</p>
 
 <ul>
-<li>Acessing the directory structure</li>
-</ul><h1>Support us!</h1>
+<li>Acessing and traversing the directory structure</li>
+</ul><h2>
+<a name="different-qt-versions" class="anchor" href="#different-qt-versions"><span class="octicon octicon-link"></span></a>Different Qt versions</h2>
+
+<p>The project is targetting the most recent version of Qt and thus was ported to Qt5. In the
+beginning the project was developed for Qt4 and as there are some projects based on Qt4 
+out there the legacy version is still being supported.</p>
+
+<p>The master branch always provides the most recent version of the project and at the moment
+this is the Qt5 version.</p>
+
+<h3>
+<a name="checking-out-legacy-versions" class="anchor" href="#checking-out-legacy-versions"><span class="octicon octicon-link"></span></a>Checking out legacy versions</h3>
+
+<p>Legacy versions such as the one supporting Qt4 are provided in specific branches. Here is a
+short list which branch to check out for the specific legacy versions:</p>
+
+<ul>
+<li>Qt4.x -&gt; qt4</li>
+</ul><p>Mind that the branch with name <code>qt5</code> is currently an unused stub!</p>
+
+<h3>
+<a name="support-for-legacy-versions" class="anchor" href="#support-for-legacy-versions"><span class="octicon octicon-link"></span></a>Support for legacy versions</h3>
+
+<p>The ongoing development focues on the <code>master</code> branch first. This means that legacy versions 
+are usually not further improved with new features. Bugfixes will be provided though!</p>
+
+<p>This should not indicate that legacy versions won't receive important new features but they 
+are rather implemented on request only. If there is a specific feature that is already 
+implemented in the most recent version but you need it in a legacy version (e.g. Qt4.x) 
+just open an issue.</p>
+
+<h1>
+<a name="support-us" class="anchor" href="#support-us"><span class="octicon octicon-link"></span></a>Support us!</h1>
 
 <p>Because QtDropbox is still in development I am glad about every helping hand on the project. If you know a bit about Qt, C++ and the Dropbox REST API you can be a valuable member of this project. Because there is currently only one person maintaining QtDropbox I support two ways of contributing:</p>
 
