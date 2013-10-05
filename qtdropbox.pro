@@ -8,8 +8,8 @@ QT       -= gui
 
 TEMPLATE = lib
 
-DEFINES += QTDROPBOX_LIBRARY 
-#           QTDROPBOX_DEBUG
+DEFINES += QTDROPBOX_LIBRARY
+#          QTDROPBOX_DEBUG
 
 SOURCES += \
     src/qdropbox.cpp \

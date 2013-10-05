@@ -11,6 +11,7 @@
 #include <QUrl>
 #include <QDomDocument>
 #include <QEventLoop>
+#include <QUrlQuery>
 
 #ifdef QTDROPBOX_DEBUG
 #include <QDebug>

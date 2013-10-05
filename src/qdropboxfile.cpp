@@ -268,18 +268,22 @@ bool QDropboxFile::getFileContent(QString filename)
 #endif
     QUrl request;
     request.setUrl(QDROPBOXFILE_CONTENT_URL, QUrl::StrictMode);
-    request.setPath(QString("%1/files/%2")
+    request.setPath(QString("/%1/files/%2")
                     .arg(_api->apiVersion().left(1))
                     .arg(filename));
-    request.addQueryItem("oauth_consumer_key", _api->appKey());
-    request.addQueryItem("oauth_nonce", QDropbox::generateNonce(128));
-    request.addQueryItem("oauth_signature_method", _api->signatureMethodString());
-    request.addQueryItem("oauth_timestamp", QString::number((int) QDateTime::currentMSecsSinceEpoch()/1000));
-    request.addQueryItem("oauth_token", _api->token());
-    request.addQueryItem("oauth_version", _api->apiVersion());
+
+    QUrlQuery query;
+    query.addQueryItem("oauth_consumer_key", _api->appKey());
+    query.addQueryItem("oauth_nonce", QDropbox::generateNonce(128));
+    query.addQueryItem("oauth_signature_method", _api->signatureMethodString());
+    query.addQueryItem("oauth_timestamp", QString::number((int) QDateTime::currentMSecsSinceEpoch()/1000));
+    query.addQueryItem("oauth_token", _api->token());
+    query.addQueryItem("oauth_version", _api->apiVersion());
 
     QString signature = _api->oAuthSign(request);
-    request.addQueryItem("oauth_signature", signature);
+    query.addQueryItem("oauth_signature", signature);
+
+    request.setQuery(query);
 
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "QDropboxFile::getFileContent " << request.toString() << endl;
@@ -434,19 +438,23 @@ bool QDropboxFile::putFile()
 
     QUrl request;
     request.setUrl(QDROPBOXFILE_CONTENT_URL, QUrl::StrictMode);
-    request.setPath(QString("%1/files_put/%2")
+    request.setPath(QString("/%1/files_put/%2")
                     .arg(_api->apiVersion().left(1))
                     .arg(_filename));
-    request.addQueryItem("oauth_consumer_key", _api->appKey());
-    request.addQueryItem("oauth_nonce", QDropbox::generateNonce(128));
-    request.addQueryItem("oauth_signature_method", _api->signatureMethodString());
-    request.addQueryItem("oauth_timestamp", QString::number((int) QDateTime::currentMSecsSinceEpoch()/1000));
-    request.addQueryItem("oauth_token", _api->token());
-    request.addQueryItem("oauth_version", _api->apiVersion());
-    request.addQueryItem("overwrite", (_overwrite?"true":"false"));
+
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem("oauth_consumer_key", _api->appKey());
+    urlQuery.addQueryItem("oauth_nonce", QDropbox::generateNonce(128));
+    urlQuery.addQueryItem("oauth_signature_method", _api->signatureMethodString());
+    urlQuery.addQueryItem("oauth_timestamp", QString::number((int) QDateTime::currentMSecsSinceEpoch()/1000));
+    urlQuery.addQueryItem("oauth_token", _api->token());
+    urlQuery.addQueryItem("oauth_version", _api->apiVersion());
+    urlQuery.addQueryItem("overwrite", (_overwrite?"true":"false"));
 
     QString signature = _api->oAuthSign(request);
-    request.addQueryItem("oauth_signature", signature);
+    urlQuery.addQueryItem("oauth_signature", signature);
+
+    request.setQuery(urlQuery);
 
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "QDropboxFile::put " << request.toString() << endl;

@@ -8,6 +8,30 @@ Basically QtDropbox aims to provide an easy to use posibillity to access the RES
 Dropbox. All HTTP calls are hidden behind the curtains of neat C++/Qt classes with nice 
 method names and specific uses.
 
+## Different Qt versions
+The project is targetting the most recent version of Qt and thus was ported to Qt5. In the
+beginning the project was developed for Qt4 and as there are some projects based on Qt4 
+out there the legacy version is still being supported.
+
+The master branch always provides the most recent version of the project and at the moment
+this is the Qt5 version.
+
+### Checking out legacy versions
+Legacy versions such as the one supporting Qt4 are provided in specific branches. Here is a
+short list which branch to check out for the specific legacy versions:
+
+* Qt4.x -> qt4
+
+Mind that the branch with name `qt5` is currently an unused stub!
+
+### Support for legacy versions
+The ongoing development focues on the `master` branch first. This means that legacy versions 
+are usually not further improved with new features. Bugfixes will be provided though!
+
+This should not indicate that legacy versions won't receive important new features but they 
+are rather implemented on request only. If there is a specific feature that is already 
+implemented in the most recent version but you need it in a legacy version (e.g. Qt4.x) 
+just open an issue.
 
 ## Development
 QtDropbox is currently under development and only provides limited features at the moment. If
@@ -20,9 +44,6 @@ Because QtDropbox is far from being ready for a release candidate I will list al
 and somewhat tested features here:
 
 Currently in progress:
-* Fixing various todo and bug tasks
-
-The next features to be implemented are:
 * Complete documentation
 * Examples
 
@@ -36,9 +57,10 @@ The next features to be implemented are:
 * Access files like a local QFile to read and write data
 * Access file and directory metadata
 * Access file revisions
+* Reading file information and metadata
 
 Postponed to next version:
-* Acessing the directory structure
+* Acessing and traversing the directory structure
 
 ## Documentation
 You can generate a documentation of all classes by:

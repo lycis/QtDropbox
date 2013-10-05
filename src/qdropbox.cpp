@@ -797,16 +797,19 @@ int QDropbox::requestToken(bool blocking)
 
     QUrl url;
     url.setUrl(apiurl.toString());
-    url.addQueryItem("oauth_consumer_key",_appKey);
-    url.addQueryItem("oauth_nonce", nonce);
-    url.addQueryItem("oauth_signature_method", sigmeth);
-    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    url.addQueryItem("oauth_version", _version);
-    url.setPath(QString("%1/oauth/request_token").arg(_version.left(1)));
+    url.setPath(QString("/%1/oauth/request_token").arg(_version.left(1)));
+
+    QUrlQuery query;
+    query.addQueryItem("oauth_consumer_key",_appKey);
+    query.addQueryItem("oauth_nonce", nonce);
+    query.addQueryItem("oauth_signature_method", sigmeth);
+    query.addQueryItem("oauth_timestamp", QString::number(timestamp));
+    query.addQueryItem("oauth_version", _version);
 
     QString signature = oAuthSign(url);
+    query.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
 
-    url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+    url.setQuery(query);
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "request token url: " << url.toString() << endl << "sig: " << signature << endl;
     qDebug() << "sending request " << url.toString() << " to " << apiurl.toString() << endl;
@@ -833,12 +836,15 @@ bool QDropbox::requestTokenAndWait()
 int QDropbox::authorize(QString email, QString pwd)
 {
     QUrl dropbox_authorize;
-    dropbox_authorize.setPath(QString("%1/oauth/authorize")
+    dropbox_authorize.setPath(QString("/%1/oauth/authorize")
                               .arg(_version.left(1)));
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "oauthToken = " << oauthToken << endl;
 #endif
-    dropbox_authorize.addQueryItem("oauth_token", oauthToken);
+
+    QUrlQuery query;
+    query.addQueryItem("oauth_token", oauthToken);
+    dropbox_authorize.setQuery(query);
     int reqnr = sendRequest(dropbox_authorize, "GET", 0, "www.dropbox.com");
     requestMap[reqnr].type = QDROPBOX_REQ_AULOGIN;
     mail     = email;
@@ -851,9 +857,12 @@ QUrl QDropbox::authorizeLink()
     QUrl link;
     link.setScheme("https");
     link.setHost("www.dropbox.com");
-    link.setPath(QString("%1/oauth/authorize")
+    link.setPath(QString("/%1/oauth/authorize")
                  .arg(_version.left(1)));
-    link.addQueryItem("oauth_token", oauthToken);
+
+    QUrlQuery query;
+    query.addQueryItem("oauth_token", oauthToken);
+    link.setQuery(query);
     return link;
 }
 
@@ -863,21 +872,26 @@ int QDropbox::requestAccessToken(bool blocking)
 
     QUrl url;
     url.setUrl(apiurl.toString());
-    url.addQueryItem("oauth_consumer_key",_appKey);
-    url.addQueryItem("oauth_nonce", nonce);
-    url.addQueryItem("oauth_signature_method", signatureMethodString());
-    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    url.addQueryItem("oauth_token", oauthToken);
-    url.addQueryItem("oauth_version", _version);
-    url.setPath(QString("%1/oauth/access_token").
+
+    QUrlQuery query;
+    query.addQueryItem("oauth_consumer_key",_appKey);
+    query.addQueryItem("oauth_nonce", nonce);
+    query.addQueryItem("oauth_signature_method", signatureMethodString());
+    query.addQueryItem("oauth_timestamp", QString::number(timestamp));
+    query.addQueryItem("oauth_token", oauthToken);
+    query.addQueryItem("oauth_version", _version);
+
+    url.setPath(QString("/%1/oauth/access_token").
                 arg(_version.left(1)));
 
 #ifdef QTDROPBOX_DEBUG
-    qDebug() << "requestToken = " << url.queryItemValue("oauth_token");
+    qDebug() << "requestToken = " << query.queryItemValue("oauth_token");
 #endif
 
     QString signature = oAuthSign(url);
-    url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+    query.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+
+    url.setQuery(query);
 
     QString dataString = url.toString(QUrl::RemoveScheme|QUrl::RemoveAuthority|
                                       QUrl::RemovePath).mid(1);
@@ -888,8 +902,8 @@ int QDropbox::requestAccessToken(bool blocking)
     QByteArray postData;
     postData.append(dataString.toUtf8());
 
-    QUrl query(url.toString(QUrl::RemoveQuery));
-    int reqnr = sendRequest(query, "POST", postData);
+    QUrl xQuery(url.toString(QUrl::RemoveQuery));
+    int reqnr = sendRequest(xQuery, "POST", postData);
 
     if(blocking)
     {
@@ -919,16 +933,20 @@ void QDropbox::requestAccountInfo(bool blocking)
 
     QUrl url;
     url.setUrl(apiurl.toString());
-    url.addQueryItem("oauth_consumer_key",_appKey);
-    url.addQueryItem("oauth_nonce", nonce);
-    url.addQueryItem("oauth_signature_method", signatureMethodString());
-    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    url.addQueryItem("oauth_token", oauthToken);
-    url.addQueryItem("oauth_version", _version);
-    url.setPath(QString("%1/account/info").arg(_version.left(1)));
+
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem("oauth_consumer_key",_appKey);
+    urlQuery.addQueryItem("oauth_nonce", nonce);
+    urlQuery.addQueryItem("oauth_signature_method", signatureMethodString());
+    urlQuery.addQueryItem("oauth_timestamp", QString::number(timestamp));
+    urlQuery.addQueryItem("oauth_token", oauthToken);
+    urlQuery.addQueryItem("oauth_version", _version);
 
     QString signature = oAuthSign(url);
-    url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+    urlQuery.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+
+    url.setPath(QString("/%1/account/info").arg(_version.left(1)));
+    url.setQuery(urlQuery);
 
     int reqnr = sendRequest(url);
     if(blocking)
@@ -965,16 +983,20 @@ void QDropbox::requestMetadata(QString file, bool blocking)
 
     QUrl url;
     url.setUrl(apiurl.toString());
-    url.addQueryItem("oauth_consumer_key",_appKey);
-    url.addQueryItem("oauth_nonce", nonce);
-    url.addQueryItem("oauth_signature_method", signatureMethodString());
-    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    url.addQueryItem("oauth_token", oauthToken);
-    url.addQueryItem("oauth_version", _version);
-    url.setPath(QString("%1/metadata/%2").arg(_version.left(1), file));
+
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem("oauth_consumer_key",_appKey);
+    urlQuery.addQueryItem("oauth_nonce", nonce);
+    urlQuery.addQueryItem("oauth_signature_method", signatureMethodString());
+    urlQuery.addQueryItem("oauth_timestamp", QString::number(timestamp));
+    urlQuery.addQueryItem("oauth_token", oauthToken);
+    urlQuery.addQueryItem("oauth_version", _version);
 
     QString signature = oAuthSign(url);
-    url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+    urlQuery.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+
+    url.setQuery(urlQuery);
+    url.setPath(QString("/%1/metadata/%2").arg(_version.left(1), file));
 
     int reqnr = sendRequest(url);
     if(blocking)
@@ -1001,16 +1023,20 @@ void QDropbox::requestSharedLink(QString file, bool blocking)
 
     QUrl url;
     url.setUrl(apiurl.toString());
-    url.addQueryItem("oauth_consumer_key",_appKey);
-    url.addQueryItem("oauth_nonce", nonce);
-    url.addQueryItem("oauth_signature_method", signatureMethodString());
-    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    url.addQueryItem("oauth_token", oauthToken);
-    url.addQueryItem("oauth_version", _version);
-    url.setPath(QString("%1/shares/%2").arg(_version.left(1), file));
+
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem("oauth_consumer_key",_appKey);
+    urlQuery.addQueryItem("oauth_nonce", nonce);
+    urlQuery.addQueryItem("oauth_signature_method", signatureMethodString());
+    urlQuery.addQueryItem("oauth_timestamp", QString::number(timestamp));
+    urlQuery.addQueryItem("oauth_token", oauthToken);
+    urlQuery.addQueryItem("oauth_version", _version);
 
     QString signature = oAuthSign(url);
-    url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+    urlQuery.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+
+    url.setPath(QString("/%1/shares/%2").arg(_version.left(1), file));
+    url.setQuery(urlQuery);
 
     int reqnr = sendRequest(url);
     if(blocking)
@@ -1113,17 +1139,21 @@ void QDropbox::requestRevisions(QString file, int max, bool blocking)
 
 	QUrl url;
     url.setUrl(apiurl.toString());
-    url.addQueryItem("oauth_consumer_key",_appKey);
-    url.addQueryItem("oauth_nonce", nonce);
-    url.addQueryItem("oauth_signature_method", signatureMethodString());
-    url.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    url.addQueryItem("oauth_token", oauthToken);
-    url.addQueryItem("oauth_version", _version);
-	url.addQueryItem("rev_limit", QString::number(max));
-    url.setPath(QString("%1/revisions/%2").arg(_version.left(1), file));
+
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem("oauth_consumer_key",_appKey);
+    urlQuery.addQueryItem("oauth_nonce", nonce);
+    urlQuery.addQueryItem("oauth_signature_method", signatureMethodString());
+    urlQuery.addQueryItem("oauth_timestamp", QString::number(timestamp));
+    urlQuery.addQueryItem("oauth_token", oauthToken);
+    urlQuery.addQueryItem("oauth_version", _version);
+    urlQuery.addQueryItem("rev_limit", QString::number(max));
 
     QString signature = oAuthSign(url);
-    url.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+    urlQuery.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+
+    url.setPath(QString("/%1/revisions/%2").arg(_version.left(1), file));
+    url.setQuery(urlQuery);
 
     int reqnr = sendRequest(url);
     if(blocking)
