@@ -34,14 +34,15 @@ implemented in the most recent version but you need it in a legacy version (e.g.
 just open an issue.
 
 ## Development
-QtDropbox is currently under development and only provides limited features at the moment. If
-you have some knowledge about C++ (with Qt framework and/or the Dropbox REST API you are welcome
-to contribute to this project. For details take a look at the
+QtDropbox is in ongoing development so not all features provided by the Dropbox API are available
+right now. If you have some knowledge about C++ (with Qt framework and/or the Dropbox REST API you
+are welcome to contribute to this project. For details take a look at the 
 [project webpage](http://lycis.github.com/QtDropbox/)
 
 ### Current status
-Because QtDropbox is far from being ready for a release candidate I will list all already available
-and somewhat tested features here:
+QtDropbox is constantly improved and developed further to include all possible requests you could
+send to Dropbox and to simplify access. Below is a list of features that are currently available and
+tested:
 
 Currently in progress:
 * Complete documentation
