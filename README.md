@@ -34,7 +34,11 @@ implemented in the most recent version but you need it in a legacy version (e.g.
 just open an issue.
 
 ## Development
+<<<<<<< HEAD
 QtDropbox is in ongoing development so not all features provided by the Dropbox API are available
+=======
+QtDropbox is in ongoind development so not all features provided by the Dropbox API are available
+>>>>>>> ddc6092ca440cb1189230d106a5260d274dbcd80
 right now. If you have some knowledge about C++ (with Qt framework and/or the Dropbox REST API you
 are welcome to contribute to this project. For details take a look at the 
 [project webpage](http://lycis.github.com/QtDropbox/)
