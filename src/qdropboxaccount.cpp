@@ -3,6 +3,9 @@
 QDropboxAccount::QDropboxAccount(QObject *parent) :
     QDropboxJson(parent)
 {
+    _quotaShared = 0;
+    _quota       = 0;
+    _quotaNormal = 0;
 }
 
 QDropboxAccount::QDropboxAccount(QString jsonString, QObject *parent) :

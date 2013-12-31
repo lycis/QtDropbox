@@ -77,7 +77,7 @@ public:
       QDropboxFile is currently implemented as sequential device. That will
       change in time.
      */
-    bool isSequential();
+    bool isSequential() const;
 
     /*!
       Fetches the file content from the Dropbox server and buffers it locally. Depending
@@ -195,7 +195,7 @@ public:
 	  Reimplemented from QIODevice::pos().
 	  Returns the current position in the file.
 	*/
-	qint64 pos();
+    qint64 pos() const;
 
 	/*!
 	  Reimplemented from QIODevice::reset().

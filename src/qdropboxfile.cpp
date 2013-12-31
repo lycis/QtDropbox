@@ -34,7 +34,7 @@ QDropboxFile::~QDropboxFile()
         delete _evLoop;
 }
 
-bool QDropboxFile::isSequential()
+bool QDropboxFile::isSequential() const
 {
     return true;
 }
@@ -546,7 +546,7 @@ bool QDropboxFile::seek(qint64 pos)
 	return true;
 }
 
-qint64 QDropboxFile::pos()
+qint64 QDropboxFile::pos() const
 {
 	return _position;
 }
