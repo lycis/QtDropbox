@@ -1,0 +1,13 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+install:
+  - sudo apt-get update
+  - sudo apt-get install libqt5-dev qt5-make
+
+script:
+  - qmake
+  - make
