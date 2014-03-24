@@ -16,7 +16,7 @@ addons:
       name: "lycis/QtDropbox"
       description: "Your project description here"
     notification_email: daniel@deder.at
-    build_command_prepend:
+    build_command_prepend: qmake
     build_command: make
     branch_pattern: master
 
