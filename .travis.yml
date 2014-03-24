@@ -3,6 +3,22 @@ language: cpp
 compiler:
   - gcc
   - clang
+  
+env:
+  global:
+   # The next declration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "JHeF0oqVGey6FAfBEkmubhuQlsPnTtuD61A8l8AmkHo1ZosU00hE8bUwsux6JDLpmuwdY5TFzVWwayp8p9A5YxsvypbdyXqMv02uoYrUTyjP5iEQ3LVcrivxce8ElOTpV/LSnSX8RoS7EZXxVDFe0hmDSosC60dxLW8QSVUw5hY="
+
+addons:
+  coverity_scan:
+    project:
+      name: "lycis/QtDropbox"
+      description: "Your project description here"
+    notification_email: daniel@deder.at
+    build_command_prepend:
+    build_command: make
+    branch_pattern: master
 
 install:
   - sudo apt-add-repository --yes ppa:ubuntu-sdk-team/ppa
