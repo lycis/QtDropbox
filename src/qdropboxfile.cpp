@@ -201,7 +201,8 @@ qint64 QDropboxFile::writeData(const char *data, qint64 len)
 #endif
 
     // flush if the threshold is reached
-    if(_buffer->size()%_bufferThreshold == 0)
+    _currentThreshold += len;
+    if(_currentThreshold > _bufferThreshold)
         flush();
 
 	int written_bytes = len;
@@ -474,22 +475,25 @@ bool QDropboxFile::putFile()
         return false;
     }
 
+    _currentThreshold = 0;
+
     return true;
 }
 
 void QDropboxFile::_init(QDropbox *api, QString filename, qint64 bufferTh)
 {
-    _api             = api;
-    _buffer          = NULL;
-    _filename        = filename;
-    _evLoop          = NULL;
-    _waitMode        = notWaiting;
-    _bufferThreshold = bufferTh;
-    _overwrite       = true;
-	_metadata        = NULL;
-	lastErrorCode    = 0;
-	lastErrorMessage = "";
-	_position        = 0;
+    _api              = api;
+    _buffer           = NULL;
+    _filename         = filename;
+    _evLoop           = NULL;
+    _waitMode         = notWaiting;
+    _bufferThreshold  = bufferTh;
+    _overwrite        = true;
+    _metadata         = NULL;
+    lastErrorCode     = 0;
+    lastErrorMessage  = "";
+    _position         = 0;
+    _currentThreshold = 0;
     return;
 }
 

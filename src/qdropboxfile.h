@@ -236,6 +236,7 @@ private:
     QString lastErrorMessage;
 
     qint64 _bufferThreshold;
+    qint64 _currentThreshold;
 
     bool _overwrite;
 
