@@ -35,8 +35,6 @@ const QString QDROPBOXFILE_CONTENT_URL = "https://api-content.dropbox.com";
   \todo implement utilities for revision access (get a list of revisions and get actual
         revisions)
 
-  \todo QDropboxFile has to be a random access device (reimplement seek() and pos())
-
  */
 class QTDROPBOXSHARED_EXPORT QDropboxFile : public QIODevice
 {
