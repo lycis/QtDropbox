@@ -29,6 +29,8 @@ private Q_SLOTS:
     void jsonCase11();
     void jsonCase12();
     void jsonCase13();
+    void jsonCase14();
+    void jsonCase15();
 
   /* QDropbox */
     void dropboxCase1();

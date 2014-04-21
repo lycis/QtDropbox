@@ -193,6 +193,29 @@ void QtDropboxTest::jsonCase13()
 }
 
 /**
+ * @brief QDropboxJson: [] in strings
+ * Verify that square brackets in strings are working correctly.
+ */
+void QtDropboxTest::jsonCase14()
+{
+    QDropboxJson json("{\"string\": \"[asdf]abcd\"}");  
+    QVERIFY2(json.isValid(), "json could not be parsed");
+    QVERIFY2(json.getString("string").compare("[asdf]abcd") == 0, "square brackets in string not parsed correctly");
+}
+
+/**
+ * @brief QDropboxJson: {} in strings
+ * Verify that curly brackets within a string are parsed correctly
+ */
+void QtDropboxTest::jsonCase15()
+{
+    QDropboxJson json("{\"string\": \"{asdf}abcd\"}");  
+    QVERIFY2(json.isValid(), "json could not be parsed");
+    QVERIFY2(json.getString("string").compare("{asdf}abcd") == 0, 
+	     QString("curly brackets in string not parsed correctly [%1]").arg(json.getString("string")).toStdString().c_str());
+}
+
+/**
  * @brief QDropbox: Plaintext Connection
  * This test connects to Dropbox and sends a dummy request to check that the connection in
  * Plaintext mode. The request is not processed any further! <b>You are required to authorize

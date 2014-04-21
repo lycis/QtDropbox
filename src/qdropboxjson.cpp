@@ -95,6 +95,8 @@ void QDropboxJson::parseString(QString strJson)
             continue;
             break;
         case '}':
+	    if(openQuotes)
+	      buffer += "}";
             continue;
             break;
         case ':':
@@ -128,11 +130,13 @@ void QDropboxJson::parseString(QString strJson)
         case '{':
             if(i == 0)
                 continue;
-            isJson  = true;
+	    if(!openQuotes)
+              isJson  = true;
             buffer += '{';
             break;
         case '[':
-            isArray = true;
+	    if(!openQuotes)
+              isArray = true;
             buffer += '[';
             break;
         default:
