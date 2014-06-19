@@ -252,10 +252,6 @@ private:
 
     void emptyList();
     qdropboxjson_entry_type interpretType(QString value);
-	QString translateMonth(QString month);
-    QString translateMonth(int month);
-	QString translateDay(QString day);
-    QString translateDay(int day);
 	int parseSubJson(QString str, int start, qdropboxjson_entry *jsonEntry);
 	void _init();
 };
