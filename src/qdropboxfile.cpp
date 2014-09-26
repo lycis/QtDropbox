@@ -223,6 +223,13 @@ void QDropboxFile::networkRequestFinished(QNetworkReply *rply)
     qDebug() << "QDropboxFile::networkRequestFinished(...)" << endl;
 #endif
 
+    if (rply->error() != QNetworkReply::NoError)
+    {
+        lastErrorCode = rply->error();
+        stopEventLoop();
+        return;
+    }
+
     switch(_waitMode)
     {
     case waitForRead:
