@@ -106,6 +106,7 @@ void QDropbox::setApiVersion(QString apiversion)
 
 void QDropbox::requestFinished(int nr, QNetworkReply *rply)
 {
+    rply->deleteLater();
 #ifdef QTDROPBOX_DEBUG
     int resp_bytes = rply->bytesAvailable();
 #endif

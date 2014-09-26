@@ -217,6 +217,8 @@ qint64 QDropboxFile::writeData(const char *data, qint64 len)
 
 void QDropboxFile::networkRequestFinished(QNetworkReply *rply)
 {
+    rply->deleteLater();
+
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "QDropboxFile::networkRequestFinished(...)" << endl;
 #endif
