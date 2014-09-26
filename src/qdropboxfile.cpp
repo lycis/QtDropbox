@@ -293,7 +293,9 @@ bool QDropboxFile::getFileContent(QString filename)
 #endif
 
     QNetworkRequest rq(request);
-    _conManager.get(rq);
+    auto reply = _conManager.get(rq);
+    connect(this, &QDropboxFile::operationAborted, reply, &QNetworkReply::abort);
+    connect(reply, &QNetworkReply::downloadProgress, this, &QDropboxFile::downloadProgress);
 
     _waitMode = waitForRead;
     startEventLoop();
@@ -464,7 +466,9 @@ bool QDropboxFile::putFile()
 #endif
 
     QNetworkRequest rq(request);
-    _conManager.put(rq, *_buffer);
+    auto reply = _conManager.put(rq, *_buffer);
+    connect(this, &QDropboxFile::operationAborted, reply, &QNetworkReply::abort);
+    connect(reply, &QNetworkReply::uploadProgress, this, &QDropboxFile::uploadProgress);
 
     _waitMode = waitForWrite;	
     startEventLoop();
@@ -562,4 +566,9 @@ bool QDropboxFile::reset()
 	QIODevice::reset();
 	_position = 0;
 	return true;
+}
+
+void QDropboxFile::abort()
+{
+    emit operationAborted();
 }

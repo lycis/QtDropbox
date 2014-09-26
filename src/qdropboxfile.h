@@ -201,6 +201,15 @@ public:
 	*/
 	bool reset();
 
+public slots:
+    void abort();
+
+signals:
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+    void uploadProgress(qint64 bytesReceived, qint64 bytesTotal);
+
+    void operationAborted();
+
 protected:
     qint64 readData(char *data, qint64 maxlen);
     qint64 writeData(const char *data, qint64 len);
