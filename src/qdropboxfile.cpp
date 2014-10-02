@@ -301,7 +301,7 @@ bool QDropboxFile::getFileContent(QString filename)
 #endif
 
     QNetworkRequest rq(request);
-    auto reply = _conManager.get(rq);
+    QNetworkReply *reply = _conManager.get(rq);
     connect(this, &QDropboxFile::operationAborted, reply, &QNetworkReply::abort);
     connect(reply, &QNetworkReply::downloadProgress, this, &QDropboxFile::downloadProgress);
 
@@ -478,7 +478,7 @@ bool QDropboxFile::putFile()
 #endif
 
     QNetworkRequest rq(request);
-    auto reply = _conManager.put(rq, *_buffer);
+    QNetworkReply *reply = _conManager.put(rq, *_buffer);
     connect(this, &QDropboxFile::operationAborted, reply, &QNetworkReply::abort);
     connect(reply, &QNetworkReply::uploadProgress, this, &QDropboxFile::uploadProgress);
 
