@@ -479,7 +479,7 @@ QDateTime QDropboxJson::getTimestamp(QString key, bool force)
 
     const QString dtFormat = "dd MMM yyyy HH:mm:ss";
 
-    auto res = QLocale{QLocale::English}.toDateTime(e.value.value->mid(6, dtFormat.size()), dtFormat);
+    QDateTime res = QLocale(QLocale::English).toDateTime(e.value.value->mid(6, dtFormat.size()), dtFormat);
     res.setTimeSpec(Qt::UTC);
 
     return res;
