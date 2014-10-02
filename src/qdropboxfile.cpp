@@ -175,7 +175,7 @@ qint64 QDropboxFile::readData(char *data, qint64 maxlen)
         maxlen = _buffer->size();
 
 	QByteArray tmp = _buffer->mid(_position, maxlen);
-    const qint64 read = tmp.size();
+	const qint64 read = tmp.size();
 	memcpy(data, tmp.data(), read);
    
 #ifdef QTDROPBOX_DEBUG
