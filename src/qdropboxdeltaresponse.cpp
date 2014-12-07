@@ -10,9 +10,9 @@ QDropboxDeltaResponse::QDropboxDeltaResponse(QString response)
 {
     QDropboxJson js(response);
 
-    this->reset = js.getBool("reset");
-    this->cursor = js.getString("cursor");
-    this->has_more = js.getBool("has_more");
+    this->_reset = js.getBool("reset");
+    this->_cursor = js.getString("cursor");
+    this->_has_more = js.getBool("has_more");
 
     QStringList entriesList = js.getArray("entries");
 
@@ -28,27 +28,27 @@ QDropboxDeltaResponse::QDropboxDeltaResponse(QString response)
                             pair.value(1)
                         )
                     );
-        this->entries.insert(pair.value(0), val);
+        this->_entries.insert(pair.value(0), val);
     }
 }
 
 const QDropboxDeltaEntryMap QDropboxDeltaResponse::getEntries() const
 {
-    return this->entries;
+    return this->_entries;
 }
 
 bool QDropboxDeltaResponse::shouldReset() const
 {
-    return this->reset;
+    return this->_reset;
 }
 
 QString QDropboxDeltaResponse::getNextCursor() const
 {
-    return this->cursor;
+    return this->_cursor;
 }
 
 
 bool QDropboxDeltaResponse::hasMore() const
 {
-    return this->has_more;
+    return this->_has_more;
 }

@@ -55,10 +55,10 @@ public:
 
 
 private:
-    QDropboxDeltaEntryMap entries;
-    bool reset;
-    QString cursor;
-    bool has_more;
+    QDropboxDeltaEntryMap _entries;
+    bool _reset;
+    QString _cursor;
+    bool _has_more;
 };
 
 #endif // QDROPBOXDELTA_H

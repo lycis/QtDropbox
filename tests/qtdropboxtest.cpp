@@ -273,7 +273,7 @@ void QtDropboxTest::dropboxCase2()
         }
 
     } while (hasMore);
-
+    strout << "next cursor: " << cursor << "\n";
     for(QDropboxFileInfoMap::const_iterator i = file_cache.begin(); i != file_cache.end(); i++)
     {
         strout << "file " << i.key() << " last modified " << i.value()->clientModified().toString() << "\n";
