@@ -21,7 +21,7 @@ QDropboxDeltaResponse::QDropboxDeltaResponse(QString response)
         i++)
     {
         QDropboxJson s(*i);
-        QStringList pair = js.getArray();
+        QStringList pair = s.getArray();
 
         QSharedPointer<QDropboxFileInfo> val(
                     new QDropboxFileInfo(

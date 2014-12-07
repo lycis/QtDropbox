@@ -2,8 +2,6 @@
 
 #include "qdropboxjson.h"
 
-#include <QtDebug>
-
 QDropboxJson::QDropboxJson(QObject *parent) :
     QObject(parent)
 {
@@ -612,7 +610,6 @@ QStringList QDropboxJson::getArray(QString key, bool force)
         return list;
 
 	QString arrayStr = e.value.value->mid(1, e.value.value->length()-2);
-    qDebug() << arrayStr;
 	QString buffer = "";
 	bool inString = false;
 	int  inJson   = 0;
@@ -659,8 +656,6 @@ QStringList QDropboxJson::getArray(QString key, bool force)
 	if(!buffer.isEmpty())
 		list.append(buffer);
 
-
-    qDebug() << "LIST " << list;
     return list;
 }
 
