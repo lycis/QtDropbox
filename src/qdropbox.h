@@ -21,6 +21,7 @@
 #include "qdropboxjson.h"
 #include "qdropboxaccount.h"
 #include "qdropboxfileinfo.h"
+#include "qdropboxdeltaresponse.h"
 
 typedef int qdropbox_request_type;
 
@@ -39,6 +40,8 @@ const qdropbox_request_type QDROPBOX_REQ_SHRDLNK = 0x0C;
 const qdropbox_request_type QDROPBOX_REQ_BSHRDLN = 0x0D;
 const qdropbox_request_type QDROPBOX_REQ_REVISIO = 0x0E;
 const qdropbox_request_type QDROPBOX_REQ_BREVISI = 0x0F;
+const qdropbox_request_type QDROPBOX_REQ_DELTA   = 0x10;
+const qdropbox_request_type QDROPBOX_REQ_BDELTA  = 0x11;
 
 //! Internally used struct to handle network requests sent from QDropbox
 /*!
@@ -431,6 +434,29 @@ public:
 	 */
 	QList<QDropboxFileInfo> requestRevisionsAndWait(QString file, int max = 10);
 
+
+    /*!
+      \brief Produces a list of delta entries. When the request is answered by the Dropbox server
+      the signal QDropbox::deltaEntriesReceived() will be emitted.
+
+      \param cursor A string used to keep track of current delta state.
+      \param path_prefix If non-empty, only include entries with given prefix.
+
+     */
+    void requestDelta(QString cursor, QString path_prefix, bool blocking = false);
+
+    /*!
+      \brief Works exactly like QDropbox::requestDelta but blocks until the list of delta
+      entries was received.
+
+      \param cursor A string used to keep track of current delta state.
+      \param path_prefix If non-empty, only includes entries with given prefix.
+
+      \return a QDropboxDeltaResponse representing the API response.
+
+     */
+     QDropboxDeltaResponse requestDeltaAndWait(QString cursor, QString path_prefix);
+
 signals:
     /*!
       This signal is emitted whenever an error occurs. The error is passed
@@ -511,6 +537,11 @@ signals:
 	*/
 	void revisionsReceived(QString revisionJson);
 
+    /*!
+      Emitted when a delta response is received.
+    */
+    void deltaReceived(QString deltaJson);
+
 public slots:
 
 private slots:
@@ -577,6 +608,8 @@ private:
     void parseBlockingSharedLink(QString response);
 	void parseRevisions(QString response);
 	void parseBlockingRevisions(QString response);
+    void parseDelta(QString response);
+    void parseBlockingDelta(QString response);
 };
 
 #endif // QDROPBOX_H
