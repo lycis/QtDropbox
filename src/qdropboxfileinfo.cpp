@@ -57,7 +57,7 @@ void QDropboxFileInfo::dataFromJson()
 	_isDeleted    = getBool("is_deleted");
 	_revisionHash = getString("rev");
 	_modified     = getTimestamp("modified");
-	_clientModified = getTimestamp("client_modified");
+    _clientModified = getTimestamp("client_mtime");
 	
 	// create content list
 	if(_isDir)
