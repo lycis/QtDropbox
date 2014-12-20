@@ -34,6 +34,7 @@ private Q_SLOTS:
 
   /* QDropbox */
     void dropboxCase1();
+    void dropboxCase2();
 
 private:
     void authorizeApplication(QDropbox *d);

@@ -276,6 +276,12 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
 		case QDROPBOX_REQ_BREVISI:
 			parseBlockingRevisions(response);
 			break;
+        case QDROPBOX_REQ_DELTA:
+            parseDelta(response);
+            break;
+        case QDROPBOX_REQ_BDELTA:
+            parseBlockingDelta(response);
+            break;
         default:
             errorState  = QDropbox::ResponseToUnknownRequest;
             errorText   = "Received a response to an unknown request";
@@ -724,6 +730,31 @@ void QDropbox::parseMetadata(QString response)
     return;
 }
 
+void QDropbox::parseDelta(QString response)
+{
+#ifdef QTDROPBOX_DEBUG
+    qDebug() << "== metadata ==" << response << "== metadata end ==";
+#endif
+
+    QDropboxJson json;
+    json.parseString(response);
+    _tempJson.parseString(response);
+    if(!json.isValid())
+    {
+        errorState = QDropbox::APIError;
+        errorText  = "Dropbox API did not send correct answer for delta.";
+#ifdef QTDROPBOX_DEBUG
+        qDebug() << "error: " << errorText << endl;
+#endif
+        emit errorOccured(errorState);
+        stopEventLoop();
+        return;
+    }
+
+    emit deltaReceived(response);
+    return;
+}
+
 void QDropbox::setKey(QString key)
 {
 #ifdef QTDROPBOX_DEBUG
@@ -1059,6 +1090,67 @@ QUrl QDropbox::requestSharedLinkAndWait(QString file)
     return QUrl(urlString);
 }
 
+void QDropbox::requestDelta(QString cursor, QString path_prefix, bool blocking)
+{
+    clearError();
+
+    timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
+
+    QUrl url;
+    url.setUrl(apiurl.toString());
+
+    QUrlQuery urlQuery;
+    urlQuery.addQueryItem("oauth_consumer_key",_appKey);
+    urlQuery.addQueryItem("oauth_nonce", nonce);
+    urlQuery.addQueryItem("oauth_signature_method", signatureMethodString());
+    urlQuery.addQueryItem("oauth_timestamp", QString::number(timestamp));
+    urlQuery.addQueryItem("oauth_token", oauthToken);
+    urlQuery.addQueryItem("oauth_version", _version);
+    if(cursor.length() > 0)
+    {
+        urlQuery.addQueryItem("cursor", cursor);
+    }
+    if(path_prefix.length() > 0)
+    {
+        urlQuery.addQueryItem("path_prefix", path_prefix);
+    }
+
+    QString signature = oAuthSign(url);
+    urlQuery.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
+
+    url.setQuery(urlQuery);
+    url.setPath(QString("/%1/delta").arg(_version.left(1)));
+
+    QString dataString = url.toString(QUrl::RemoveScheme|QUrl::RemoveAuthority|
+                                      QUrl::RemovePath).mid(1);
+#ifdef QTDROPBOX_DEBUG
+    qDebug() << "dataString = " << dataString << endl;
+#endif
+
+    QByteArray postData;
+    postData.append(dataString.toUtf8());
+
+    QUrl xQuery(url.toString(QUrl::RemoveQuery));
+    int reqnr = sendRequest(xQuery, "POST", postData);
+
+    if(blocking)
+    {
+        requestMap[reqnr].type = QDROPBOX_REQ_BDELTA;
+        startEventLoop();
+    }
+    else
+        requestMap[reqnr].type = QDROPBOX_REQ_DELTA;
+    return;
+}
+
+QDropboxDeltaResponse QDropbox::requestDeltaAndWait(QString cursor, QString path_prefix)
+{
+    requestDelta(cursor, path_prefix, true);
+    QDropboxDeltaResponse r(_tempJson.strContent());
+
+    return r;
+}
+
 void QDropbox::startEventLoop()
 {
 #ifdef QTDROPBOX_DEBUG
@@ -1104,6 +1196,14 @@ void QDropbox::parseBlockingMetadata(QString response)
 {
     clearError();
     parseMetadata(response);
+    stopEventLoop();
+    return;
+}
+
+void QDropbox::parseBlockingDelta(QString response)
+{
+    clearError();
+    parseDelta(response);
     stopEventLoop();
     return;
 }

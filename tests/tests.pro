@@ -19,10 +19,11 @@ DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 HEADERS += \
     qtdropboxtest.hpp \
+    keys.hpp \
     keys.hpp
 
-LIBS += -L../lib/
-INCLUDEPATH += ../qtdropbox/
+LIBS += -L../../build-qtdropbox-Desktop-Debug
+INCLUDEPATH += ../src/
 
 include(../libqtdropbox.pri)
 

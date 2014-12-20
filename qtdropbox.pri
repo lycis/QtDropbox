@@ -7,7 +7,8 @@ SOURCES += \
     $$PWD/src/qdropboxjson.cpp \
     $$PWD/src/qdropboxaccount.cpp \
     $$PWD/src/qdropboxfile.cpp \
-    $$PWD/src/qdropboxfileinfo.cpp
+    $$PWD/src/qdropboxfileinfo.cpp \
+    $$PWD/src/qdropboxdeltaresponse.cpp
 
 HEADERS += \
     $$PWD/src/qtdropbox_global.h \
@@ -16,6 +17,7 @@ HEADERS += \
     $$PWD/src/qdropboxaccount.h \
     $$PWD/src/qdropboxfile.h \
     $$PWD/src/qtdropbox.h \
-    $$PWD/src/qdropboxfileinfo.h
+    $$PWD/src/qdropboxfileinfo.h \
+    $$PWD/src/qdropboxdeltaresponse.h
 
 CONFIG += network

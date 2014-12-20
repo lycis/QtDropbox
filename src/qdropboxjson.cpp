@@ -168,6 +168,7 @@ void QDropboxJson::parseString(QString strJson)
 			 // value is an array value -> parse array
 			 bool inString    = false;
 			 bool arrayEnd    = false;
+             int arrayDepth = 0;
 			 int j = i+1;
 			 buffer = "[";
 			 for(;!arrayEnd && j<strJson.size();++j)
@@ -179,10 +180,23 @@ void QDropboxJson::parseString(QString strJson)
 					 inString = !inString;
 					 buffer += arrC;
 					 break;
+                 case '[':
+                     buffer += "[";
+                     arrayDepth += 1;
+                     break;
 				 case ']':
 					 buffer += "]";
-					 if(!inString)
-						 arrayEnd = true;
+                     if(!inString)
+                     {
+                         if(arrayDepth == 0)
+                         {
+                            arrayEnd = true;
+                         }
+                         else
+                         {
+                            arrayDepth -= 1;
+                         }
+                     }
 					 break;
 				 case '\\':
 					 if(strJson.at(j+1) == '"') // escaped double quote
@@ -599,11 +613,12 @@ QStringList QDropboxJson::getArray(QString key, bool force)
 	QString buffer = "";
 	bool inString = false;
 	int  inJson   = 0;
+    int  inArray  = 0;
 	for(int i=0; i<arrayStr.size(); ++i)
 	{
 		QChar c = arrayStr.at(i);
-		if( ((c != ',' && c != ' ') || inString || inJson) &&
-			(c != '"' || inJson > 0))
+        if( ((c != ',' && c != ' ') || inString || inJson || inArray) &&
+            (c != '"' || inJson > 0 || inArray > 0))
 			buffer += c;
 		switch(c.toLatin1())
 		{
@@ -616,14 +631,20 @@ QStringList QDropboxJson::getArray(QString key, bool force)
 			else
 				inString = !inString;
 			break;
-		case '{':
+        case '{':
 			inJson++;
 			break;
 		case '}':
 			inJson--;
 			break;
+        case '[':
+            inArray++;
+            break;
+        case ']':
+            inArray--;
+            break;
 		case ',':
-			if(inJson == 0 && !inString)
+            if(inJson == 0 && inArray == 0 && !inString)
 			{
 				list.append(buffer);
 				buffer = "";

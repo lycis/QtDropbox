@@ -1,5 +1,7 @@
 #include "qtdropboxtest.hpp"
 
+typedef QMap<QString, QSharedPointer<QDropboxFileInfo> > QDropboxFileInfoMap;
+
 QtDropboxTest::QtDropboxTest()
 {
 }
@@ -228,6 +230,55 @@ void QtDropboxTest::dropboxCase1()
     QVERIFY2(connectDropbox(&dropbox, QDropbox::Plaintext), "connection error");
     QDropboxAccount accInf = dropbox.requestAccountInfoAndWait();
     QVERIFY2(dropbox.error() == QDropbox::NoError, "error on request");
+    return;
+}
+
+/**
+ * @brief QDropbox: delta
+ * This test connects to Dropbox and tests the delta API.
+ *
+ * <b>You are required to authorize
+ * the application for access! The Authorization URI will be printed to you and manual interaction
+ * is required to pass this test!</b>
+ */
+void QtDropboxTest::dropboxCase2()
+{
+    QTextStream strout(stdout);
+    QDropbox dropbox(APP_KEY, APP_SECRET);
+    QVERIFY2(connectDropbox(&dropbox, QDropbox::Plaintext), "connection error");
+
+    QString cursor = "";
+    bool hasMore = true;
+    QDropboxFileInfoMap file_cache;
+
+    strout << "requesting delta...\n";
+    do
+    {
+        QDropboxDeltaResponse r = dropbox.requestDeltaAndWait(cursor, "");
+        cursor = r.getNextCursor();
+        hasMore = r.hasMore();
+
+        const QDropboxDeltaEntryMap entries = r.getEntries();
+        for(QDropboxDeltaEntryMap::const_iterator i = entries.begin(); i != entries.end(); i++)
+        {
+            if(i.value().isNull())
+            {
+                file_cache.remove(i.key());
+            }
+            else
+            {
+                strout << "inserting file " << i.key() << "\n";
+                file_cache.insert(i.key(), i.value());
+            }
+        }
+
+    } while (hasMore);
+    strout << "next cursor: " << cursor << "\n";
+    for(QDropboxFileInfoMap::const_iterator i = file_cache.begin(); i != file_cache.end(); i++)
+    {
+        strout << "file " << i.key() << " last modified " << i.value()->clientModified().toString() << "\n";
+    }
+
     return;
 }
 
