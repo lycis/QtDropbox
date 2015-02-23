@@ -3,11 +3,13 @@
 
 QDropboxDeltaResponse::QDropboxDeltaResponse()
 {
-
+    _init();
 }
 
 QDropboxDeltaResponse::QDropboxDeltaResponse(QString response)
 {
+    _init();
+
     QDropboxJson js(response);
 
     this->_reset = js.getBool("reset");
@@ -51,4 +53,11 @@ QString QDropboxDeltaResponse::getNextCursor() const
 bool QDropboxDeltaResponse::hasMore() const
 {
     return this->_has_more;
+}
+
+void QDropboxDeltaResponse::_init()
+{
+    _reset = false;
+    _cursor = "";
+    _has_more = false;
 }

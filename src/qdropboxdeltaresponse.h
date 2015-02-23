@@ -59,6 +59,8 @@ private:
     bool _reset;
     QString _cursor;
     bool _has_more;
+
+    void _init();
 };
 
 #endif // QDROPBOXDELTA_H
