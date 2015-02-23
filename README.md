@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/lycis/QtDropbox.png?branch=master)](https://travis-ci.org/lycis/QtDropbox)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/1639/badge.svg)](https://scan.coverity.com/projects/1639)
 
 # QtDropbox
 
