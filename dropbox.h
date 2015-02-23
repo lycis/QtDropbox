@@ -1,7 +1,7 @@
 #ifndef QDROPBOX_H
 #define QDROPBOX_H
 
-#include "qtdropbox_global.h"
+#include "dropbox_global.h"
 
 #include <QObject>
 #include <QNetworkAccessManager>
@@ -13,35 +13,35 @@
 #include <QEventLoop>
 #include <QUrlQuery>
 
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
 #include <QDebug>
 #endif
 
-#include "qtdropbox_global.h"
-#include "qdropboxjson.h"
-#include "qdropboxaccount.h"
-#include "qdropboxfileinfo.h"
-#include "qdropboxdeltaresponse.h"
+#include "dropbox_global.h"
+#include "dropboxjson.h"
+#include "dropboxaccount.h"
+#include "dropboxfileinfo.h"
+#include "dropboxdeltaresponse.h"
 
-typedef int qdropbox_request_type;
+typedef int DropboxRequestType;
 
-const qdropbox_request_type QDROPBOX_REQ_CONNECT = 0x01;
-const qdropbox_request_type QDROPBOX_REQ_RQTOKEN = 0x02;
-const qdropbox_request_type QDROPBOX_REQ_AULOGIN = 0x03;
-const qdropbox_request_type QDROPBOX_REQ_REDIREC = 0x04;
-const qdropbox_request_type QDROPBOX_REQ_ACCTOKN = 0x05;
-const qdropbox_request_type QDROPBOX_REQ_ACCINFO = 0x06;
-const qdropbox_request_type QDROPBOX_REQ_RQBTOKN = 0x07;
-const qdropbox_request_type QDROPBOX_REQ_BACCTOK = 0x08;
-const qdropbox_request_type QDROPBOX_REQ_METADAT = 0x09;
-const qdropbox_request_type QDROPBOX_REQ_BACCINF = 0x0A;
-const qdropbox_request_type QDROPBOX_REQ_BMETADA = 0x0B;
-const qdropbox_request_type QDROPBOX_REQ_SHRDLNK = 0x0C;
-const qdropbox_request_type QDROPBOX_REQ_BSHRDLN = 0x0D;
-const qdropbox_request_type QDROPBOX_REQ_REVISIO = 0x0E;
-const qdropbox_request_type QDROPBOX_REQ_BREVISI = 0x0F;
-const qdropbox_request_type QDROPBOX_REQ_DELTA   = 0x10;
-const qdropbox_request_type QDROPBOX_REQ_BDELTA  = 0x11;
+const DropboxRequestType DROPBOX_REQ_CONNECT = 0x01;
+const DropboxRequestType DROPBOX_REQ_RQTOKEN = 0x02;
+const DropboxRequestType DROPBOX_REQ_AULOGIN = 0x03;
+const DropboxRequestType DROPBOX_REQ_REDIREC = 0x04;
+const DropboxRequestType DROPBOX_REQ_ACCTOKN = 0x05;
+const DropboxRequestType DROPBOX_REQ_ACCINFO = 0x06;
+const DropboxRequestType DROPBOX_REQ_RQBTOKN = 0x07;
+const DropboxRequestType DROPBOX_REQ_BACCTOK = 0x08;
+const DropboxRequestType DROPBOX_REQ_METADAT = 0x09;
+const DropboxRequestType DROPBOX_REQ_BACCINF = 0x0A;
+const DropboxRequestType DROPBOX_REQ_BMETADA = 0x0B;
+const DropboxRequestType DROPBOX_REQ_SHRDLNK = 0x0C;
+const DropboxRequestType DROPBOX_REQ_BSHRDLN = 0x0D;
+const DropboxRequestType DROPBOX_REQ_REVISIO = 0x0E;
+const DropboxRequestType DROPBOX_REQ_BREVISI = 0x0F;
+const DropboxRequestType DROPBOX_REQ_DELTA   = 0x10;
+const DropboxRequestType DROPBOX_REQ_BDELTA  = 0x11;
 
 //! Internally used struct to handle network requests sent from QDropbox
 /*!
@@ -50,7 +50,7 @@ const qdropbox_request_type QDROPBOX_REQ_BDELTA  = 0x11;
   made to the QtDropbox API.
  */
 struct qdropbox_request{
-    qdropbox_request_type type; //!< Type of the request
+    DropboxRequestType type;    //!< Type of the request
     QString method;             //!< Used method to send the request (POST/GET)
     QString host;               //!< Host that received the request
     int linked;                 //!< ID of any linked request (for forwarded requests)
@@ -100,7 +100,7 @@ struct qdropbox_request{
   \bug HMAC-SHA1 authentication is not working (does not have to be in 1.0)
 
  */
-class QTDROPBOXSHARED_EXPORT QDropbox : public QObject
+class QTDROPBOXSHARED_EXPORT Dropbox : public QObject
 {
     Q_OBJECT
 public:
@@ -144,7 +144,7 @@ public:
 
       \param parent The parent object QDropbox depends on.
      */
-    explicit QDropbox(QObject *parent = 0);
+    explicit Dropbox(QObject *parent = 0);
 
     /*!
       This constructor initializes QDropbox with your key and shared secret. The selected authentication method and
@@ -157,8 +157,8 @@ public:
       \param parent Parent object of QDropbox
 
      */
-    explicit QDropbox(QString key, QString sharedSecret,
-                      OAuthMethod method = QDropbox::Plaintext,
+    explicit Dropbox(QString key, QString sharedSecret,
+                      OAuthMethod method = Dropbox::Plaintext,
                       QString url = "api.dropbox.com", QObject *parent = 0);
 
     /*!
@@ -351,7 +351,7 @@ public:
       It returns an instance of QDropboxAccount containing the requested data. You do not have
       to react on the accountInfoReceived() signal when using this function.
      */
-    QDropboxAccount requestAccountInfoAndWait();
+    DropboxAccount requestAccountInfoAndWait();
 
     /*!
       This function is public for internal QtDropbox API use. It is used to sign
@@ -393,7 +393,7 @@ public:
 
       \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
      */
-    QDropboxFileInfo requestMetadataAndWait(QString file);
+    DropboxFileInfo requestMetadataAndWait(QString file);
 
     /*!
      * \brief Creates and returns a Dropbox link to files or folders users can use to view a preview of the file in a web browser.
@@ -432,7 +432,7 @@ public:
 	  \param file The absoulte path of the file (e.g. <i>/dropbox/test.txt</i>)
 	  \param max Defines the maximum amount of revisions to be requested.
 	 */
-	QList<QDropboxFileInfo> requestRevisionsAndWait(QString file, int max = 10);
+	QList<DropboxFileInfo> requestRevisionsAndWait(QString file, int max = 10);
 
 
     /*!
@@ -455,7 +455,7 @@ public:
       \return a QDropboxDeltaResponse representing the API response.
 
      */
-     QDropboxDeltaResponse requestDeltaAndWait(QString cursor, QString path_prefix);
+     DropboxDeltaResponse requestDeltaAndWait(QString cursor, QString path_prefix);
 
 signals:
     /*!
@@ -465,7 +465,7 @@ signals:
 
       \param errorcode The occured error.
      */
-    void errorOccured(QDropbox::Error errorcode);
+    void errorOccured(Dropbox::Error errorcode);
     /*!
       Emitted when the used token is expired. Reauthorize the user connection
       by prompting the URL provided by authorizeUrl() to your user to reauthorize.
@@ -555,40 +555,40 @@ private:
         HMAC_BUF_LEN            = 4096
     } ;
 
-    QNetworkAccessManager conManager;
+    QNetworkAccessManager _networkAccessManager;
 
-    Error   errorState;
-    QString errorText;
+    Error   _error;
+    QString _errorText;
 
     QString _appKey;
     QString _appSharedSecret;
 
-    QUrl        apiurl;
-    QString     nonce;
-    long        timestamp;
-    OAuthMethod oauthMethod;
+    QUrl        _apiUrl;
+    QString     _nonce;
+    long        _timestamp;
+    OAuthMethod _oauthMethod;
     QString     _version;
 
-    QString oauthToken;
-    QString oauthTokenSecret;
+    QString     _oauthToken;
+    QString     _oauthTokenSecret;
 
-    QMap <QNetworkReply*,int>  replynrMap;
-    int  lastreply;
-    QMap<int,qdropbox_request> requestMap;
-    QMap<int,int> delayMap;
+    QMap <QNetworkReply*,int>   _replynrMap;
+    int                         _lastReply;
+    QMap<int,qdropbox_request>  _requestMap;
+    QMap<int,int>               _delayMap;
 
-    QString mail;
-    QString password;
+    QString                     _mail;
+    QString                     _password;
 
     // for blocked functions
-    QEventLoop *_evLoop;
+    QEventLoop *_eventLoop;
     void startEventLoop();
     void stopEventLoop();
 
     // temporary memory
-    QDropboxJson _tempJson;
+    DropboxJson _tempJson;
 
-    QDropboxAccount _account;
+    DropboxAccount _account;
 
     QString hmacsha1(QString key, QString baseString);
     void prepareApiUrl();

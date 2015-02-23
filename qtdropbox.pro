@@ -1,37 +1,28 @@
+TEMPLATE = lib
+
 QT       += network xml
 QT       -= gui
 
 CONFIG += static
 
-TEMPLATE = lib
-
 DEFINES += QTDROPBOX_LIBRARY
 
 SOURCES += \
-    qdropbox.cpp \
-    qdropboxjson.cpp \
-    qdropboxaccount.cpp \
-    qdropboxfile.cpp \
-    qdropboxfileinfo.cpp \
-    qdropboxdeltaresponse.cpp
+    dropbox.cpp \
+    dropboxaccount.cpp \
+    dropboxdeltaresponse.cpp \
+    dropboxfile.cpp \
+    dropboxfileinfo.cpp \
+    dropboxjson.cpp
 
 HEADERS += \
-    qtdropbox_global.h \
-    qdropbox.h \
-    qdropboxjson.h \
-    qdropboxaccount.h \
-    qdropboxfile.h \
-    qtdropbox.h \
-    qdropboxfileinfo.h \
-    qdropboxdeltaresponse.h
+    dropbox.h \
+    dropboxaccount.h \
+    dropboxdeltaresponse.h \
+    dropboxfile.h \
+    dropboxfileinfo.h \
+    dropboxjson.h \
+    dropbox_global.h
 
 TARGET = qtdropbox
 
-documentation.commands = doxygen doc/doxygen.conf
-QMAKE_EXTRA_TARGETS += documentation
-
-package.files = libqtdropbox.pri \
-                src/*.h
-package.path = qtdropbox
-
-INSTALLS += target package

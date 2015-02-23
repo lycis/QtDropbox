@@ -1,7 +1,7 @@
 #ifndef QDROPBOXJSON_H
 #define QDROPBOXJSON_H
 
-#include "qtdropbox_global.h"
+#include "dropbox_global.h"
 
 #include <QObject>
 #include <QMap>
@@ -9,33 +9,33 @@
 #include <QDateTime>
 #include <QStringList>
 
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
 #include <QDebug>
 #endif
 
-typedef char qdropboxjson_entry_type;
+typedef char DropboxJsonEntryType;
 
-const qdropboxjson_entry_type QDROPBOXJSON_TYPE_NUM     = 'N';
-const qdropboxjson_entry_type QDROPBOXJSON_TYPE_STR     = 'S';
-const qdropboxjson_entry_type QDROPBOXJSON_TYPE_JSON    = 'J';
-const qdropboxjson_entry_type QDROPBOXJSON_TYPE_ARRAY   = 'A';
-const qdropboxjson_entry_type QDROPBOXJSON_TYPE_FLOAT   = 'F';
-const qdropboxjson_entry_type QDROPBOXJSON_TYPE_BOOL    = 'B';
-const qdropboxjson_entry_type QDROPBOXJSON_TYPE_UINT    = 'U';
-const qdropboxjson_entry_type QDROPBOXJSON_TYPE_UNKNOWN = '?';
+const DropboxJsonEntryType DROPBOXJSON_TYPE_NUM     = 'N';
+const DropboxJsonEntryType DROPBOXJSON_TYPE_STR     = 'S';
+const DropboxJsonEntryType DROPBOXJSON_TYPE_JSON    = 'J';
+const DropboxJsonEntryType DROPBOXJSON_TYPE_ARRAY   = 'A';
+const DropboxJsonEntryType DROPBOXJSON_TYPE_FLOAT   = 'F';
+const DropboxJsonEntryType DROPBOXJSON_TYPE_BOOL    = 'B';
+const DropboxJsonEntryType DROPBOXJSON_TYPE_UINT    = 'U';
+const DropboxJsonEntryType DROPBOXJSON_TYPE_UNKNOWN = '?';
 
-class QDropboxJson;
+class DropboxJson;
 
 //! Keeps values of a JSON
-union qdropboxjson_value{
-    QDropboxJson  *json; //!< Used to store subjsons (JSON in JSON)
-    QString       *value; //!< used to store a real value, all values are converted from QString
+union DropboxJsonValue {
+    DropboxJson    *json; //!< Used to store subjsons (JSON in JSON)
+    QString        *value; //!< used to store a real value, all values are converted from QString
 };
 
 //! Keeps keys of a JSON
-struct qdropboxjson_entry{
-    qdropboxjson_entry_type type; //!< Datatype of value
-    qdropboxjson_value      value; //!< Reference to the value struct
+struct DropboxJsonEntry {
+    DropboxJsonEntryType    type; //!< Datatype of value
+    DropboxJsonValue        value; //!< Reference to the value struct
 };
 
 //! Used to store JSON data that is returned from Dropbox.
@@ -58,7 +58,7 @@ struct qdropboxjson_entry{
   \todo Implemement setter functions and toString() for JSON generation (altough not necessary it
         would be a nice feature)
  */
-class QTDROPBOXSHARED_EXPORT QDropboxJson : public QObject
+class QTDROPBOXSHARED_EXPORT DropboxJson : public QObject
 {
     Q_OBJECT
 public:
@@ -67,7 +67,7 @@ public:
 
       \param parent Pointer to the parent QObject.
      */
-    QDropboxJson(QObject *parent = 0);
+    DropboxJson(QObject *parent = 0);
 
     /*!
       This constructor interprets the given string as JSON.
@@ -75,19 +75,19 @@ public:
       \param strJson JSON as string.
       \param parent Parent QObject.
      */
-    QDropboxJson(QString strJson, QObject *parent = 0);
+    DropboxJson(QString strJson, QObject *parent = 0);
 
     /*!
       Copies the data of another QDropboxJSon.
 
       \param other The QDropboxJson to be copied.
      */
-    QDropboxJson(const QDropboxJson &other);
+    DropboxJson(const DropboxJson &other);
 
     /*!
       Cleans up the JSON on destruction.
      */
-    ~QDropboxJson();
+    ~DropboxJson();
 
     /*!
       This enum is used to categorize the data type of JSON values.
@@ -166,9 +166,9 @@ public:
       Returns a sub JSON identified by the given key. If the key does not map to a
       JSON a NULL pointer will be returned. It is not possible to force a conversion.
      */
-    QDropboxJson *getJson(QString key);
+    DropboxJson *getJson(QString key);
 
-    void setJson(QString key, QDropboxJson value);
+    void setJson(QString key, DropboxJson value);
 
     /*!
       Returns a stored floating point value identified by the given key. If the key does
@@ -218,7 +218,7 @@ public:
 	/**!
 	  Overloaded operator to copy a QDropboxJson.
 	*/
-    QDropboxJson& operator =(QDropboxJson&);
+    DropboxJson& operator =(DropboxJson&);
 
 	/**!
 	  A JSON may be an anonymous array like this:
@@ -241,18 +241,18 @@ public:
 	  \param other the JSON you wish to compare to
 	  \returns 0 if the JSON objects are equals
 	*/
-	int compare(const QDropboxJson& other);
+	int compare(const DropboxJson& other);
     
 protected:
-		bool valid;
+    bool _valid;
 
 private:
-    QMap<QString, qdropboxjson_entry> valueMap;
+    QMap<QString, DropboxJsonEntry> _valueMap;
 	bool _anonymousArray;
 
     void emptyList();
-    qdropboxjson_entry_type interpretType(QString value);
-	int parseSubJson(QString str, int start, qdropboxjson_entry *jsonEntry);
+    DropboxJsonEntryType interpretType(QString value);
+    int parseSubJson(QString str, int start, DropboxJsonEntry *jsonEntry);
 	void _init();
 };
 

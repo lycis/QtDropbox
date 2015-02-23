@@ -1,6 +1,11 @@
+[![Qt Pods](http://qt-pods.org/assets/logo.png "Qt Pods")](http://qt-pods.org)
+
 [![Build Status](https://travis-ci.org/lycis/QtDropbox.png?branch=master)](https://travis-ci.org/lycis/QtDropbox)
 
 # QtDropbox
+
+You can add QtDropbox to your project easily by using qt-pods. Read more about qt-pods here:
+https://github.com/cybercatalyst/qt-pods
 
 ## In short
 QtDropbox is an API for the well known cloud storage service [Dropbox](http://www.dropbox.com).

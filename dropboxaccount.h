@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QUrl>
-#include "qdropboxjson.h"
+#include "dropboxjson.h"
 
 //! Stores information about a user account
 /*!
@@ -19,7 +19,7 @@
   See https://www.dropbox.com/developers/reference/api#account-info for details.
 
  */
-class QTDROPBOXSHARED_EXPORT QDropboxAccount : public QDropboxJson
+class QTDROPBOXSHARED_EXPORT DropboxAccount : public DropboxJson
 {
     Q_OBJECT
 public:
@@ -29,7 +29,7 @@ public:
 
       \param parent Parent QObject.
      */
-    QDropboxAccount(QObject *parent = 0);
+    DropboxAccount(QObject *parent = 0);
 
     /*!
       This constructor creates an object based on the data contained in the
@@ -38,14 +38,14 @@ public:
       \param jsonString JSON data in string representation
       \param parent Parent QObject.
      */
-    QDropboxAccount(QString jsonString, QObject *parent = 0);
+    DropboxAccount(QString jsonString, QObject *parent = 0);
 
     /*!
       Use this constructor to create a copy of an other QDropboxAccount.
 
       \param other Original QDropboxAccount
      */
-    QDropboxAccount(const QDropboxAccount& other);
+    DropboxAccount(const DropboxAccount& other);
 
     /*!
       Returns the referal link of the user.
@@ -91,12 +91,12 @@ public:
       Overloaded operator to copy a QDropboxAccount by using =. Internally
       copyFrom() is called.
      */
-    QDropboxAccount& operator =(QDropboxAccount&);
+    DropboxAccount& operator =(DropboxAccount&);
 
     /*!
       This function is used to copy the data from an other QDropboxAccount.
      */
-    void copyFrom(const QDropboxAccount& a);
+    void copyFrom(const DropboxAccount& a);
 
 private:  
     QUrl    _referralLink;

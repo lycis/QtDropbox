@@ -6,11 +6,11 @@
 #include <QString>
 #include <QList>
 
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
 #include <QDebug>
 #endif
 
-#include "qdropboxjson.h"
+#include "dropboxjson.h"
 
 //! Provides information and metadata about files and directories
 /*!
@@ -35,7 +35,7 @@
   \bug modified() and clientModified() are currently not working due to a bug in 
   QDropboxJson
  */
-class QTDROPBOXSHARED_EXPORT QDropboxFileInfo : public QDropboxJson
+class QTDROPBOXSHARED_EXPORT DropboxFileInfo : public DropboxJson
 {
     Q_OBJECT
 public:
@@ -45,7 +45,7 @@ public:
 	  \warning internal use only
 	  \param parent parent QObject
 	*/
-    QDropboxFileInfo(QObject *parent = 0);
+    DropboxFileInfo(QObject *parent = 0);
 
 	/*!
 	  Creates an instance of QDropboxFileInfo based on the data provided
@@ -54,19 +54,19 @@ public:
 	  \param jsonStr metadata JSON in string representation
 	  \param parent pointer to the parent QObject
 	*/
-    QDropboxFileInfo(QString jsonStr, QObject *parent = 0);
+    DropboxFileInfo(QString jsonStr, QObject *parent = 0);
 
 	/*!
 	   Creates a copy of an other QDropboxFileInfo instance.
 
 	   \param other original instance
 	 */
-    QDropboxFileInfo(const QDropboxFileInfo &other);
+    DropboxFileInfo(const DropboxFileInfo &other);
 
 	/*!
 	  Default destructor. Takes care of cleaning up when the object is destroyed.
 	*/
-	~QDropboxFileInfo();
+	~DropboxFileInfo();
 	
 	/*!
 	  Copies the values from an other QDropboxFileInfo instance to the
@@ -74,14 +74,14 @@ public:
 
 	  \param other original instance
 	*/
-    void copyFrom(const QDropboxFileInfo &other);
+    void copyFrom(const DropboxFileInfo &other);
 
 	/*!
 	  Works exactly like copyFrom() only as an operator.
 
 	  \param other original instance
 	*/
-    QDropboxFileInfo& operator=(const QDropboxFileInfo& other);
+    DropboxFileInfo& operator=(const DropboxFileInfo& other);
 
 	/*!
 	  Human readable file size.
@@ -154,7 +154,7 @@ public:
 	  This function will return a list with length 0 (zero) if the item is no
 	  directory.
 	*/
-	QList<QDropboxFileInfo> contents() const;
+	QList<DropboxFileInfo> contents() const;
 
 signals:
     
@@ -164,20 +164,20 @@ private:
     void dataFromJson();
     void _init();
 
-    QString   _size;
-    quint64   _revision;
-    bool      _thumbExists;
-    quint64   _bytes;
-    QDateTime _modified;
-    QDateTime _clientModified;
-    QString   _icon;
-    QString   _root;
-	QString   _path;
-	bool      _isDir;
-	QString   _mimeType;
-	bool      _isDeleted;
-	QString   _revisionHash;
-	QList<QDropboxFileInfo>* _content;
+    QString                 _size;
+    quint64                 _revision;
+    bool                    _thumbExists;
+    quint64                 _bytes;
+    QDateTime               _modified;
+    QDateTime               _clientModified;
+    QString                 _icon;
+    QString                 _root;
+    QString                 _path;
+    bool                    _isDir;
+    QString                 _mimeType;
+    bool                    _isDeleted;
+    QString                 _revisionHash;
+	QList<DropboxFileInfo>* _content;
 };
 
 #endif // QDROPBOXFILEINFO_H

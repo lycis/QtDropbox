@@ -1,7 +1,7 @@
-#include "qdropboxaccount.h"
+#include "dropboxaccount.h"
 
-QDropboxAccount::QDropboxAccount(QObject *parent) :
-    QDropboxJson(parent)
+DropboxAccount::DropboxAccount(QObject *parent) :
+    DropboxJson(parent)
 {
     _quotaShared = 0;
     _quota       = 0;
@@ -9,23 +9,23 @@ QDropboxAccount::QDropboxAccount(QObject *parent) :
     _uid         = 0;
 }
 
-QDropboxAccount::QDropboxAccount(QString jsonString, QObject *parent) :
-    QDropboxJson(jsonString, parent)
+DropboxAccount::DropboxAccount(QString jsonString, QObject *parent) :
+    DropboxJson(jsonString, parent)
 {
 	_init();
 }
 
-QDropboxAccount::QDropboxAccount(const QDropboxAccount& other) :
-    QDropboxJson()
+DropboxAccount::DropboxAccount(const DropboxAccount& other) :
+    DropboxJson()
 {
     copyFrom(other);
 }
 
-void QDropboxAccount::_init()
+void DropboxAccount::_init()
 {
     if(!isValid())
     {
-        valid = false;
+        _valid = false;
         return;
     }
 
@@ -36,22 +36,22 @@ void QDropboxAccount::_init()
        !hasKey("quota_info") ||
        !hasKey("email"))
     {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
         qDebug() << "json invalid 1" << endl;
 #endif
-        valid = false;
+        _valid = false;
         return;
     }
 
-    QDropboxJson* quota = getJson("quota_info");
+    DropboxJson* quota = getJson("quota_info");
     if(!quota->hasKey("shared") ||
        !quota->hasKey("quota") ||
        !quota->hasKey("normal"))
     {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
         qDebug() << "json invalid 2" << endl;
 #endif
-        valid = false;
+        _valid = false;
         return;
     }
 
@@ -65,9 +65,9 @@ void QDropboxAccount::_init()
     _quota       = quota->getUInt("quota", true);
     _quotaNormal = quota->getUInt("normal", true);
 
-    valid = true;
+    _valid = true;
 
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "== account data ==" << endl;
     qDebug() << "reflink: " << _referralLink << endl;
     qDebug() << "displayname: " << _displayName << endl;
@@ -82,56 +82,56 @@ void QDropboxAccount::_init()
     return;
 }
 
-QUrl QDropboxAccount::referralLink()  const
+QUrl DropboxAccount::referralLink()  const
 {
     return _referralLink;
 }
 
-QString QDropboxAccount::displayName()  const
+QString DropboxAccount::displayName()  const
 {
     return _displayName;
 }
 
-qint64 QDropboxAccount::uid()  const
+qint64 DropboxAccount::uid()  const
 {
     return _uid;
 }
 
-QString QDropboxAccount::country()  const
+QString DropboxAccount::country()  const
 {
     return _country;
 }
 
-QString QDropboxAccount::email()  const
+QString DropboxAccount::email()  const
 {
     return _email;
 }
 
-quint64 QDropboxAccount::quotaShared()  const
+quint64 DropboxAccount::quotaShared()  const
 {
     return _quotaShared;
 }
 
-quint64 QDropboxAccount::quota()  const
+quint64 DropboxAccount::quota()  const
 {
     return _quota;
 }
 
-quint64 QDropboxAccount::quotaNormal()  const
+quint64 DropboxAccount::quotaNormal()  const
 {
     return _quotaNormal;
 }
 
-QDropboxAccount &QDropboxAccount::operator =(QDropboxAccount &a)
+DropboxAccount &DropboxAccount::operator =(DropboxAccount &a)
 {
     copyFrom(a);
     return *this;
 }
 
-void QDropboxAccount::copyFrom(const QDropboxAccount &other)
+void DropboxAccount::copyFrom(const DropboxAccount &other)
 {
     this->setParent(other.parent());
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "creating account from account" << endl;
     qDebug() << "taken reflink: " << other.referralLink().toString() << endl;
 #endif
