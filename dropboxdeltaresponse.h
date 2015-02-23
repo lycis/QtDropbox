@@ -10,25 +10,25 @@
 #include <QUrl>
 #include <QEvent>
 
-#include "qtdropbox_global.h"
-#include "qdropboxjson.h"
-#include "qdropboxfileinfo.h"
+#include "dropbox_global.h"
+#include "dropboxjson.h"
+#include "dropboxfileinfo.h"
 
 //! Type for a mapping from file paths to file metadata info.
-typedef QMap<QString, QSharedPointer<QDropboxFileInfo> > QDropboxDeltaEntryMap;
+typedef QMap<QString, QSharedPointer<DropboxFileInfo> > QDropboxDeltaEntryMap;
 
 //! Response from a /delta call.
 /*!
   This structure is used to carry the (multi-part) response from a call to the delta API.
  */
-class QDropboxDeltaResponse
+class DropboxDeltaResponse
 {
 public:
     //! Constructs a blank QDropboxDeltaResponse object.
-    QDropboxDeltaResponse();
+    DropboxDeltaResponse();
 
     //! Constructs a QDropboxDeltaResponse object from a JSON response.
-    QDropboxDeltaResponse(QString response);
+    DropboxDeltaResponse(QString response);
 
     //! Retrieves the string-to-metadata map.
     /*!
@@ -55,10 +55,10 @@ public:
 
 
 private:
-    QDropboxDeltaEntryMap _entries;
-    bool _reset;
-    QString _cursor;
-    bool _has_more;
+    QDropboxDeltaEntryMap   _entries;
+    bool                    _reset;
+    QString                 _cursor;
+    bool                    _hasMore;
 };
 
 #endif // QDROPBOXDELTA_H

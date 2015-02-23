@@ -1,102 +1,102 @@
-#include "qdropbox.h"
+#include "dropbox.h"
 
-QDropbox::QDropbox(QObject *parent) :
+Dropbox::Dropbox(QObject *parent) :
     QObject(parent),
-    conManager(this)
+    _networkAccessManager(this)
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "creating dropbox api" << endl;
 #endif
 
-    errorState = QDropbox::NoError;
-    errorText  = "";
+    _error = Dropbox::NoError;
+    _errorText  = "";
     setApiVersion("1.0");
     setApiUrl("api.dropbox.com");
-    setAuthMethod(QDropbox::Plaintext);
+    setAuthMethod(Dropbox::Plaintext);
 
-    oauthToken = "";
-    oauthTokenSecret = "";
+    _oauthToken = "";
+    _oauthTokenSecret = "";
 
-    lastreply = 0;
+    _lastReply = 0;
 
-    connect(&conManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkReplyFinished(QNetworkReply*)));
+    connect(&_networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkReplyFinished(QNetworkReply*)));
 
     // needed for nonce generation
     qsrand(QDateTime::currentMSecsSinceEpoch());
 
-    _evLoop = NULL;
+    _eventLoop = NULL;
 }
 
-QDropbox::QDropbox(QString key, QString sharedSecret, OAuthMethod method, QString url, QObject *parent) :
+Dropbox::Dropbox(QString key, QString sharedSecret, OAuthMethod method, QString url, QObject *parent) :
     QObject(parent),
-    conManager(this)
+    _networkAccessManager(this)
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "creating api with key, shared secret and method" << endl;
 #endif
 
-    errorState      = QDropbox::NoError;
-    errorText       = "";
+    _error      = Dropbox::NoError;
+    _errorText       = "";
     setKey(key);
     setSharedSecret(sharedSecret);
     setAuthMethod(method);
     setApiVersion("1.0");
     setApiUrl(url);
 
-    oauthToken = "";
-    oauthTokenSecret = "";
+    _oauthToken = "";
+    _oauthTokenSecret = "";
 
-    lastreply = 0;
+    _lastReply = 0;
 
-    connect(&conManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkReplyFinished(QNetworkReply*)));
+    connect(&_networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkReplyFinished(QNetworkReply*)));
 
     // needed for nonce generation
     qsrand(QDateTime::currentMSecsSinceEpoch());
 
-    _evLoop = NULL;
+    _eventLoop = NULL;
 }
 
-QDropbox::Error QDropbox::error()
+Dropbox::Error Dropbox::error()
 {
-    return errorState;
+    return _error;
 }
 
-QString QDropbox::errorString()
+QString Dropbox::errorString()
 {
-    return errorText;
+    return _errorText;
 }
 
-void QDropbox::setApiUrl(QString url)
+void Dropbox::setApiUrl(QString url)
 {
-    apiurl.setUrl(QString("//%1").arg(url));
+    _apiUrl.setUrl(QString("//%1").arg(url));
     prepareApiUrl();
     return;
 }
 
-QString QDropbox::apiUrl()
+QString Dropbox::apiUrl()
 {
-    return apiurl.toString();
+    return _apiUrl.toString();
 }
 
-void QDropbox::setAuthMethod(OAuthMethod m)
+void Dropbox::setAuthMethod(OAuthMethod m)
 {
-    oauthMethod = m;
+    _oauthMethod = m;
     prepareApiUrl();
     return;
 }
 
-QDropbox::OAuthMethod QDropbox::authMethod()
+Dropbox::OAuthMethod Dropbox::authMethod()
 {
-    return oauthMethod;
+    return _oauthMethod;
 }
 
-void QDropbox::setApiVersion(QString apiversion)
+void Dropbox::setApiVersion(QString apiversion)
 {
     if(apiversion.compare("1.0"))
     {
-        errorState = QDropbox::VersionNotSupported;
-        errorText  = "Only version 1.0 is supported.";
-        emit errorOccured(QDropbox::VersionNotSupported);
+        _error = Dropbox::VersionNotSupported;
+        _errorText  = "Only version 1.0 is supported.";
+        emit errorOccured(Dropbox::VersionNotSupported);
         return;
     }
 
@@ -104,71 +104,71 @@ void QDropbox::setApiVersion(QString apiversion)
     return;
 }
 
-void QDropbox::requestFinished(int nr, QNetworkReply *rply)
+void Dropbox::requestFinished(int nr, QNetworkReply *rply)
 {
     rply->deleteLater();
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     int resp_bytes = rply->bytesAvailable();
 #endif
     QByteArray buff = rply->readAll();
     QString response = QString(buff);
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "request " << nr << "finished." << endl;
     qDebug() << "request was: " << rply->url().toString() << endl;
 #endif
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "response: " << resp_bytes << "bytes" << endl;
     qDebug() << "status code: " << rply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString() << endl;
     qDebug() << "== begin response ==" << endl << response << endl << "== end response ==" << endl;
-    qDebug() << "req#" << nr << " is of type " << requestMap[nr].type << endl;
+    qDebug() << "req#" << nr << " is of type " << _requestMap[nr].type << endl;
 #endif
     // drop box error handling based on return codes
     switch(rply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt())
     {
-    case QDROPBOX_ERROR_BAD_INPUT:
-        errorState = QDropbox::BadInput;
-        errorText  = "";
-        emit errorOccured(errorState);
+    case DROPBOX_ERROR_BAD_INPUT:
+        _error = Dropbox::BadInput;
+        _errorText  = "";
+        emit errorOccured(_error);
         checkReleaseEventLoop(nr);
         return;
         break;
-    case QDROPBOX_ERROR_EXPIRED_TOKEN:
-        errorState = QDropbox::TokenExpired;
-        errorText  = "";
+    case DROPBOX_ERROR_EXPIRED_TOKEN:
+        _error = Dropbox::TokenExpired;
+        _errorText  = "";
         emit tokenExpired();
         checkReleaseEventLoop(nr);
         return;
         break;
-    case QDROPBOX_ERROR_BAD_OAUTH_REQUEST:
-        errorState = QDropbox::BadOAuthRequest;
-        errorText  = "";
-        emit errorOccured(errorState);
+    case DROPBOX_ERROR_BAD_OAUTH_REQUEST:
+        _error = Dropbox::BadOAuthRequest;
+        _errorText  = "";
+        emit errorOccured(_error);
         checkReleaseEventLoop(nr);
         return;
         break;
-    case QDROPBOX_ERROR_FILE_NOT_FOUND:
+    case DROPBOX_ERROR_FILE_NOT_FOUND:
         emit fileNotFound();
         checkReleaseEventLoop(nr);
         return;
         break;
-    case QDROPBOX_ERROR_WRONG_METHOD:
-        errorState = QDropbox::WrongHttpMethod;
-        errorText  = "";
-        emit errorOccured(errorState);
+    case DROPBOX_ERROR_WRONG_METHOD:
+        _error = Dropbox::WrongHttpMethod;
+        _errorText  = "";
+        emit errorOccured(_error);
         checkReleaseEventLoop(nr);
         return;
         break;
-    case QDROPBOX_ERROR_REQUEST_CAP:
-        errorState = QDropbox::MaxRequestsExceeded;
-        errorText = "";
-        emit errorOccured(errorState);
+    case DROPBOX_ERROR_REQUEST_CAP:
+        _error = Dropbox::MaxRequestsExceeded;
+        _errorText = "";
+        emit errorOccured(_error);
         checkReleaseEventLoop(nr);
         return;
         break;
-    case QDROPBOX_ERROR_USER_OVER_QUOTA:
-        errorState = QDropbox::UserOverQuota;
-        errorText = "";
-        emit errorOccured(errorState);
+    case DROPBOX_ERROR_USER_OVER_QUOTA:
+        _error = Dropbox::UserOverQuota;
+        _errorText = "";
+        emit errorOccured(_error);
         checkReleaseEventLoop(nr);
         return;
         break;
@@ -179,22 +179,22 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
     if(rply->error() != QNetworkReply::NoError)
     {
 
-        errorState = QDropbox::CommunicationError;
-        errorText  = QString("%1 - %2").arg(rply->error()).arg(rply->errorString());
-#ifdef QTDROPBOX_DEBUG
-        qDebug() << "error " << errorState << "(" << errorText << ") in request" << endl;
+        _error = Dropbox::CommunicationError;
+        _errorText  = QString("%1 - %2").arg(rply->error()).arg(rply->errorString());
+#ifdef QT_DEBUG
+        qDebug() << "error " << _error << "(" << _errorText << ") in request" << endl;
 #endif
-        emit errorOccured(errorState);
+        emit errorOccured(_error);
         return;
     }
 
     // ignore connection requests
-    if(requestMap[nr].type == QDROPBOX_REQ_CONNECT)
+    if(_requestMap[nr].type == DROPBOX_REQ_CONNECT)
     {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
         qDebug() << "- answer to connection request ignored" << endl;
 #endif
-        requestMap.remove(nr);
+        _requestMap.remove(nr);
         return;
     }
 
@@ -203,121 +203,121 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
 
     if(rply->attribute(QNetworkRequest::HttpStatusCodeAttribute) == 302)
     {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
         qDebug() << "redirection received" << endl;
 #endif
         // redirection handling
         QUrl newlocation(rply->header(QNetworkRequest::LocationHeader).toString(), QUrl::StrictMode);
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
         qDebug() << "new url: " << newlocation.toString() << endl;
 #endif
         int oldnr = nr;
-        nr = sendRequest(newlocation, requestMap[nr].method, 0, requestMap[nr].host);
-        requestMap[nr].type = QDROPBOX_REQ_REDIREC;
-        requestMap[nr].linked = oldnr;
+        nr = sendRequest(newlocation, _requestMap[nr].method, 0, _requestMap[nr].host);
+        _requestMap[nr].type = DROPBOX_REQ_REDIREC;
+        _requestMap[nr].linked = oldnr;
         return;
     }
     else
     {
-        if(requestMap[nr].type == QDROPBOX_REQ_REDIREC)
+        if(_requestMap[nr].type == DROPBOX_REQ_REDIREC)
         {
             // change values if this is the answert to a redirect
-            qdropbox_request redir = requestMap[nr];
-            qdropbox_request orig  = requestMap[redir.linked];
-            requestMap[nr] = orig;
-            requestMap.remove(nr);
+            qdropbox_request redir = _requestMap[nr];
+            qdropbox_request orig  = _requestMap[redir.linked];
+            _requestMap[nr] = orig;
+            _requestMap.remove(nr);
             nr = redir.linked;
         }
 
         // standard handling depending on message type
-        switch(requestMap[nr].type)
+        switch(_requestMap[nr].type)
         {
-        case QDROPBOX_REQ_CONNECT:
+        case DROPBOX_REQ_CONNECT:
             // was only a connect request - so drop it
             break;
-        case QDROPBOX_REQ_RQTOKEN:
+        case DROPBOX_REQ_RQTOKEN:
             // requested a tiken
             responseTokenRequest(response);
             break;
-        case QDROPBOX_REQ_RQBTOKN:
+        case DROPBOX_REQ_RQBTOKN:
             responseBlockedTokenRequest(response);
             break;
-        case QDROPBOX_REQ_AULOGIN:
+        case DROPBOX_REQ_AULOGIN:
             delayed_nr = responseDropboxLogin(response, nr);
             delayed_finish = true;
             break;
-        case QDROPBOX_REQ_ACCTOKN:
+        case DROPBOX_REQ_ACCTOKN:
             responseAccessToken(response);
             break;
-        case QDROPBOX_REQ_METADAT:
+        case DROPBOX_REQ_METADAT:
             parseMetadata(response);
             break;
-        case QDROPBOX_REQ_BMETADA:
+        case DROPBOX_REQ_BMETADA:
             parseBlockingMetadata(response);
 			break;
-        case QDROPBOX_REQ_BACCTOK:
+        case DROPBOX_REQ_BACCTOK:
             responseBlockingAccessToken(response);
             break;
-        case QDROPBOX_REQ_ACCINFO:
+        case DROPBOX_REQ_ACCINFO:
             parseAccountInfo(response);
             break;
-        case QDROPBOX_REQ_BACCINF:
+        case DROPBOX_REQ_BACCINF:
             parseBlockingAccountInfo(response);
             break;
-        case QDROPBOX_REQ_SHRDLNK:
+        case DROPBOX_REQ_SHRDLNK:
             parseSharedLink(response);
             break;
-        case QDROPBOX_REQ_BSHRDLN:
+        case DROPBOX_REQ_BSHRDLN:
             parseBlockingSharedLink(response);
             break;
-		case QDROPBOX_REQ_REVISIO:
+        case DROPBOX_REQ_REVISIO:
 			parseRevisions(response);
 			break;
-		case QDROPBOX_REQ_BREVISI:
+        case DROPBOX_REQ_BREVISI:
 			parseBlockingRevisions(response);
 			break;
-        case QDROPBOX_REQ_DELTA:
+        case DROPBOX_REQ_DELTA:
             parseDelta(response);
             break;
-        case QDROPBOX_REQ_BDELTA:
+        case DROPBOX_REQ_BDELTA:
             parseBlockingDelta(response);
             break;
         default:
-            errorState  = QDropbox::ResponseToUnknownRequest;
-            errorText   = "Received a response to an unknown request";
-            emit errorOccured(errorState);
+            _error  = Dropbox::ResponseToUnknownRequest;
+            _errorText   = "Received a response to an unknown request";
+            emit errorOccured(_error);
             break;
         }
     }
 
     if(delayed_finish)
-        delayMap[delayed_nr] = nr;
+        _delayMap[delayed_nr] = nr;
     else
     {
-        if(delayMap[nr])
+        if(_delayMap[nr])
         {
-            int drq = delayMap[nr];
+            int drq = _delayMap[nr];
             while(drq!=0)
             {
-                emit operationFinished(delayMap[drq]);
-                delayMap.remove(drq);
-                drq = delayMap[drq];
+                emit operationFinished(_delayMap[drq]);
+                _delayMap.remove(drq);
+                drq = _delayMap[drq];
             }
         }
 
-        requestMap.remove(nr);
+        _requestMap.remove(nr);
         emit operationFinished(nr);
     }
 
     return;
 }
 
-void QDropbox::networkReplyFinished(QNetworkReply *rply)
+void Dropbox::networkReplyFinished(QNetworkReply *rply)
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "reply finished" << endl;
 #endif
-    int reqnr = replynrMap[rply];
+    int reqnr = _replynrMap[rply];
     requestFinished(reqnr, rply);
 }
 /*
@@ -421,7 +421,7 @@ QString QDropbox::hmacsha1(QString base, QString key)
 */
 
 
-QString QDropbox::hmacsha1(QString baseString, QString key)
+QString Dropbox::hmacsha1(QString baseString, QString key)
 {
     int blockSize = 64; // HMAC-::hmacsha1SHA-1 block size, defined in SHA-1 standard
     if (key.length() > blockSize) { // if key is longer than block size (64), reduce key length with SHA-1 compression
@@ -447,7 +447,7 @@ QString QDropbox::hmacsha1(QString baseString, QString key)
     return hashed.toBase64();
 }
 
-QString QDropbox::generateNonce(qint32 length)
+QString Dropbox::generateNonce(qint32 length)
 {
     QString clng = "";
     for(int i=0; i<length; ++i)
@@ -455,44 +455,44 @@ QString QDropbox::generateNonce(qint32 length)
     return clng;
 }
 
-QString QDropbox::oAuthSign(QUrl base, QString method)
+QString Dropbox::oAuthSign(QUrl base, QString method)
 {
-    if(oauthMethod == QDropbox::Plaintext){
-#ifdef QTDROPBOX_DEBUG
+    if(_oauthMethod == Dropbox::Plaintext){
+#ifdef QT_DEBUG
         qDebug() << "oauthMethod = Plaintext";
 #endif
-        return QString("%1&%2").arg(_appSharedSecret).arg(oauthTokenSecret);
+        return QString("%1&%2").arg(_appSharedSecret).arg(_oauthTokenSecret);
     }
 
     QString param   = base.toString(QUrl::RemoveAuthority|QUrl::RemovePath|QUrl::RemoveScheme).mid(1);
     param = QUrl::toPercentEncoding(param);
     QString requrl  = base.toString(QUrl::RemoveQuery);
     requrl = QUrl::toPercentEncoding(requrl);
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "param = " << param << endl << "requrl = " << requrl << endl;
 #endif
     QString baseurl = method+"&"+requrl+"&"+param;
-    QString key     = QString("%1&%2").arg(_appSharedSecret).arg(oauthTokenSecret);
-#ifdef QTDROPBOX_DEBUG
+    QString key     = QString("%1&%2").arg(_appSharedSecret).arg(_oauthTokenSecret);
+#ifdef QT_DEBUG
     qDebug() << "baseurl = " << baseurl << " endbase";
     qDebug() << "key = " << key << " endkey";
 #endif
 
     QString signature = "";
-    if(oauthMethod == QDropbox::HMACSHA1)
+    if(_oauthMethod == Dropbox::HMACSHA1)
         signature = hmacsha1(baseurl.toUtf8(), key.toUtf8());
     else
     {
-        errorState = QDropbox::UnknownAuthMethod;
-        errorText  = QString("Authentication method %1 is unknown").arg(oauthMethod);
-        emit errorOccured(errorState);
-#ifdef QTDROPBOX_DEBUG
-        qDebug() << "Authentication method " << oauthMethod << " is unknown";
+        _error = Dropbox::UnknownAuthMethod;
+        _errorText  = QString("Authentication method %1 is unknown").arg(_oauthMethod);
+        emit errorOccured(_error);
+#ifdef QT_DEBUG
+        qDebug() << "Authentication method " << _oauthMethod << " is unknown";
 #endif
         return "";
     }
 
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "key = " << key << endl;
     qDebug() << "signature = " << signature << "(base64 = " << QByteArray(signature.toUtf8()).toBase64() << endl;
 
@@ -500,20 +500,20 @@ QString QDropbox::oAuthSign(QUrl base, QString method)
     return signature.toUtf8();
 }
 
-void QDropbox::prepareApiUrl()
+void Dropbox::prepareApiUrl()
 {
     //if(oauthMethod == QDropbox::Plaintext)
-    apiurl.setScheme("https");
+    _apiUrl.setScheme("https");
     //else
     //  apiurl.setScheme("http");
 }
 
-int QDropbox::sendRequest(QUrl request, QString type, QByteArray postdata, QString host)
+int Dropbox::sendRequest(QUrl request, QString type, QByteArray postdata, QString host)
 {
     if(!host.trimmed().compare(""))
-        host = apiurl.toString(QUrl::RemoveScheme).mid(2);
+        host = _apiUrl.toString(QUrl::RemoveScheme).mid(2);
 
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "sendRequest() host = " << host << endl;
 #endif
 
@@ -532,42 +532,42 @@ int QDropbox::sendRequest(QUrl request, QString type, QByteArray postdata, QStri
     QNetworkReply *rply;
 
     if(!type.compare("GET"))
-        rply = conManager.get(rq);
+        rply = _networkAccessManager.get(rq);
     else if(!type.compare("POST"))
     {
         rq.setHeader( QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded" );
-        rply = conManager.post(rq, postdata);
+        rply = _networkAccessManager.post(rq, postdata);
     }
     else
     {
-        errorState = QDropbox::UnknownQueryMethod;
-        errorText  = "The provided query method is unknown.";
-        emit errorOccured(errorState);
-#ifdef QTDROPBOX_DEBUG
-        qDebug() << "error " << errorState << "(" << errorText << ") in request" << endl;
+        _error = Dropbox::UnknownQueryMethod;
+        _errorText  = "The provided query method is unknown.";
+        emit errorOccured(_error);
+#ifdef QT_DEBUG
+        qDebug() << "error " << _error << "(" << _errorText << ") in request" << endl;
 #endif
         return -1;
     }
 
-    replynrMap[rply] = ++lastreply;
+    _replynrMap[rply] = ++_lastReply;
 
-    requestMap[lastreply].method = type;
-    requestMap[lastreply].host   = host;
+    _requestMap[_lastReply].method = type;
+    _requestMap[_lastReply].host   = host;
 
-#ifdef QTDROPBOX_DEBUG
-    qDebug() << "sendRequest() -> request #" << lastreply << " sent." << endl;
+#ifdef QT_DEBUG
+    qDebug() << "sendRequest() -> request #" << _lastReply << " sent." << endl;
 #endif
-    return lastreply;
+    return _lastReply;
 }
 
-void QDropbox::responseTokenRequest(QString response)
+void Dropbox::responseTokenRequest(QString response)
 {
     parseToken(response);
-    emit requestTokenFinished(oauthToken, oauthTokenSecret);
+    emit requestTokenFinished(_oauthToken, _oauthTokenSecret);
     return;
 }
 
-int QDropbox::responseDropboxLogin(QString response, int reqnr)
+int Dropbox::responseDropboxLogin(QString response, int reqnr)
 {
     Q_UNUSED(reqnr);
 
@@ -577,7 +577,7 @@ int QDropbox::responseDropboxLogin(QString response, int reqnr)
     int lnr, cnr;
     if(!xml.setContent(response, false, &err, &lnr, &cnr))
     {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
         qDebug() << "invalid xml (" << lnr << "," << cnr << "): " << err << "dump:" << endl;
         qDebug() << xml.toString() << endl;
 #endif
@@ -586,49 +586,49 @@ int QDropbox::responseDropboxLogin(QString response, int reqnr)
     return 0;
 }
 
-void QDropbox::responseAccessToken(QString response)
+void Dropbox::responseAccessToken(QString response)
 {
     parseToken(response);
-    emit accessTokenFinished(oauthToken, oauthTokenSecret);
+    emit accessTokenFinished(_oauthToken, _oauthTokenSecret);
     return;
 }
 
-QString QDropbox::signatureMethodString()
+QString Dropbox::signatureMethodString()
 {
     QString sigmeth;
-    switch(oauthMethod)
+    switch(_oauthMethod)
     {
-    case QDropbox::Plaintext:
+    case Dropbox::Plaintext:
         sigmeth = "PLAINTEXT";
         break;
-    case QDropbox::HMACSHA1:
+    case Dropbox::HMACSHA1:
         sigmeth = "HMAC-SHA1";
         break;
     default:
-        errorState = QDropbox::UnknownAuthMethod;
-        errorText  = QString("Authentication method %1 is unknown").arg(oauthMethod);
-        emit errorOccured(errorState);
+        _error = Dropbox::UnknownAuthMethod;
+        _errorText  = QString("Authentication method %1 is unknown").arg(_oauthMethod);
+        emit errorOccured(_error);
         return "";
         break;
     }
     return sigmeth;
 }
 
-void QDropbox::parseToken(QString response)
+void Dropbox::parseToken(QString response)
 {
 	clearError();
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "processing token request" << endl;
 #endif
 
     QStringList split = response.split("&");
     if(split.size() < 2)
     {
-        errorState = QDropbox::APIError;
-        errorText  = "The Dropbox API did not respond as expected.";
-        emit errorOccured(errorState);
-#ifdef QTDROPBOX_DEBUG
-        qDebug() << "error " << errorState << "(" << errorText << ") in request" << endl;
+        _error = Dropbox::APIError;
+        _errorText  = "The Dropbox API did not respond as expected.";
+        emit errorOccured(_error);
+#ifdef QT_DEBUG
+        qDebug() << "error " << _error << "(" << _errorText << ") in request" << endl;
 #endif
         return;
     }
@@ -636,45 +636,45 @@ void QDropbox::parseToken(QString response)
     if(!split.at(0).startsWith("oauth_token_secret") ||
             !split.at(1).startsWith("oauth_token"))
     {
-        errorState = QDropbox::APIError;
-        errorText  = "The Dropbox API did not respond as expected.";
-        emit errorOccured(errorState);
-#ifdef QTDROPBOX_DEBUG
-        qDebug() << "error " << errorState << "(" << errorText << ") in request" << endl;
+        _error = Dropbox::APIError;
+        _errorText  = "The Dropbox API did not respond as expected.";
+        emit errorOccured(_error);
+#ifdef QT_DEBUG
+        qDebug() << "error " << _error << "(" << _errorText << ") in request" << endl;
 #endif
         return;
     }
 
     QStringList tokenSecretList = split.at(0).split("=");
-    oauthTokenSecret = tokenSecretList.at(1);
+    _oauthTokenSecret = tokenSecretList.at(1);
     QStringList tokenList = split.at(1).split("=");
-    oauthToken = tokenList.at(1);
+    _oauthToken = tokenList.at(1);
 
-#ifdef QTDROPBOX_DEBUG
-    qDebug() << "token = " << oauthToken << endl << "token_secret = " << oauthTokenSecret << endl;
+#ifdef QT_DEBUG
+    qDebug() << "token = " << _oauthToken << endl << "token_secret = " << _oauthTokenSecret << endl;
 #endif
 
-    emit tokenChanged(oauthToken, oauthTokenSecret);
+    emit tokenChanged(_oauthToken, _oauthTokenSecret);
     return;
 }
 
-void QDropbox::parseAccountInfo(QString response)
+void Dropbox::parseAccountInfo(QString response)
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "== account info ==" << response << "== account info end ==";
 #endif
 
-    QDropboxJson json;
+    DropboxJson json;
     json.parseString(response);
     _tempJson.parseString(response);
     if(!json.isValid())
     {
-        errorState = QDropbox::APIError;
-        errorText  = "Dropbox API did not send correct answer for account information.";
-#ifdef QTDROPBOX_DEBUG
-        qDebug() << "error: " << errorText << endl;
+        _error = Dropbox::APIError;
+        _errorText  = "Dropbox API did not send correct answer for account information.";
+#ifdef QT_DEBUG
+        qDebug() << "error: " << _errorText << endl;
 #endif
-        emit errorOccured(errorState);
+        emit errorOccured(_error);
         return;
     }
 
@@ -682,9 +682,9 @@ void QDropbox::parseAccountInfo(QString response)
     return;
 }
 
-void QDropbox::parseSharedLink(QString response)
+void Dropbox::parseSharedLink(QString response)
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "== shared link ==" << response << "== shared link end ==";
 #endif
 
@@ -693,35 +693,35 @@ void QDropbox::parseSharedLink(QString response)
     _tempJson.parseString(response);
     if(!_tempJson.isValid())
     {
-        errorState = QDropbox::APIError;
-        errorText  = "Dropbox API did not send correct answer for file/directory shared link.";
-#ifdef QTDROPBOX_DEBUG
-        qDebug() << "error: " << errorText << endl;
+        _error = Dropbox::APIError;
+        _errorText  = "Dropbox API did not send correct answer for file/directory shared link.";
+#ifdef QT_DEBUG
+        qDebug() << "error: " << _errorText << endl;
 #endif
-        emit errorOccured(errorState);
+        emit errorOccured(_error);
         stopEventLoop();
         return;
     }
     emit sharedLinkReceived(response);
 }
 
-void QDropbox::parseMetadata(QString response)
+void Dropbox::parseMetadata(QString response)
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "== metadata ==" << response << "== metadata end ==";
 #endif
 
-    QDropboxJson json;
+    DropboxJson json;
     json.parseString(response);
     _tempJson.parseString(response);
     if(!json.isValid())
     {
-        errorState = QDropbox::APIError;
-        errorText  = "Dropbox API did not send correct answer for file/directory metadata.";
-#ifdef QTDROPBOX_DEBUG
-        qDebug() << "error: " << errorText << endl;
+        _error = Dropbox::APIError;
+        _errorText  = "Dropbox API did not send correct answer for file/directory metadata.";
+#ifdef QT_DEBUG
+        qDebug() << "error: " << _errorText << endl;
 #endif
-        emit errorOccured(errorState);
+        emit errorOccured(_error);
         stopEventLoop();
         return;
     }
@@ -730,23 +730,23 @@ void QDropbox::parseMetadata(QString response)
     return;
 }
 
-void QDropbox::parseDelta(QString response)
+void Dropbox::parseDelta(QString response)
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "== metadata ==" << response << "== metadata end ==";
 #endif
 
-    QDropboxJson json;
+    DropboxJson json;
     json.parseString(response);
     _tempJson.parseString(response);
     if(!json.isValid())
     {
-        errorState = QDropbox::APIError;
-        errorText  = "Dropbox API did not send correct answer for delta.";
-#ifdef QTDROPBOX_DEBUG
-        qDebug() << "error: " << errorText << endl;
+        _error = Dropbox::APIError;
+        _errorText  = "Dropbox API did not send correct answer for delta.";
+#ifdef QT_DEBUG
+        qDebug() << "error: " << _errorText << endl;
 #endif
-        emit errorOccured(errorState);
+        emit errorOccured(_error);
         stopEventLoop();
         return;
     }
@@ -755,136 +755,136 @@ void QDropbox::parseDelta(QString response)
     return;
 }
 
-void QDropbox::setKey(QString key)
+void Dropbox::setKey(QString key)
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "appKey = " << key;
 #endif
     _appKey = key;
 }
 
-QString QDropbox::key()
+QString Dropbox::key()
 {
     return _appKey;
 }
 
-void QDropbox::setSharedSecret(QString sharedSecret)
+void Dropbox::setSharedSecret(QString sharedSecret)
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "appSharedSecret = " << sharedSecret;
 #endif
     _appSharedSecret = sharedSecret;
 }
 
-QString QDropbox::sharedSecret()
+QString Dropbox::sharedSecret()
 {
     return _appSharedSecret;
 }
 
-void QDropbox::setToken(QString t)
+void Dropbox::setToken(QString t)
 {
-    oauthToken = t;
+    _oauthToken = t;
 }
 
-QString QDropbox::token()
+QString Dropbox::token()
 {
-    return oauthToken;
+    return _oauthToken;
 }
 
-void QDropbox::setTokenSecret(QString s)
+void Dropbox::setTokenSecret(QString s)
 {
-#ifdef QTDROPBOX_DEBUG
-    qDebug() << "oauthTokenSecret = " << oauthTokenSecret;
+#ifdef QT_DEBUG
+    qDebug() << "oauthTokenSecret = " << _oauthTokenSecret;
 #endif
-    oauthTokenSecret = s;
+    _oauthTokenSecret = s;
 }
 
-QString QDropbox::tokenSecret()
+QString Dropbox::tokenSecret()
 {
-    return oauthTokenSecret;
+    return _oauthTokenSecret;
 }
 
-QString QDropbox::appKey()
+QString Dropbox::appKey()
 {
     return _appKey;
 }
 
-QString QDropbox::appSharedSecret()
+QString Dropbox::appSharedSecret()
 {
     return _appSharedSecret;
 }
 
-QString QDropbox::apiVersion()
+QString Dropbox::apiVersion()
 {
     return _version;
 }
 
-int QDropbox::requestToken(bool blocking)
+int Dropbox::requestToken(bool blocking)
 {
 	clearError();
     QString sigmeth = signatureMethodString();
 
-    timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
-    nonce = generateNonce(128);
+    _timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
+    _nonce = generateNonce(128);
 
     QUrl url;
-    url.setUrl(apiurl.toString());
+    url.setUrl(_apiUrl.toString());
     url.setPath(QString("/%1/oauth/request_token").arg(_version.left(1)));
 
     QUrlQuery query;
     query.addQueryItem("oauth_consumer_key",_appKey);
-    query.addQueryItem("oauth_nonce", nonce);
+    query.addQueryItem("oauth_nonce", _nonce);
     query.addQueryItem("oauth_signature_method", sigmeth);
-    query.addQueryItem("oauth_timestamp", QString::number(timestamp));
+    query.addQueryItem("oauth_timestamp", QString::number(_timestamp));
     query.addQueryItem("oauth_version", _version);
 
     QString signature = oAuthSign(url);
     query.addQueryItem("oauth_signature", QUrl::toPercentEncoding(signature));
 
     url.setQuery(query);
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "request token url: " << url.toString() << endl << "sig: " << signature << endl;
-    qDebug() << "sending request " << url.toString() << " to " << apiurl.toString() << endl;
+    qDebug() << "sending request " << url.toString() << " to " << _apiUrl.toString() << endl;
 #endif
 
     int reqnr = sendRequest(url);
     if(blocking)
     {
-        requestMap[reqnr].type = QDROPBOX_REQ_RQBTOKN;
+        _requestMap[reqnr].type = DROPBOX_REQ_RQBTOKN;
         startEventLoop();
     }
     else
-        requestMap[reqnr].type = QDROPBOX_REQ_RQTOKEN;
+        _requestMap[reqnr].type = DROPBOX_REQ_RQTOKEN;
 
     return reqnr;
 }
 
-bool QDropbox::requestTokenAndWait()
+bool Dropbox::requestTokenAndWait()
 {
     requestToken(true);
     return (error() == NoError);
 }
 
-int QDropbox::authorize(QString email, QString pwd)
+int Dropbox::authorize(QString mail, QString password)
 {
     QUrl dropbox_authorize;
     dropbox_authorize.setPath(QString("/%1/oauth/authorize")
                               .arg(_version.left(1)));
-#ifdef QTDROPBOX_DEBUG
-    qDebug() << "oauthToken = " << oauthToken << endl;
+#ifdef QT_DEBUG
+    qDebug() << "oauthToken = " << _oauthToken << endl;
 #endif
 
     QUrlQuery query;
-    query.addQueryItem("oauth_token", oauthToken);
+    query.addQueryItem("oauth_token", _oauthToken);
     dropbox_authorize.setQuery(query);
     int reqnr = sendRequest(dropbox_authorize, "GET", 0, "www.dropbox.com");
-    requestMap[reqnr].type = QDROPBOX_REQ_AULOGIN;
-    mail     = email;
-    password = pwd;
+    _requestMap[reqnr].type = DROPBOX_REQ_AULOGIN;
+    _mail     = mail;
+    _password = password;
     return reqnr;
 }
 
-QUrl QDropbox::authorizeLink()
+QUrl Dropbox::authorizeLink()
 {
     QUrl link;
     link.setScheme("https");
@@ -893,30 +893,30 @@ QUrl QDropbox::authorizeLink()
                  .arg(_version.left(1)));
 
     QUrlQuery query;
-    query.addQueryItem("oauth_token", oauthToken);
+    query.addQueryItem("oauth_token", _oauthToken);
     link.setQuery(query);
     return link;
 }
 
-int QDropbox::requestAccessToken(bool blocking)
+int Dropbox::requestAccessToken(bool blocking)
 {
 	clearError();
 
     QUrl url;
-    url.setUrl(apiurl.toString());
+    url.setUrl(_apiUrl.toString());
 
     QUrlQuery query;
     query.addQueryItem("oauth_consumer_key",_appKey);
-    query.addQueryItem("oauth_nonce", nonce);
+    query.addQueryItem("oauth_nonce", _nonce);
     query.addQueryItem("oauth_signature_method", signatureMethodString());
-    query.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    query.addQueryItem("oauth_token", oauthToken);
+    query.addQueryItem("oauth_timestamp", QString::number(_timestamp));
+    query.addQueryItem("oauth_token", _oauthToken);
     query.addQueryItem("oauth_version", _version);
 
     url.setPath(QString("/%1/oauth/access_token").
                 arg(_version.left(1)));
 
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "requestToken = " << query.queryItemValue("oauth_token");
 #endif
 
@@ -927,7 +927,7 @@ int QDropbox::requestAccessToken(bool blocking)
 
     QString dataString = url.toString(QUrl::RemoveScheme|QUrl::RemoveAuthority|
                                       QUrl::RemovePath).mid(1);
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "dataString = " << dataString << endl;
 #endif
 
@@ -939,39 +939,39 @@ int QDropbox::requestAccessToken(bool blocking)
 
     if(blocking)
     {
-        requestMap[reqnr].type = QDROPBOX_REQ_BACCTOK;
+        _requestMap[reqnr].type = DROPBOX_REQ_BACCTOK;
         startEventLoop();
     }
     else
-        requestMap[reqnr].type = QDROPBOX_REQ_ACCTOKN;
+        _requestMap[reqnr].type = DROPBOX_REQ_ACCTOKN;
 
     return reqnr;
 }
 
-bool QDropbox::requestAccessTokenAndWait()
+bool Dropbox::requestAccessTokenAndWait()
 {
     requestAccessToken(true);
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "requestTokenAndWait() finished: error = " << error() << endl;
 #endif
     return (error() == NoError);
 }
 
-void QDropbox::requestAccountInfo(bool blocking)
+void Dropbox::requestAccountInfo(bool blocking)
 {
     clearError();
 
-    timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
+    _timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
 
     QUrl url;
-    url.setUrl(apiurl.toString());
+    url.setUrl(_apiUrl.toString());
 
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("oauth_consumer_key",_appKey);
-    urlQuery.addQueryItem("oauth_nonce", nonce);
+    urlQuery.addQueryItem("oauth_nonce", _nonce);
     urlQuery.addQueryItem("oauth_signature_method", signatureMethodString());
-    urlQuery.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    urlQuery.addQueryItem("oauth_token", oauthToken);
+    urlQuery.addQueryItem("oauth_timestamp", QString::number(_timestamp));
+    urlQuery.addQueryItem("oauth_token", _oauthToken);
     urlQuery.addQueryItem("oauth_version", _version);
 
     QString signature = oAuthSign(url);
@@ -983,23 +983,23 @@ void QDropbox::requestAccountInfo(bool blocking)
     int reqnr = sendRequest(url);
     if(blocking)
     {
-        requestMap[reqnr].type = QDROPBOX_REQ_BACCINF;
+        _requestMap[reqnr].type = DROPBOX_REQ_BACCINF;
         startEventLoop();
     }
     else
-        requestMap[reqnr].type = QDROPBOX_REQ_ACCINFO;
+        _requestMap[reqnr].type = DROPBOX_REQ_ACCINFO;
     return;
 }
 
-QDropboxAccount QDropbox::requestAccountInfoAndWait()
+DropboxAccount Dropbox::requestAccountInfoAndWait()
 {
     requestAccountInfo(true);
-    QDropboxAccount a(_tempJson.strContent(), this);
+    DropboxAccount a(_tempJson.strContent(), this);
     _account = a;
     return _account;
 }
 
-void QDropbox::parseBlockingAccountInfo(QString response)
+void Dropbox::parseBlockingAccountInfo(QString response)
 {
     clearError();
     parseAccountInfo(response);
@@ -1007,21 +1007,21 @@ void QDropbox::parseBlockingAccountInfo(QString response)
     return;
 }
 
-void QDropbox::requestMetadata(QString file, bool blocking)
+void Dropbox::requestMetadata(QString file, bool blocking)
 {
     clearError();
 
-    timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
+    _timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
 
     QUrl url;
-    url.setUrl(apiurl.toString());
+    url.setUrl(_apiUrl.toString());
 
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("oauth_consumer_key",_appKey);
-    urlQuery.addQueryItem("oauth_nonce", nonce);
+    urlQuery.addQueryItem("oauth_nonce", _nonce);
     urlQuery.addQueryItem("oauth_signature_method", signatureMethodString());
-    urlQuery.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    urlQuery.addQueryItem("oauth_token", oauthToken);
+    urlQuery.addQueryItem("oauth_timestamp", QString::number(_timestamp));
+    urlQuery.addQueryItem("oauth_token", _oauthToken);
     urlQuery.addQueryItem("oauth_version", _version);
 
     QString signature = oAuthSign(url);
@@ -1033,35 +1033,35 @@ void QDropbox::requestMetadata(QString file, bool blocking)
     int reqnr = sendRequest(url);
     if(blocking)
     {
-        requestMap[reqnr].type = QDROPBOX_REQ_BMETADA;
+        _requestMap[reqnr].type = DROPBOX_REQ_BMETADA;
         startEventLoop();
     }
     else
-        requestMap[reqnr].type = QDROPBOX_REQ_METADAT;
+        _requestMap[reqnr].type = DROPBOX_REQ_METADAT;
     //QDropboxFileInfo fi(_tempJson.strContent(), this);
     return;
 }
 
-QDropboxFileInfo QDropbox::requestMetadataAndWait(QString file)
+DropboxFileInfo Dropbox::requestMetadataAndWait(QString file)
 {
     requestMetadata(file, true);
-    QDropboxFileInfo fi(_tempJson.strContent(), this);
+    DropboxFileInfo fi(_tempJson.strContent(), this);
     return fi;
 }
 
-void QDropbox::requestSharedLink(QString file, bool blocking)
+void Dropbox::requestSharedLink(QString file, bool blocking)
 {
 	clearError();
 
     QUrl url;
-    url.setUrl(apiurl.toString());
+    url.setUrl(_apiUrl.toString());
 
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("oauth_consumer_key",_appKey);
-    urlQuery.addQueryItem("oauth_nonce", nonce);
+    urlQuery.addQueryItem("oauth_nonce", _nonce);
     urlQuery.addQueryItem("oauth_signature_method", signatureMethodString());
-    urlQuery.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    urlQuery.addQueryItem("oauth_token", oauthToken);
+    urlQuery.addQueryItem("oauth_timestamp", QString::number(_timestamp));
+    urlQuery.addQueryItem("oauth_token", _oauthToken);
     urlQuery.addQueryItem("oauth_version", _version);
 
     QString signature = oAuthSign(url);
@@ -1073,38 +1073,38 @@ void QDropbox::requestSharedLink(QString file, bool blocking)
     int reqnr = sendRequest(url);
     if(blocking)
     {
-        requestMap[reqnr].type = QDROPBOX_REQ_BSHRDLN;
+        _requestMap[reqnr].type = DROPBOX_REQ_BSHRDLN;
         startEventLoop();
     }
     else
-        requestMap[reqnr].type = QDROPBOX_REQ_SHRDLNK;
+        _requestMap[reqnr].type = DROPBOX_REQ_SHRDLNK;
 
     return;
 }
 
-QUrl QDropbox::requestSharedLinkAndWait(QString file)
+QUrl Dropbox::requestSharedLinkAndWait(QString file)
 {
     requestSharedLink(file,true);
-    QDropboxJson json(_tempJson.strContent());
+    DropboxJson json(_tempJson.strContent());
     QString urlString = json.getString("url");
     return QUrl(urlString);
 }
 
-void QDropbox::requestDelta(QString cursor, QString path_prefix, bool blocking)
+void Dropbox::requestDelta(QString cursor, QString path_prefix, bool blocking)
 {
     clearError();
 
-    timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
+    _timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
 
     QUrl url;
-    url.setUrl(apiurl.toString());
+    url.setUrl(_apiUrl.toString());
 
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("oauth_consumer_key",_appKey);
-    urlQuery.addQueryItem("oauth_nonce", nonce);
+    urlQuery.addQueryItem("oauth_nonce", _nonce);
     urlQuery.addQueryItem("oauth_signature_method", signatureMethodString());
-    urlQuery.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    urlQuery.addQueryItem("oauth_token", oauthToken);
+    urlQuery.addQueryItem("oauth_timestamp", QString::number(_timestamp));
+    urlQuery.addQueryItem("oauth_token", _oauthToken);
     urlQuery.addQueryItem("oauth_version", _version);
     if(cursor.length() > 0)
     {
@@ -1123,7 +1123,7 @@ void QDropbox::requestDelta(QString cursor, QString path_prefix, bool blocking)
 
     QString dataString = url.toString(QUrl::RemoveScheme|QUrl::RemoveAuthority|
                                       QUrl::RemovePath).mid(1);
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "dataString = " << dataString << endl;
 #endif
 
@@ -1135,48 +1135,48 @@ void QDropbox::requestDelta(QString cursor, QString path_prefix, bool blocking)
 
     if(blocking)
     {
-        requestMap[reqnr].type = QDROPBOX_REQ_BDELTA;
+        _requestMap[reqnr].type = DROPBOX_REQ_BDELTA;
         startEventLoop();
     }
     else
-        requestMap[reqnr].type = QDROPBOX_REQ_DELTA;
+        _requestMap[reqnr].type = DROPBOX_REQ_DELTA;
     return;
 }
 
-QDropboxDeltaResponse QDropbox::requestDeltaAndWait(QString cursor, QString path_prefix)
+DropboxDeltaResponse Dropbox::requestDeltaAndWait(QString cursor, QString path_prefix)
 {
     requestDelta(cursor, path_prefix, true);
-    QDropboxDeltaResponse r(_tempJson.strContent());
+    DropboxDeltaResponse r(_tempJson.strContent());
 
     return r;
 }
 
-void QDropbox::startEventLoop()
+void Dropbox::startEventLoop()
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "QDropbox::startEventLoop()" << endl;
 #endif
-    if(_evLoop == NULL)
-        _evLoop = new QEventLoop(this);
-    _evLoop->exec();
+    if(_eventLoop == NULL)
+        _eventLoop = new QEventLoop(this);
+    _eventLoop->exec();
     return;
 }
 
-void QDropbox::stopEventLoop()
+void Dropbox::stopEventLoop()
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "QDropbox::stopEventLoop()" << endl;
 #endif
-    if(_evLoop == NULL)
+    if(_eventLoop == NULL)
         return;
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "loop ended" << endl;
 #endif
-    _evLoop->exit();
+    _eventLoop->exit();
     return;
 }
 
-void QDropbox::responseBlockedTokenRequest(QString response)
+void Dropbox::responseBlockedTokenRequest(QString response)
 {
     clearError();
     responseTokenRequest(response);
@@ -1184,7 +1184,7 @@ void QDropbox::responseBlockedTokenRequest(QString response)
     return;
 }
 
-void QDropbox::responseBlockingAccessToken(QString response)
+void Dropbox::responseBlockingAccessToken(QString response)
 {
     clearError();
     responseAccessToken(response);
@@ -1192,7 +1192,7 @@ void QDropbox::responseBlockingAccessToken(QString response)
     return;
 }
 
-void QDropbox::parseBlockingMetadata(QString response)
+void Dropbox::parseBlockingMetadata(QString response)
 {
     clearError();
     parseMetadata(response);
@@ -1200,7 +1200,7 @@ void QDropbox::parseBlockingMetadata(QString response)
     return;
 }
 
-void QDropbox::parseBlockingDelta(QString response)
+void Dropbox::parseBlockingDelta(QString response)
 {
     clearError();
     parseDelta(response);
@@ -1208,7 +1208,7 @@ void QDropbox::parseBlockingDelta(QString response)
     return;
 }
 
-void QDropbox::parseBlockingSharedLink(QString response)
+void Dropbox::parseBlockingSharedLink(QString response)
 {
     clearError();
     parseSharedLink(response);
@@ -1217,15 +1217,15 @@ void QDropbox::parseBlockingSharedLink(QString response)
 }
 
 // check if the event loop has to be stopped after a blocking request was sent
-void QDropbox::checkReleaseEventLoop(int reqnr)
+void Dropbox::checkReleaseEventLoop(int reqnr)
 {
-    switch(requestMap[reqnr].type)
+    switch(_requestMap[reqnr].type)
     {
-    case QDROPBOX_REQ_RQBTOKN:
-    case QDROPBOX_REQ_BACCTOK:
-    case QDROPBOX_REQ_BACCINF:
-    case QDROPBOX_REQ_BMETADA:
-	case QDROPBOX_REQ_BREVISI:
+    case DROPBOX_REQ_RQBTOKN:
+    case DROPBOX_REQ_BACCTOK:
+    case DROPBOX_REQ_BACCINF:
+    case DROPBOX_REQ_BMETADA:
+    case DROPBOX_REQ_BREVISI:
         stopEventLoop(); // release local event loop
         break;
     default:
@@ -1234,19 +1234,19 @@ void QDropbox::checkReleaseEventLoop(int reqnr)
     return;
 }
 
-void QDropbox::requestRevisions(QString file, int max, bool blocking)
+void Dropbox::requestRevisions(QString file, int max, bool blocking)
 {
 	clearError();
 
 	QUrl url;
-    url.setUrl(apiurl.toString());
+    url.setUrl(_apiUrl.toString());
 
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("oauth_consumer_key",_appKey);
-    urlQuery.addQueryItem("oauth_nonce", nonce);
+    urlQuery.addQueryItem("oauth_nonce", _nonce);
     urlQuery.addQueryItem("oauth_signature_method", signatureMethodString());
-    urlQuery.addQueryItem("oauth_timestamp", QString::number(timestamp));
-    urlQuery.addQueryItem("oauth_token", oauthToken);
+    urlQuery.addQueryItem("oauth_timestamp", QString::number(_timestamp));
+    urlQuery.addQueryItem("oauth_token", _oauthToken);
     urlQuery.addQueryItem("oauth_version", _version);
     urlQuery.addQueryItem("rev_limit", QString::number(max));
 
@@ -1259,44 +1259,44 @@ void QDropbox::requestRevisions(QString file, int max, bool blocking)
     int reqnr = sendRequest(url);
     if(blocking)
     {
-        requestMap[reqnr].type = QDROPBOX_REQ_BREVISI;
+        _requestMap[reqnr].type = DROPBOX_REQ_BREVISI;
         startEventLoop();
     }
     else
-        requestMap[reqnr].type = QDROPBOX_REQ_REVISIO;
+        _requestMap[reqnr].type = DROPBOX_REQ_REVISIO;
 
     return;
 }
 
-QList<QDropboxFileInfo> QDropbox::requestRevisionsAndWait(QString file, int max)
+QList<DropboxFileInfo> Dropbox::requestRevisionsAndWait(QString file, int max)
 {
 	clearError();
 	requestRevisions(file, max, true);
-	QList<QDropboxFileInfo> revisionList;
+    QList<DropboxFileInfo> revisionList;
 
-	if(errorState != QDropbox::NoError || !_tempJson.isValid())
+    if(_error != Dropbox::NoError || !_tempJson.isValid())
 		return revisionList;
 
 	QStringList responseList = _tempJson.getArray();
 	for(int i=0; i<responseList.size(); ++i)
 	{
 		QString revData = responseList.at(i);
-		QDropboxFileInfo revision(revData);
+        DropboxFileInfo revision(revData);
 		revisionList.append(revision);
 	}
 
 	return revisionList;
 }
 
-void QDropbox::parseRevisions(QString response)
+void Dropbox::parseRevisions(QString response)
 {
-    QDropboxJson json;
+    DropboxJson json;
     _tempJson.parseString(response);
     if(!_tempJson.isValid())
     {
-        errorState = QDropbox::APIError;
-        errorText  = "Dropbox API did not send correct answer for file/directory metadata.";
-        emit errorOccured(errorState);
+        _error = Dropbox::APIError;
+        _errorText  = "Dropbox API did not send correct answer for file/directory metadata.";
+        emit errorOccured(_error);
         stopEventLoop();
         return;
     }
@@ -1305,7 +1305,7 @@ void QDropbox::parseRevisions(QString response)
     return;
 }
 
-void QDropbox::parseBlockingRevisions(QString response)
+void Dropbox::parseBlockingRevisions(QString response)
 {
 	clearError();
 	parseRevisions(response);
@@ -1313,10 +1313,10 @@ void QDropbox::parseBlockingRevisions(QString response)
 	return;
 }
 
-void QDropbox::clearError()
+void Dropbox::clearError()
 {
-    errorState  = QDropbox::NoError;
-    errorText  = "";
+    _error  = Dropbox::NoError;
+    _errorText  = "";
     return;
 }
 

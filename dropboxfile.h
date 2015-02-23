@@ -10,12 +10,12 @@
 #include <QUrl>
 #include <QEvent>
 
-#include "qtdropbox_global.h"
-#include "qdropboxjson.h"
-#include "qdropbox.h"
-#include "qdropboxfileinfo.h"
+#include "dropbox_global.h"
+#include "dropboxjson.h"
+#include "dropbox.h"
+#include "dropboxfileinfo.h"
 
-const QString QDROPBOXFILE_CONTENT_URL = "https://api-content.dropbox.com";
+const QString DROPBOXFILE_CONTENT_URL = "https://api-content.dropbox.com";
 
 //! Allows access to files stored on Dropbox
 /*!
@@ -36,7 +36,7 @@ const QString QDROPBOXFILE_CONTENT_URL = "https://api-content.dropbox.com";
         revisions)
 
  */
-class QTDROPBOXSHARED_EXPORT QDropboxFile : public QIODevice
+class QTDROPBOXSHARED_EXPORT DropboxFile : public QIODevice
 {
     Q_OBJECT
 public:
@@ -45,7 +45,7 @@ public:
 
       \param parent Parent QObject
      */
-    QDropboxFile(QObject* parent = 0);
+    DropboxFile(QObject* parent = 0);
 
     /*!
       Creates an instance of QDropboxFile that may connect to Dropbox if the passed
@@ -55,7 +55,7 @@ public:
       \param api Pointer to a QDropbox that is connected to an account.
       \param parent Parent QObject
      */
-    QDropboxFile(QDropbox* api, QObject* parent = 0);
+    DropboxFile(Dropbox* api, QObject* parent = 0);
 
     /*!
       Creates an instance of QDropboxFile that may access a file on Dropbox.
@@ -64,12 +64,12 @@ public:
       \param api A QDropbox that is connected to an user account.
       \param parent Parent QObject
      */
-    QDropboxFile(QString filename, QDropbox* api, QObject* parent = 0);
+    DropboxFile(QString filename, Dropbox* api, QObject* parent = 0);
 
     /*!
       This deconstructor cleans up on destruction of the object.
      */
-    ~QDropboxFile();
+    ~DropboxFile();
 
     /*!
       QDropboxFile is currently implemented as sequential device. That will
@@ -97,12 +97,12 @@ public:
 
       \param dropbox Pointer to the QDropbox object
      */
-    void setApi(QDropbox* dropbox);
+    void setApi(Dropbox* dropbox);
 
     /*!
       Returns a pointer to the QDropbox instance that is used to connect to Dropbox.
      */
-    QDropbox* api();
+    Dropbox* api();
 
     /*!
       Set the name of the file you want to access. Remember to use correct Dropbox path
@@ -162,7 +162,7 @@ public:
 	/*!
 	  Return the metadata of the file as a QDropboxFileInfo object.
 	*/
-	QDropboxFileInfo metadata();
+	DropboxFileInfo metadata();
 
 	/*!
 	  Check if the file has changed on the dropbox while it was opened locally.
@@ -179,7 +179,7 @@ public:
 	  \param max When defined the function will only list up to the specified amount of revisions.
 	  \returns A list of the latest revisions of the file.
 	*/
-	QList<QDropboxFileInfo> revisions(int max = 10);
+	QList<DropboxFileInfo> revisions(int max = 10);
 
 	/*!
 	  Reimplemented from QIODevice::seek().
@@ -218,7 +218,7 @@ private slots:
     void networkRequestFinished(QNetworkReply* rply);
 
 private:
-    QNetworkAccessManager _conManager;
+    QNetworkAccessManager _networkAccessManager;
 
     QByteArray *_buffer;
 
@@ -226,7 +226,7 @@ private:
     QString _tokenSecret;
     QString _filename;
 
-    QDropbox *_api;
+    Dropbox *_api;
 
 
     enum WaitState{
@@ -239,8 +239,8 @@ private:
 
     QEventLoop* _evLoop;
 
-    int     lastErrorCode;
-    QString lastErrorMessage;
+    int     _lastErrorCode;
+    QString _lastErrorMessage;
 
     qint64 _bufferThreshold;
     qint64 _currentThreshold;
@@ -249,7 +249,7 @@ private:
 
 	int _position;
 
-	QDropboxFileInfo *_metadata;
+    DropboxFileInfo *_dropboxFileInfo;
 
     void obtainToken();
     void connectSignals();
@@ -263,7 +263,7 @@ private:
     bool putFile();
 	void obtainMetadata();
 
-    void _init(QDropbox *api, QString filename, qint64 bufferTh);
+    void _init(Dropbox *api, QString filename, qint64 bufferTh);
 };
 
 #endif // QDROPBOXFILE_H

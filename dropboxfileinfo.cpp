@@ -1,32 +1,32 @@
-#include "qdropboxfileinfo.h"
+#include "dropboxfileinfo.h"
 
-QDropboxFileInfo::QDropboxFileInfo(QObject *parent) :
-    QDropboxJson(parent)
+DropboxFileInfo::DropboxFileInfo(QObject *parent) :
+    DropboxJson(parent)
 {
   _init();
 }
 
-QDropboxFileInfo::QDropboxFileInfo(QString jsonStr, QObject *parent) :
-    QDropboxJson(jsonStr, parent)
+DropboxFileInfo::DropboxFileInfo(QString jsonStr, QObject *parent) :
+    DropboxJson(jsonStr, parent)
 {
     _init();
     dataFromJson();
 }
 
-QDropboxFileInfo::QDropboxFileInfo(const QDropboxFileInfo &other) :
-    QDropboxJson(0)
+DropboxFileInfo::DropboxFileInfo(const DropboxFileInfo &other) :
+    DropboxJson(0)
 {
     _init();
     copyFrom(other);
 }
 
-QDropboxFileInfo::~QDropboxFileInfo()
+DropboxFileInfo::~DropboxFileInfo()
 {
   if(_content != NULL)
     delete _content;
 }
 
-void QDropboxFileInfo::copyFrom(const QDropboxFileInfo &other)
+void DropboxFileInfo::copyFrom(const DropboxFileInfo &other)
 {
 	parseString(other.strContent());
 	dataFromJson();
@@ -34,13 +34,13 @@ void QDropboxFileInfo::copyFrom(const QDropboxFileInfo &other)
 	return;
 }
 
-QDropboxFileInfo &QDropboxFileInfo::operator=(const QDropboxFileInfo &other)
+DropboxFileInfo &DropboxFileInfo::operator=(const DropboxFileInfo &other)
 {
     copyFrom(other);
     return *this;
 }
 
-void QDropboxFileInfo::dataFromJson()
+void DropboxFileInfo::dataFromJson()
 {
 	if(!isValid())
 		return;
@@ -62,14 +62,14 @@ void QDropboxFileInfo::dataFromJson()
 	// create content list
 	if(_isDir)
 	{
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
 	  qDebug() << "fileinfo: generating contents list";
 #endif
-	  _content = new QList<QDropboxFileInfo>();
+      _content = new QList<DropboxFileInfo>();
 	  QStringList contentsArray = getArray("contents");
 	  for(qint32 i = 0; i<contentsArray.size(); ++i)
 	  {
-	    QDropboxFileInfo contentInfo(contentsArray.at(i));
+        DropboxFileInfo contentInfo(contentsArray.at(i));
 		if(!contentInfo.isValid())
 		  continue;
 		
@@ -80,7 +80,7 @@ void QDropboxFileInfo::dataFromJson()
 	return;
 }
 
-void QDropboxFileInfo::_init()
+void DropboxFileInfo::_init()
 {
     _size           = "";
     _revision       = 0;
@@ -99,77 +99,77 @@ void QDropboxFileInfo::_init()
     return;
 }
 
-QString QDropboxFileInfo::revisionHash()  const
+QString DropboxFileInfo::revisionHash()  const
 {
 	return _revisionHash;
 }
 
-bool QDropboxFileInfo::isDeleted()  const
+bool DropboxFileInfo::isDeleted()  const
 {
 	return _isDeleted;
 }
 
 
-QString QDropboxFileInfo::mimeType()  const
+QString DropboxFileInfo::mimeType()  const
 {
 	return _mimeType;
 }
 
-bool QDropboxFileInfo::isDir()  const
+bool DropboxFileInfo::isDir()  const
 {
 	return _isDir;
 }
 
-QString QDropboxFileInfo::path()  const
+QString DropboxFileInfo::path()  const
 {
 	return _path;
 }
 
-QString QDropboxFileInfo::root()  const
+QString DropboxFileInfo::root()  const
 {
 	return _root;
 }
 
-QString QDropboxFileInfo::icon()  const
+QString DropboxFileInfo::icon()  const
 {
 	return _icon;
 }
 
-QDateTime QDropboxFileInfo::clientModified()
+QDateTime DropboxFileInfo::clientModified()
 {
 	return _clientModified;
 }
 
-QDateTime QDropboxFileInfo::modified()
+QDateTime DropboxFileInfo::modified()
 {
 	return _modified;
 }
 
-quint64 QDropboxFileInfo::bytes()  const
+quint64 DropboxFileInfo::bytes()  const
 {
 	return _bytes;
 }
 
-bool QDropboxFileInfo::thumbExists()  const
+bool DropboxFileInfo::thumbExists()  const
 {
 	return _thumbExists;
 }
 
-quint64 QDropboxFileInfo::revision() const
+quint64 DropboxFileInfo::revision() const
 {
 	return _revision;
 }
 
-QString QDropboxFileInfo::size() const
+QString DropboxFileInfo::size() const
 {
 	return _size;
 }
 
-QList<QDropboxFileInfo> QDropboxFileInfo::contents() const
+QList<DropboxFileInfo> DropboxFileInfo::contents() const
 {
    if(_content == NULL || !isDir())
    {
-     QList<QDropboxFileInfo> l;
+     QList<DropboxFileInfo> l;
 	 l.clear();
      return l;
    }

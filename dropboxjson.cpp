@@ -1,41 +1,41 @@
 #include <QLocale>
 
-#include "qdropboxjson.h"
+#include "dropboxjson.h"
 
-QDropboxJson::QDropboxJson(QObject *parent) :
+DropboxJson::DropboxJson(QObject *parent) :
     QObject(parent)
 {
     _init();
 }
 
-QDropboxJson::QDropboxJson(QString strJson, QObject *parent) :
+DropboxJson::DropboxJson(QString strJson, QObject *parent) :
     QObject(parent)
 {
     _init();
     parseString(strJson);
 }
 
-QDropboxJson::QDropboxJson(const QDropboxJson &other) :
+DropboxJson::DropboxJson(const DropboxJson &other) :
     QObject(other.parent())
 {
     _init();
     parseString(other.strContent());
 }
 
-QDropboxJson::~QDropboxJson()
+DropboxJson::~DropboxJson()
 {
     emptyList();
 }
 
-void QDropboxJson::_init()
+void DropboxJson::_init()
 {
-	valid          = false;
+    _valid          = false;
 	_anonymousArray = false;
 }
 
-void QDropboxJson::parseString(QString strJson)
+void DropboxJson::parseString(QString strJson)
 {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "parse string = " << strJson << endl;
 #endif
 
@@ -43,18 +43,18 @@ void QDropboxJson::parseString(QString strJson)
     emptyList();
 
     // basically a json is valid until it is invalidated
-    valid = true;
+    _valid = true;
 
     if(!strJson.startsWith("{") ||
             !strJson.endsWith("}"))
     {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
     qDebug() << "string does not start with { " << endl;
 #endif
 
 		if(strJson.startsWith("[") && strJson.endsWith("]"))
 		{
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
 			qDebug() << "JSON is anonymous array" << endl;
 #endif
 			_anonymousArray = true;
@@ -63,7 +63,7 @@ void QDropboxJson::parseString(QString strJson)
 		}
 		else
 		{
-			valid = false;
+            _valid = false;
 			return;
 		}
     }
@@ -107,7 +107,7 @@ void QDropboxJson::parseString(QString strJson)
                 buffer += ":";
                 continue;
             }
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
             qDebug() << "key = " << buffer << endl;
 #endif
 
@@ -121,7 +121,7 @@ void QDropboxJson::parseString(QString strJson)
 				buffer += ',';
                 continue;
 			}
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
             qDebug() << "value = " << buffer << endl;
 #endif
             value       = buffer.trimmed();
@@ -149,9 +149,9 @@ void QDropboxJson::parseString(QString strJson)
         if(isJson)
         {
             // create new json object with data until }
-            qdropboxjson_entry e;
+            DropboxJsonEntry e;
 			int offset = parseSubJson(strJson, i, &e);
-            valueMap[key] = e;
+            _valueMap[key] = e;
             key = "";
 
             // ignore next ,
@@ -224,14 +224,14 @@ void QDropboxJson::parseString(QString strJson)
 
         if(insertValue)
         {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
             qDebug() << "insert value " << key << " with content = " << value.trimmed() << " and type = " << interpretType(value.trimmed()) << endl;
 #endif
-            qdropboxjson_entry e;
+            DropboxJsonEntry e;
 			QString *valuePointer = new QString(value.trimmed());
 			e.value.value = valuePointer;
             e.type        = interpretType(value.trimmed());
-            valueMap[key] = e;
+            _valueMap[key] = e;
 
             key   = "";
             value = "";
@@ -242,21 +242,21 @@ void QDropboxJson::parseString(QString strJson)
     // there's some key left
     if(key.compare(""))
     {
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
             qDebug() << "rest value = " << buffer << endl;
 #endif
         // but no value in the buffer -> json is invalid because a value is missing
         if(!buffer.compare(""))
         {
-            valid = false;
+            _valid = false;
         }
         else
         {
             // if there's a value left we store it
-            qdropboxjson_entry e;
+            DropboxJsonEntry e;
             e.value.value = new QString(buffer.trimmed());
             e.type        = interpretType(buffer.trimmed());
-            valueMap[key] = e;
+            _valueMap[key] = e;
         }
 
     }
@@ -264,45 +264,45 @@ void QDropboxJson::parseString(QString strJson)
     return;
 }
 
-void QDropboxJson::clear()
+void DropboxJson::clear()
 {
     emptyList();
     return;
 }
 
-bool QDropboxJson::isValid()
+bool DropboxJson::isValid()
 {
-    return valid;
+    return _valid;
 }
 
-bool QDropboxJson::hasKey(QString key)
+bool DropboxJson::hasKey(QString key)
 {
-    return valueMap.contains(key);
+    return _valueMap.contains(key);
 }
 
-QDropboxJson::DataType QDropboxJson::type(QString key)
+DropboxJson::DataType DropboxJson::type(QString key)
 {
-    if(!valueMap.contains(key))
+    if(!_valueMap.contains(key))
         return UnknownType;
 
-    qdropboxjson_entry_type t;
-    t = valueMap.value(key).type;
+    DropboxJsonEntryType t;
+    t = _valueMap.value(key).type;
 
     switch(t)
     {
-    case QDROPBOXJSON_TYPE_NUM:
+    case DROPBOXJSON_TYPE_NUM:
         return NumberType;
-    case QDROPBOXJSON_TYPE_STR:
+    case DROPBOXJSON_TYPE_STR:
         return StringType;
-    case QDROPBOXJSON_TYPE_JSON:
+    case DROPBOXJSON_TYPE_JSON:
         return JsonType;
-    case QDROPBOXJSON_TYPE_ARRAY:
+    case DROPBOXJSON_TYPE_ARRAY:
         return ArrayType;
-    case QDROPBOXJSON_TYPE_FLOAT:
+    case DROPBOXJSON_TYPE_FLOAT:
         return FloatType;
-    case QDROPBOXJSON_TYPE_BOOL:
+    case DROPBOXJSON_TYPE_BOOL:
         return BoolType;
-    case QDROPBOXJSON_TYPE_UINT:
+    case DROPBOXJSON_TYPE_UINT:
         return UnsignedIntType;
     default:
         return UnknownType;
@@ -310,155 +310,155 @@ QDropboxJson::DataType QDropboxJson::type(QString key)
     return UnknownType;
 }
 
-qint64 QDropboxJson::getInt(QString key, bool force)
+qint64 DropboxJson::getInt(QString key, bool force)
 {
-    if(!valueMap.contains(key))
+    if(!_valueMap.contains(key))
         return 0;
 
-    qdropboxjson_entry e;
-    e = valueMap.value(key);
+    DropboxJsonEntry e;
+    e = _valueMap.value(key);
 
-    if(!force && e.type != QDROPBOXJSON_TYPE_NUM)
+    if(!force && e.type != DROPBOXJSON_TYPE_NUM)
         return 0;
 
     return e.value.value->toInt();
 }
 
-void QDropboxJson::setInt(QString key, qint64 value)
+void DropboxJson::setInt(QString key, qint64 value)
 {
-    if(valueMap.contains(key)){
-        valueMap[key].value.value->setNum(value);
+    if(_valueMap.contains(key)){
+        _valueMap[key].value.value->setNum(value);
     }else{
-        qdropboxjson_entry e;
+        DropboxJsonEntry e;
         QString *valuePointer = new QString();
         valuePointer->setNum(value);
         e.value.value = valuePointer;
-        e.type        = QDROPBOXJSON_TYPE_NUM;
-        valueMap[key] = e;
+        e.type        = DROPBOXJSON_TYPE_NUM;
+        _valueMap[key] = e;
     }
 }
 
-quint64 QDropboxJson::getUInt(QString key, bool force)
+quint64 DropboxJson::getUInt(QString key, bool force)
 {
-    if(!valueMap.contains(key))
+    if(!_valueMap.contains(key))
         return 0;
 
-    qdropboxjson_entry e;
-    e = valueMap.value(key);
+    DropboxJsonEntry e;
+    e = _valueMap.value(key);
 
-    if(!force && e.type != QDROPBOXJSON_TYPE_UINT)
+    if(!force && e.type != DROPBOXJSON_TYPE_UINT)
         return 0;
 
     return e.value.value->toUInt();
 }
 
-void QDropboxJson::setUInt(QString key, quint64 value)
+void DropboxJson::setUInt(QString key, quint64 value)
 {
-    if(valueMap.contains(key)){
-        valueMap[key].value.value->setNum(value);
+    if(_valueMap.contains(key)){
+        _valueMap[key].value.value->setNum(value);
     }else{
-        qdropboxjson_entry e;
+        DropboxJsonEntry e;
         QString *valuePointer = new QString();
         valuePointer->setNum(value);
         e.value.value = valuePointer;
-        e.type        = QDROPBOXJSON_TYPE_UINT;
-        valueMap[key] = e;
+        e.type        = DROPBOXJSON_TYPE_UINT;
+        _valueMap[key] = e;
     }
 }
 
-QString QDropboxJson::getString(QString key, bool force)
+QString DropboxJson::getString(QString key, bool force)
 {
-    if(!valueMap.contains(key))
+    if(!_valueMap.contains(key))
         return "";
 
-    qdropboxjson_entry e;
-    e = valueMap.value(key);
+    DropboxJsonEntry e;
+    e = _valueMap.value(key);
 
-    if(!force && e.type != QDROPBOXJSON_TYPE_STR)
+    if(!force && e.type != DROPBOXJSON_TYPE_STR)
         return "";
 
 	QString value = e.value.value->mid(1, e.value.value->size()-2);
     return value;
 }
 
-void QDropboxJson::setString(QString key, QString value)
+void DropboxJson::setString(QString key, QString value)
 {
-    if(valueMap.contains(key)){
-        *(valueMap[key].value.value) = value;
+    if(_valueMap.contains(key)){
+        *(_valueMap[key].value.value) = value;
     }else{
-        qdropboxjson_entry e;
+        DropboxJsonEntry e;
         QString *valuePointer = new QString(value);
         e.value.value = valuePointer;
-        e.type        = QDROPBOXJSON_TYPE_STR;
-        valueMap[key] = e;
+        e.type        = DROPBOXJSON_TYPE_STR;
+        _valueMap[key] = e;
     }
 }
 
-QDropboxJson* QDropboxJson::getJson(QString key)
+DropboxJson* DropboxJson::getJson(QString key)
 {
-    if(!valueMap.contains(key))
+    if(!_valueMap.contains(key))
         return NULL;
 
-    qdropboxjson_entry e;
-    e = valueMap.value(key);
+    DropboxJsonEntry e;
+    e = _valueMap.value(key);
 
-    if(e.type != QDROPBOXJSON_TYPE_JSON)
+    if(e.type != DROPBOXJSON_TYPE_JSON)
         return NULL;
 
 
     return e.value.json;
 }
 
-void QDropboxJson::setJson(QString key, QDropboxJson value)
+void DropboxJson::setJson(QString key, DropboxJson value)
 {
-    if(valueMap.contains(key)){
-        *(valueMap[key].value.json) = value;
+    if(_valueMap.contains(key)){
+        *(_valueMap[key].value.json) = value;
     }else{
-        qdropboxjson_entry e;
-        QDropboxJson *valuePointer = new QDropboxJson(value);
+        DropboxJsonEntry e;
+        DropboxJson *valuePointer = new DropboxJson(value);
         e.value.json = valuePointer;
-        e.type        = QDROPBOXJSON_TYPE_JSON;
-        valueMap[key] = e;
+        e.type        = DROPBOXJSON_TYPE_JSON;
+        _valueMap[key] = e;
     }
 }
 
-double QDropboxJson::getDouble(QString key, bool force)
+double DropboxJson::getDouble(QString key, bool force)
 {
-    if(!valueMap.contains(key))
+    if(!_valueMap.contains(key))
         return 0.0f;
 
-    qdropboxjson_entry e;
-    e = valueMap.value(key);
+    DropboxJsonEntry e;
+    e = _valueMap.value(key);
 
-    if(!force && e.type != QDROPBOXJSON_TYPE_FLOAT)
+    if(!force && e.type != DROPBOXJSON_TYPE_FLOAT)
         return 0.0f;
 
     return e.value.value->toDouble();
 }
 
-void QDropboxJson::setDouble(QString key, double value)
+void DropboxJson::setDouble(QString key, double value)
 {
-    if(valueMap.contains(key)){
-        valueMap[key].value.value->setNum(value);
+    if(_valueMap.contains(key)){
+        _valueMap[key].value.value->setNum(value);
     }else{
-        qdropboxjson_entry e;
+        DropboxJsonEntry e;
         QString *valuePointer = new QString();
         valuePointer->setNum(value);
         e.value.value = valuePointer;
-        e.type        = QDROPBOXJSON_TYPE_FLOAT;
-        valueMap[key] = e;
+        e.type        = DROPBOXJSON_TYPE_FLOAT;
+        _valueMap[key] = e;
     }
 }
 
-bool QDropboxJson::getBool(QString key, bool force)
+bool DropboxJson::getBool(QString key, bool force)
 {
-    if(!valueMap.contains(key))
+    if(!_valueMap.contains(key))
         return false;
 
-    qdropboxjson_entry e;
-    e = valueMap.value(key);
+    DropboxJsonEntry e;
+    e = _valueMap.value(key);
 
-    if(!force && e.type != QDROPBOXJSON_TYPE_BOOL)
+    if(!force && e.type != DROPBOXJSON_TYPE_BOOL)
         return false;
 
     if(!e.value.value->compare("false"))
@@ -467,28 +467,28 @@ bool QDropboxJson::getBool(QString key, bool force)
     return true;
 }
 
-void QDropboxJson::setBool(QString key, bool value)
+void DropboxJson::setBool(QString key, bool value)
 {
-    if(valueMap.contains(key)){
-        *(valueMap[key].value.value) = value ? "true" : "false";
+    if(_valueMap.contains(key)){
+        *(_valueMap[key].value.value) = value ? "true" : "false";
     }else{
-        qdropboxjson_entry e;
+        DropboxJsonEntry e;
         QString *valuePointer = new QString(value ? "true" : "false");
         e.value.value = valuePointer;
-        e.type        = QDROPBOXJSON_TYPE_BOOL;
-        valueMap[key] = e;
+        e.type        = DROPBOXJSON_TYPE_BOOL;
+        _valueMap[key] = e;
     }
 }
 
-QDateTime QDropboxJson::getTimestamp(QString key, bool force)
+QDateTime DropboxJson::getTimestamp(QString key, bool force)
 {
-	if(!valueMap.contains(key))
+    if(!_valueMap.contains(key))
 		return QDateTime();
 
-	qdropboxjson_entry e;
-	e = valueMap.value(key);
+    DropboxJsonEntry e;
+    e = _valueMap.value(key);
 
-	if(!force && e.type != QDROPBOXJSON_TYPE_STR)
+    if(!force && e.type != DROPBOXJSON_TYPE_STR)
 		return QDateTime();
 
     const QString dtFormat = "dd MMM yyyy HH:mm:ss";
@@ -499,37 +499,37 @@ QDateTime QDropboxJson::getTimestamp(QString key, bool force)
     return res;
 }
 
-void QDropboxJson::setTimestamp(QString key, QDateTime value)
+void DropboxJson::setTimestamp(QString key, QDateTime value)
 {
     const QString dtFormat = "ddd, dd MMM yyyy hh:mm:ss '+0000'";
 
     value = value.toUTC();
 
-    if(valueMap.contains(key)){
-        *(valueMap[key].value.value) = value.toString(dtFormat);
+    if(_valueMap.contains(key)){
+        *(_valueMap[key].value.value) = value.toString(dtFormat);
     }else{
-        qdropboxjson_entry e;
+        DropboxJsonEntry e;
         QString *valuePointer = new QString(QLocale{QLocale::English}.toString(value, dtFormat));
         e.value.value = valuePointer;
         e.value.value = valuePointer;
-        e.type        = QDROPBOXJSON_TYPE_STR;
-        valueMap[key] = e;
+        e.type        = DROPBOXJSON_TYPE_STR;
+        _valueMap[key] = e;
     }
 }
 
-QString QDropboxJson::strContent() const
+QString DropboxJson::strContent() const
 {
-	if(valueMap.size() == 0)
+    if(_valueMap.size() == 0)
 		return "";
 
     QString content = "{";
-	QList<QString> keys = valueMap.keys();
+    QList<QString> keys = _valueMap.keys();
 	for(int i=0; i<keys.size(); ++i)
 	{
 		QString value = "";
-		qdropboxjson_entry e = valueMap.value(keys.at(i));
+        DropboxJsonEntry e = _valueMap.value(keys.at(i));
 
-		if(e.type != QDROPBOXJSON_TYPE_JSON)
+        if(e.type != DROPBOXJSON_TYPE_JSON)
 			value = *e.value.value;
 		else
 			value = e.value.json->strContent();
@@ -542,71 +542,71 @@ QString QDropboxJson::strContent() const
 	return content;
 }
 
-void QDropboxJson::emptyList()
+void DropboxJson::emptyList()
 {
-    QList<QString> keys = valueMap.keys();
+    QList<QString> keys = _valueMap.keys();
     for(qint32 i=0; i<keys.size(); ++i)
     {
-        qdropboxjson_entry e = valueMap.value(keys.at(i));
-        if(e.type == QDROPBOXJSON_TYPE_JSON)
+        DropboxJsonEntry e = _valueMap.value(keys.at(i));
+        if(e.type == DROPBOXJSON_TYPE_JSON)
             delete e.value.json;
         else
             delete e.value.value;
-		valueMap.remove(keys.at(i));
+        _valueMap.remove(keys.at(i));
     }
-    valueMap.empty();
+    _valueMap.empty();
     return;
 }
 
-qdropboxjson_entry_type QDropboxJson::interpretType(QString value)
+DropboxJsonEntryType DropboxJson::interpretType(QString value)
 {
     // check for string
     if(value.startsWith("\"") && value.endsWith("\""))
-        return QDROPBOXJSON_TYPE_STR;
+        return DROPBOXJSON_TYPE_STR;
 
     // check for integer
     bool ok;
     value.toInt(&ok);
     if(ok)
-        return QDROPBOXJSON_TYPE_NUM;
+        return DROPBOXJSON_TYPE_NUM;
 
     // check for uint
     value.toUInt(&ok);
     if(ok)
-        return QDROPBOXJSON_TYPE_UINT;
+        return DROPBOXJSON_TYPE_UINT;
 
     // check for bool
     if(!value.compare("true") || !value.compare("false"))
-        return QDROPBOXJSON_TYPE_BOOL;
+        return DROPBOXJSON_TYPE_BOOL;
 
     // check for array
     if(value.startsWith("[") && value.endsWith("]"))
-        return QDROPBOXJSON_TYPE_ARRAY;
+        return DROPBOXJSON_TYPE_ARRAY;
 
     value.toDouble(&ok);
     if(ok)
-        return QDROPBOXJSON_TYPE_FLOAT;
+        return DROPBOXJSON_TYPE_FLOAT;
 
-    return QDROPBOXJSON_TYPE_UNKNOWN;
+    return DROPBOXJSON_TYPE_UNKNOWN;
 }
 
-QDropboxJson& QDropboxJson::operator=(QDropboxJson& other)
+DropboxJson& DropboxJson::operator=(DropboxJson& other)
 {
 	/*!< \todo use toString() */
 	parseString(other.strContent());
 	return *this;
 }
 
-QStringList QDropboxJson::getArray(QString key, bool force)
+QStringList DropboxJson::getArray(QString key, bool force)
 {
 	QStringList list;
-	if(!valueMap.contains(key))
+    if(!_valueMap.contains(key))
         return list;
 
-    qdropboxjson_entry e;
-    e = valueMap.value(key);
+    DropboxJsonEntry e;
+    e = _valueMap.value(key);
 
-    if(!force && e.type != QDROPBOXJSON_TYPE_ARRAY)
+    if(!force && e.type != DROPBOXJSON_TYPE_ARRAY)
         return list;
 
 	QString arrayStr = e.value.value->mid(1, e.value.value->length()-2);
@@ -659,11 +659,11 @@ QStringList QDropboxJson::getArray(QString key, bool force)
     return list;
 }
 
-int QDropboxJson::parseSubJson(QString strJson, int start, qdropboxjson_entry *jsonEntry)
+int DropboxJson::parseSubJson(QString strJson, int start, DropboxJsonEntry *jsonEntry)
 {
 	int openBrackets = 1;
 	QString buffer = "";
-    QDropboxJson* jsonValue = NULL;
+    DropboxJson* jsonValue = NULL;
 
 	int j;
 	for(j=start+1; openBrackets > 0 && j < strJson.size(); ++j)
@@ -675,35 +675,35 @@ int QDropboxJson::parseSubJson(QString strJson, int start, qdropboxjson_entry *j
 	}
 
 	buffer = strJson.mid(start, j-start);
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
 	qDebug() << "brackets = " << openBrackets << endl;
 	qDebug() << "json data(" << start << ":" << j-start << ") = " << buffer << endl;
 #endif
-	jsonValue = new QDropboxJson();
+    jsonValue = new DropboxJson();
 	jsonValue->parseString(buffer);
 
 	// invalid sub json means invalid json
 	if(!jsonValue->isValid())
 	{
-#ifdef QTDROPBOX_DEBUG
+#ifdef QT_DEBUG
 		qDebug() << "subjson invalid!" << endl;
 #endif
-		valid = false;
+        _valid = false;
 		return j;
 	}
 
 	// insert new
 	jsonEntry->value.json = jsonValue;
-	jsonEntry->type       = QDROPBOXJSON_TYPE_JSON;
+    jsonEntry->type       = DROPBOXJSON_TYPE_JSON;
 	return j;
 }
 
-bool QDropboxJson::isAnonymousArray()
+bool DropboxJson::isAnonymousArray()
 {
 	return _anonymousArray;
 }
 
-QStringList QDropboxJson::getArray()
+QStringList DropboxJson::getArray()
 {
 	if(!isAnonymousArray())
 		return QStringList();
@@ -711,27 +711,27 @@ QStringList QDropboxJson::getArray()
 	return getArray("_anonArray");
 }
 
-int QDropboxJson::compare(const QDropboxJson& other)
+int DropboxJson::compare(const DropboxJson& other)
 {
-	if(valueMap.size() != other.valueMap.size())
+    if(_valueMap.size() != other._valueMap.size())
 		return 1;
 
-	QMap<QString, qdropboxjson_entry> yourMap = other.valueMap;
+    QMap<QString, DropboxJsonEntry> yourMap = other._valueMap;
 
-	QList<QString> keys = valueMap.keys();
+    QList<QString> keys = _valueMap.keys();
 	for(int i=0; i<keys.size(); ++i)
 	{
 		QString key = keys.at(i);
 		if(!yourMap.contains(key))
 			return 1;
 
-		qdropboxjson_entry myEntry = valueMap.value(key);
-		qdropboxjson_entry yourEntry = yourMap.value(key);
+        DropboxJsonEntry myEntry = _valueMap.value(key);
+        DropboxJsonEntry yourEntry = yourMap.value(key);
 		
 		if(myEntry.type != yourEntry.type)
 			return 1;
 
-		if(myEntry.type == QDROPBOXJSON_TYPE_JSON)
+        if(myEntry.type == DROPBOXJSON_TYPE_JSON)
 		{
 			if(myEntry.value.json->compare(*yourEntry.value.json) != 0)
 				return 1;
