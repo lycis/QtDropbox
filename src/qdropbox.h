@@ -485,6 +485,15 @@ signals:
      */
     void operationFinished(int requestnr);
 
+	/*!
+	  When an asynchronous operation (actually any operation) that requests or transfers
+	  information from or to Dropbox is started this signal is emitted. The passed
+	  request number can be used to link operations with the operationFinished(...) signal.
+
+	  \param requestnr number of the started request.
+	*/
+	void operationStarted(int requestnr);
+
     /*!
       This signal is emitted when the function requestToken() is finished and a
       token and token scret (valid for authorization only) is received.

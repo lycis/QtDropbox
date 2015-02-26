@@ -460,6 +460,7 @@ int QDropbox::sendRequest(QUrl request, QString type, QByteArray postdata, QStri
 #ifdef QTDROPBOX_DEBUG
     qDebug() << "sendRequest() -> request #" << lastreply << " sent." << endl;
 #endif
+	emit operationStarted(lastreply); // fire signal for operation start
     return lastreply;
 }
 
