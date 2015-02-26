@@ -11,3 +11,4 @@ qtdropbox.v12.suo
 *.vcxproj
 qtdropbox.vcxproj.filters
 x64/*
+*.opensdf
