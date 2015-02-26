@@ -5,3 +5,9 @@ build-tests-Desktop_Qt_5_4_0_MSVC2013_64bit-Debug/Makefile
 *.Debug
 build-tests-Desktop_Qt_5_4_0_MSVC2013_64bit-Debug/Makefile.Release
 moc_*
+qtdropbox.sdf
+*.sln
+qtdropbox.v12.suo
+*.vcxproj
+qtdropbox.vcxproj.filters
+x64/*

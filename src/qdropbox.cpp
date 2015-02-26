@@ -185,6 +185,7 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
         qDebug() << "error " << errorState << "(" << errorText << ") in request" << endl;
 #endif
         emit errorOccured(errorState);
+		checkReleaseEventLoop(nr);
         return;
     }
 
