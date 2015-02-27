@@ -195,7 +195,7 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
 #ifdef QTDROPBOX_DEBUG
         qDebug() << "- answer to connection request ignored" << endl;
 #endif
-        requestMap.remove(nr);
+		removeRequestFromMap(nr);
         return;
     }
 
@@ -226,7 +226,7 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
             qdropbox_request redir = requestMap[nr];
             qdropbox_request orig  = requestMap[redir.linked];
             requestMap[nr] = orig;
-            requestMap.remove(nr);
+			removeRequestFromMap(nr);
             nr = redir.linked;
         }
 
@@ -306,7 +306,7 @@ void QDropbox::requestFinished(int nr, QNetworkReply *rply)
             }
         }
 
-        requestMap.remove(nr);
+		removeRequestFromMap(nr);
         emit operationFinished(nr);
     }
 
@@ -1224,3 +1224,32 @@ void QDropbox::clearError()
     return;
 }
 
+qdropbox_request QDropbox::requestInfo(int rqnr)
+{
+	qdropbox_request request{ QDROPBOX_REQ_INVALID, "", "", 0 };
+
+	if (!requestMap.contains(rqnr)) {
+		return request; // invalid request
+	}
+
+	return requestMap[rqnr];
+}
+
+void QDropbox::removeRequestFromMap(int rqnr)
+{
+	if (!saveFinishedRequests())
+	{
+		requestMap.remove(rqnr);
+	}
+	return;
+}
+
+void QDropbox::setSaveFinishedRequests(bool save)
+{
+	_saveFinishedRequests = save;
+}
+
+bool QDropbox::saveFinishedRequests()
+{
+	return _saveFinishedRequests;
+}

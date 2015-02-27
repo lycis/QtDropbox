@@ -25,6 +25,7 @@
 
 typedef int qdropbox_request_type;
 
+const qdropbox_request_type QDROPBOX_REQ_INVALID = 0x00;
 const qdropbox_request_type QDROPBOX_REQ_CONNECT = 0x01;
 const qdropbox_request_type QDROPBOX_REQ_RQTOKEN = 0x02;
 const qdropbox_request_type QDROPBOX_REQ_AULOGIN = 0x03;
@@ -457,6 +458,40 @@ public:
      */
      QDropboxDeltaResponse requestDeltaAndWait(QString cursor, QString path_prefix);
 
+	 /*!
+	   \brief Provides information about a request.
+
+	   This function can be used if you wish to obtain further information regarding a request.
+	   It provides technical information for requests so it is mostly about debugging information.
+
+	   Requesting information about a request number that does not exist will return invalid information.
+
+	   Requesting information on a request that has been finished already will return an invalid record.
+
+	   \param rqnr number of the request
+	 */
+	 qdropbox_request requestInfo(int rqnr);
+
+	 /*!
+		\brief For debugging: Save finished requests so information can be requested on them.
+
+		This function is for debugging errors. When the setting is changed to true records of already
+		finished requests to Dropbox will be saved. Usually they are deleted as soon as they are
+		processed. Saving them will allow you to use requestInfo(...) on already finished requests.
+
+		Activating this setting may have an impact about long-time performance and used memory.
+
+		Old records will not be deleted when the setting is turned off!
+
+		\param save set to true if you want to persist request information
+	 */
+	 void setSaveFinishedRequests(bool save);
+
+	 /*!
+		\brief Indicates if information about finished requests is to be persisted.
+	 */
+	 bool saveFinishedRequests();
+
 signals:
     /*!
       This signal is emitted whenever an error occurs. The error is passed
@@ -599,6 +634,10 @@ private:
 
     QDropboxAccount _account;
 
+	// indicates wether finished request shall be saved for debugging
+	// mind the possible performance impact!
+	bool _saveFinishedRequests = false;
+
     QString hmacsha1(QString key, QString baseString);
     void prepareApiUrl();
     int  sendRequest(QUrl request, QString type = "GET", QByteArray postdata = 0, QString host = "");
@@ -619,6 +658,7 @@ private:
 	void parseBlockingRevisions(QString response);
     void parseDelta(QString response);
     void parseBlockingDelta(QString response);
+	void removeRequestFromMap(int rqnr);
 };
 
 #endif // QDROPBOX_H
