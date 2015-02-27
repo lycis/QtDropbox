@@ -636,7 +636,7 @@ private:
 
 	// indicates wether finished request shall be saved for debugging
 	// mind the possible performance impact!
-	bool _saveFinishedRequests = false;
+	bool _saveFinishedRequests;
 
     QString hmacsha1(QString key, QString baseString);
     void prepareApiUrl();

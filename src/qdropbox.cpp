@@ -25,6 +25,7 @@ QDropbox::QDropbox(QObject *parent) :
     qsrand(QDateTime::currentMSecsSinceEpoch());
 
     _evLoop = NULL;
+	_saveFinishedRequests = false;
 }
 
 QDropbox::QDropbox(QString key, QString sharedSecret, OAuthMethod method, QString url, QObject *parent) :
@@ -54,6 +55,7 @@ QDropbox::QDropbox(QString key, QString sharedSecret, OAuthMethod method, QStrin
     qsrand(QDateTime::currentMSecsSinceEpoch());
 
     _evLoop = NULL;
+	_saveFinishedRequests = false;
 }
 
 QDropbox::Error QDropbox::error()
