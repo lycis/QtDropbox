@@ -9,6 +9,7 @@
 #include <QNetworkRequest>
 #include <QUrl>
 #include <QEvent>
+#include <QSharedPointer>
 
 #include "qtdropbox_global.h"
 #include "qdropboxjson.h"
