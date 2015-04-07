@@ -7,12 +7,12 @@
 QtDropbox is an API for the well known cloud storage service [Dropbox](http://www.dropbox.com).
 
 ## A bit longer
-Basically QtDropbox aims to provide an easy to use posibillity to access the REST API of
+Basically QtDropbox aims to provide an easy to use possibility to access the REST API of
 Dropbox. All HTTP calls are hidden behind the curtains of neat C++/Qt classes with nice 
 method names and specific uses.
 
 ## Different Qt versions
-The project is targetting the most recent version of Qt and thus was ported to Qt5. In the
+The project is targeting the most recent version of Qt and thus was ported to Qt5. In the
 beginning the project was developed for Qt4 and as there are some projects based on Qt4 
 out there the legacy version is still being supported.
 
@@ -21,14 +21,14 @@ this is the Qt5 version.
 
 ### Checking out legacy versions
 Legacy versions such as the one supporting Qt4 are provided in specific branches. Here is a
-short list which branch to check out for the specific legacy versions:
+short list of which branch to check out for the specific legacy versions:
 
 * Qt4.x -> qt4
 
 Mind that the branch with name `qt5` is currently an unused stub!
 
 ### Support for legacy versions
-The ongoing development focues on the `master` branch first. This means that legacy versions 
+The ongoing development focuses on the `master` branch first. This means that legacy versions 
 are usually not further improved with new features. Bugfixes will be provided though!
 
 This should not indicate that legacy versions won't receive important new features but they 
@@ -37,8 +37,8 @@ implemented in the most recent version but you need it in a legacy version (e.g.
 just open an issue.
 
 ## Development
-QtDropbox is in ongoind development so not all features provided by the Dropbox API are available
-right now. If you have some knowledge about C++ (with Qt framework and/or the Dropbox REST API you
+QtDropbox is in ongoing development so not all features provided by the Dropbox API are available
+right now. If you have some knowledge about C++ (with Qt framework and/or the Dropbox REST API) you
 are welcome to contribute to this project. For details take a look at the 
 [project webpage](http://lycis.github.com/QtDropbox/)
 
