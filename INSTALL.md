@@ -3,7 +3,7 @@
 ## Dependencies
 To build and use QtDropbox you'll need the Qt C++ Framework with
 version 4.7 or higher available for download at
-[Qt Project](http://http://qt-project.org/).
+[Qt Project](http://qt-project.org/).
 
 To generate a documentation you need to have doxygen installed.
 
@@ -35,7 +35,7 @@ necessary definitions. See _Usage_ below for details.
 
 ## Usage
 ### Using with Qt projects
-When including QtDropbox into your project your project you have to
+When including QtDropbox into your project you have to
 include the libqtdropbox.pri project definitions file. This will add
 all necessary header files to your project and link with the library.
 
