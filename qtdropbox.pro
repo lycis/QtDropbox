@@ -8,6 +8,8 @@ QT       -= gui
 
 TEMPLATE = lib
 
+CONFIG += C++11
+
 DEFINES += QTDROPBOX_LIBRARY
 #          QTDROPBOX_DEBUG
 
