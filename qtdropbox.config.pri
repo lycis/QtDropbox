@@ -1,6 +1,12 @@
 OTHER_FILES += libqtdropbox.pri
 
-target.path = lib/
+!unix {
+    target.path = lib/
+}
+
+unix {
+    target.path = /usr/lib/
+}
 
 #-------------------------------------------------
 # Documentation target
@@ -13,7 +19,14 @@ QMAKE_EXTRA_TARGETS += documentation
 #-------------------------------------------------
 package.files = libqtdropbox.pri \
                 src/*.h
-package.path = qtdropbox
+
+!unix {
+    package.path = qtdropbox
+}
+
+unix {
+    package.path = /usr/include/qtdropbox
+}
 
 #-------------------------------------------------
 # install definitions
