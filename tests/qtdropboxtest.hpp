@@ -3,6 +3,7 @@
 
 #include <QtTest>
 #include <QDesktopServices>
+#include <QThread>
 #include "qtdropbox.h"
 #include "keys.hpp"
 
