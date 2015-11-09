@@ -299,11 +299,13 @@ void QtDropboxTest::authorizeApplication(QDropbox* d)
 
     strout << "URL: " << d->authorizeLink().toString() << endl;
     QDesktopServices::openUrl(d->authorizeLink());
-    strout << "Press ENTER after you authorized the application!";
-    strout.flush();
-    strin.readLine();
+    strout << "Wait for authorized the application!";
     strout << endl;
-    d->requestAccessTokenAndWait();
+    
+    while(d->requestAccessTokenAndWait() == false)
+    {
+        QThread::msleep(1000);
+    }
 }
 
 /**
