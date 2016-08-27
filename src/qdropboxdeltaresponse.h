@@ -22,7 +22,7 @@ typedef QMap<QString, QSharedPointer<QDropboxFileInfo> > QDropboxDeltaEntryMap;
 /*!
   This structure is used to carry the (multi-part) response from a call to the delta API.
  */
-class QDropboxDeltaResponse
+class QTDROPBOXSHARED_EXPORT QDropboxDeltaResponse
 {
 public:
     //! Constructs a blank QDropboxDeltaResponse object.
